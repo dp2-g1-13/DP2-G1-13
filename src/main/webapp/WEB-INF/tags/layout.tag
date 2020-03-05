@@ -1,25 +1,25 @@
 <%@ tag trimDirectiveWhitespaces="true" %>
-<%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
 
 <%@ attribute name="pageName" required="true" %>
 <%@ attribute name="customScript" required="false" fragment="true"%>
 
 <!doctype html>
 <html>
-<petclinic:htmlHeader/>
+<flatbook:htmlHeader/>
 
 <body>
-<petclinic:bodyHeader menuName="${pageName}"/>
+<flatbook:bodyHeader menuName="${pageName}"/>
 
 <div class="container-fluid">
     <div class="container xd-container">
 
         <jsp:doBody/>
 
-        <petclinic:pivotal/>
+        <flatbook:pivotal/>
     </div>
 </div>
-<petclinic:footer/>
+<flatbook:footer/>
 <jsp:invoke fragment="customScript" />
 
 </body>
