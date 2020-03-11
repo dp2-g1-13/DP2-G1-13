@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collection;
 
 @Service
 public class DBImageService {
@@ -24,6 +25,11 @@ public class DBImageService {
     @Transactional(readOnly = true)
     public DBImage getImageById(int imageId) {
         return dbImageRepository.findById(imageId);
+    }
+
+    @Transactional(readOnly = true)
+    public Collection<DBImage> getImagesByFlatId(int flatId) {
+        return dbImageRepository.findManyByFlatId(flatId);
     }
 
     @Transactional

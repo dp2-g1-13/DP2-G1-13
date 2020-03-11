@@ -43,6 +43,7 @@ public class FlatService {
     public void saveFlat(Flat flat) throws DataAccessException {
         this.flatRepository.save(flat);
         for(DBImage image : flat.getImages()) {
+            image.setFlat(flat);
             this.dbImageRepository.save(image);
         }
     }

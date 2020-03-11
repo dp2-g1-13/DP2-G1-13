@@ -98,6 +98,8 @@ ALTER TABLE flats ADD CONSTRAINT fk_flats_address FOREIGN KEY (address_id) REFER
 CREATE TABLE images (
     id INTEGER IDENTITY PRIMARY KEY,
     binary LONGVARBINARY NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_type VARCHAR(255) NOT NULL,
     flat_id INTEGER NOT NULL
 );
 ALTER TABLE images ADD CONSTRAINT fk_images_flats FOREIGN KEY (flat_id) REFERENCES flats(id);

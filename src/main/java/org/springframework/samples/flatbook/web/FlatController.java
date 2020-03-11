@@ -1,6 +1,7 @@
 package org.springframework.samples.flatbook.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.service.DBImageService;
 import org.springframework.samples.flatbook.service.FlatService;
@@ -12,7 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.Base64;
+import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class FlatController {
@@ -41,7 +45,7 @@ public class FlatController {
     }
 
     @PostMapping(value = "/flats/new")
-    public String processCreationForm(@Valid Flat flat, @RequestParam("images") MultipartFile[] images, BindingResult result) {
+    public String processCreationForm(@Valid Flat flat, BindingResult result) {
         if(result.hasErrors()) {
            return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
         } else {
@@ -54,7 +58,10 @@ public class FlatController {
     @GetMapping(value = "/flats/{flatId}")
     public ModelAndView showFlat(@PathVariable("flatId") int flatId) {
         ModelAndView mav = new ModelAndView("flats/flatDetails");
-        mav.addObject(this.flatService.findFlatById(flatId));
+        Flat flat = this.flatService.findFlatById(flatId);
+        mav.addObject(flat);
+        Collection<DBImage> images = this.dbImageService.getImagesByFlatId(flat.getId());
+        mav.addObject("imagesEncoded", images.stream().map(x -> Base64.getEncoder().encodeToString(x.getData())).collect(Collectors.toList()));
         return mav;
     }
 
