@@ -72,9 +72,35 @@ CREATE TABLE users(
 
 CREATE TABLE authorities (
 	username varchar_ignorecase(50) NOT NULL,
-	authority varchar_ignorecase(50) NOT NULL,	
+	authority varchar_ignorecase(50) NOT NULL
 );
 ALTER TABLE authorities ADD CONSTRAINT fk_authorities_users FOREIGN KEY (username) REFERENCES users(username);
+
+CREATE TABLE addresses (
+    id INTEGER IDENTITY PRIMARY KEY,
+    address VARCHAR(255),
+    city VARCHAR(255),
+    postal_code INTEGER NOT NULL,
+    country VARCHAR(100)
+);
+
+CREATE TABLE flats (
+    id INTEGER IDENTITY PRIMARY KEY,
+    description VARCHAR(255),
+    square_meter INTEGER NOT NULL,
+    number_rooms INTEGER NOT NULL,
+    number_baths INTEGER NOT NULL,
+    available_services VARCHAR(255),
+    address_id INTEGER NOT NULL
+);
+ALTER TABLE flats ADD CONSTRAINT fk_flats_address FOREIGN KEY (address_id) REFERENCES addresses(id);
+
+CREATE TABLE images (
+    id INTEGER IDENTITY PRIMARY KEY,
+    binary LONGVARBINARY NOT NULL,
+    flat_id INTEGER NOT NULL
+);
+ALTER TABLE images ADD CONSTRAINT fk_images_flats FOREIGN KEY (flat_id) REFERENCES flats(id);
 
 CREATE UNIQUE INDEX ix_auth_username ON authorities (username,authority);
 
