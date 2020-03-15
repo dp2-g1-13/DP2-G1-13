@@ -16,9 +16,13 @@
 
 package org.springframework.samples.flatbook.model;
 
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-@MappedSuperclass
+@Entity
+@Table(name = "hosts")
 public class Host extends Person {
+
+	private String pollitaswenas;
 
 }

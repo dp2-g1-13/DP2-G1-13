@@ -19,6 +19,7 @@ package org.springframework.samples.flatbook.model;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
@@ -32,7 +33,7 @@ import javax.validation.constraints.Pattern;
  * @author Ken Krebs
  */
 @MappedSuperclass
-public class Person extends BaseEntity {
+public abstract class Person extends BaseEntity {
 
 	@Column(name = "first_name")
 	@NotBlank
@@ -57,7 +58,8 @@ public class Person extends BaseEntity {
 	@Pattern(regexp = "^[0-9]{9}$")
 	protected Integer	phoneNumber;
 
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "username")
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "username")
 	@NotNull
 	protected User		user;
 
