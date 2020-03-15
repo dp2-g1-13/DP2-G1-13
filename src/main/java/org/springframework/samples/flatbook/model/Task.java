@@ -16,8 +16,9 @@
 
 package org.springframework.samples.flatbook.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -25,13 +26,18 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
-@Table(name = "pets")
+@Getter
+@Setter
+@Table(name = "tasks")
 public class Task extends BaseEntity {
 
 	@Column(name = "title")
@@ -47,63 +53,15 @@ public class Task extends BaseEntity {
 	private TaskStatus	status;
 
 	@NotNull
-	@Temporal(TemporalType.DATE)
-	private Date		creationMoment;
+	@Column(name = "creation_date")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	private LocalDate	creationDate;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Tennant		creator;
 
-	@NotNull
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Tennant		asignates;
 
-
-	public String getTitle() {
-		return this.title;
-	}
-
-	public void setTitle(final String title) {
-		this.title = title;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
-	}
-
-	public TaskStatus getStatus() {
-		return this.status;
-	}
-
-	public void setStatus(final TaskStatus status) {
-		this.status = status;
-	}
-
-	public Date getCreationMoment() {
-		return this.creationMoment;
-	}
-
-	public void setCreationMoment(final Date creationMoment) {
-		this.creationMoment = creationMoment;
-	}
-
-	public Tennant getCreator() {
-		return this.creator;
-	}
-
-	public void setCreator(final Tennant creator) {
-		this.creator = creator;
-	}
-
-	public Tennant getAsignates() {
-		return this.asignates;
-	}
-
-	public void setAsignates(final Tennant asignates) {
-		this.asignates = asignates;
-	}
 }

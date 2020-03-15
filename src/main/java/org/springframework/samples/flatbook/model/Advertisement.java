@@ -17,12 +17,21 @@
 package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Simple business object representing a pet.
@@ -32,56 +41,33 @@ import javax.validation.constraints.NotNull;
  * @author Sam Brannen
  */
 @Entity
+@Getter
+@Setter
 @Table(name = "advertisements")
 public class Advertisement extends BaseEntity {
 
 	@Column(name = "title")
 	@NotBlank
-	private String		title;
+	private String			title;
 
 	@Column(name = "description")
 	@NotBlank
-	private String		description;
+	private String			description;
 
 	@Column(name = "requeriments")
 	@NotBlank
-	private String		requeriments;
+	private String			requeriments;
 
 	@Column(name = "creation_date")
 	@NotNull
-	private LocalDate	creationDate;
+	private LocalDate		creationDate;
 
+	@NotNull
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "flat_id")
+	private Flat			flat;
 
-	public String getTitle() {
-		return this.title;
-	}
-
-	public void setTitle(final String title) {
-		this.title = title;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
-	}
-
-	public String getRequeriments() {
-		return this.requeriments;
-	}
-
-	public void setRequeriments(final String requeriments) {
-		this.requeriments = requeriments;
-	}
-
-	public LocalDate getCreationDate() {
-		return this.creationDate;
-	}
-
-	public void setCreationDate(final LocalDate creationDate) {
-		this.creationDate = creationDate;
-	}
-
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "advertisement_id")
+	private List<Request>	requests;
 }

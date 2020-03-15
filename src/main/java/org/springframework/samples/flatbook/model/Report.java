@@ -18,9 +18,14 @@ package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -36,7 +41,17 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class Report extends BaseEntity {
 
 	@Column(name = "reason")
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private LocalDate creationDate;
+	@NotBlank
+	private String		reason;
 
+	@NotNull
+	@Column(name = "creation_date")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	private LocalDate	creationDate;
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Person		sender;
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Person		receiver;
 }

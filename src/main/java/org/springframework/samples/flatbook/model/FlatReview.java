@@ -16,8 +16,12 @@
 
 package org.springframework.samples.flatbook.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  * Simple business object representing a pet.
@@ -30,4 +34,7 @@ import javax.persistence.Table;
 @Table(name = "flat_reviews")
 public class FlatReview extends BaseEntity {
 
+	@NotNull
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Tennant creator;
 }

@@ -26,7 +26,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
+@Getter
+@Setter
 @Table(name = "requests")
 public class Request extends BaseEntity {
 
@@ -41,30 +48,7 @@ public class Request extends BaseEntity {
 
 	@NotNull
 	@Column(name = "creation_date")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private LocalDate		creationDate;
 
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
-	}
-
-	public RequestStatus getStatus() {
-		return this.status;
-	}
-
-	public void setStatus(final RequestStatus status) {
-		this.status = status;
-	}
-
-	public LocalDate getCreationDate() {
-		return this.creationDate;
-	}
-
-	public void setCreationMoment(final LocalDate creationDate) {
-		this.creationDate = creationDate;
-	}
 }
