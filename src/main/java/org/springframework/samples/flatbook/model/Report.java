@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,31 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.samples.flatbook.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * Simple domain object representing a list of veterinarians. Mostly here to be used for
- * the 'vets' {@link org.springframework.web.servlet.view.xml.MarshallingView}.
+ * Simple business object representing a pet.
  *
- * @author Arjen Poutsma
+ * @author Ken Krebs
+ * @author Juergen Hoeller
+ * @author Sam Brannen
  */
-@XmlRootElement
-public class Vets {
+@Entity
+@Table(name = "reports")
+public class Report extends BaseEntity {
 
-	private List<Vet> vets;
-
-	@XmlElement
-	public List<Vet> getVetList() {
-		if (vets == null) {
-			vets = new ArrayList<>();
-		}
-		return vets;
-	}
+	@Column(name = "reason")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	private LocalDate creationDate;
 
 }
