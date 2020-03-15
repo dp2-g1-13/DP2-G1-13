@@ -10,6 +10,7 @@
         <div class="col-md-12">
             <spring:url value="/resources/images/pets.png" htmlEscape="true" var="petsImage"/>
             <img class="img-responsive" src="${petsImage}"/>
+            <a href="/flats/new">Prueba flats</a>
         </div>
     </div>
 </flatbook:layout>
