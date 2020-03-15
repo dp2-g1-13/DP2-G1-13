@@ -61,7 +61,8 @@ public class FlatController {
         Flat flat = this.flatService.findFlatById(flatId);
         mav.addObject(flat);
         Collection<DBImage> images = this.dbImageService.getImagesByFlatId(flat.getId());
-        mav.addObject("imagesEncoded", images.stream().map(x -> Base64.getEncoder().encodeToString(x.getData())).collect(Collectors.toList()));
+        mav.addObject("images", images);
+//        mav.addObject("imagesEncoded", images.stream().map(x -> Base64.getEncoder().encodeToString(x.getData())).collect(Collectors.toList()));
         return mav;
     }
 
