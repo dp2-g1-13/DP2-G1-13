@@ -16,18 +16,23 @@
 
 package org.springframework.samples.flatbook.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
-/**
- * Simple business object representing a pet.
- *
- * @author Ken Krebs
- * @author Juergen Hoeller
- * @author Sam Brannen
- */
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
+@Getter
+@Setter
 @Table(name = "flat_reviews")
 public class FlatReview extends BaseEntity {
 
+	@NotNull
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Tennant creator;
 }

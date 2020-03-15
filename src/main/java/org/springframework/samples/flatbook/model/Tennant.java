@@ -16,11 +16,32 @@
 
 package org.springframework.samples.flatbook.model;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
+@Getter
+@Setter
 @Table(name = "tennants")
 public class Tennant extends Person {
 
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "flat_id")
+	private Flat				flat;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<Request>		requests;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<TennantReview>	reviews;
 }

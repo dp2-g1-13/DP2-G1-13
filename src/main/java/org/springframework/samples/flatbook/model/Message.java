@@ -18,13 +18,17 @@ package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Simple business object representing a pet.
@@ -34,33 +38,23 @@ import org.springframework.format.annotation.DateTimeFormat;
  * @author Sam Brannen
  */
 @Entity
+@Getter
+@Setter
 @Table(name = "messages")
-public class Message extends NamedEntity {
+public class Message extends BaseEntity {
 
-	@Column(name = "creation_date")
+	@Column(name = "creation_moment")
 	@NotNull
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private LocalDateTime	creationDate;
+	private LocalDateTime	creationMoment;
 
 	@Column(name = "body")
 	@NotBlank
 	private String			body;
 
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Person			sender;
 
-	public LocalDateTime getCreationDate() {
-		return this.creationDate;
-	}
-
-	public void setCreationDate(final LocalDateTime creationDate) {
-		this.creationDate = creationDate;
-	}
-
-	public String getBody() {
-		return this.body;
-	}
-
-	public void setBody(final String body) {
-		this.body = body;
-	}
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Person			receiver;
 
 }

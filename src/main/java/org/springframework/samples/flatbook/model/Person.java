@@ -18,22 +18,24 @@ package org.springframework.samples.flatbook.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-/**
- * Simple JavaBean domain object representing an person.
- *
- * @author Ken Krebs
- */
-@MappedSuperclass
-public abstract class Person extends BaseEntity {
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Table(name = "persons")
+@Getter
+@Setter
+public class Person extends User {
 
 	@Column(name = "first_name")
 	@NotBlank
@@ -62,54 +64,5 @@ public abstract class Person extends BaseEntity {
 	@JoinColumn(name = "username")
 	@NotNull
 	protected User		user;
-
-
-	public User getUser() {
-		return this.user;
-	}
-
-	public void setUser(final User user) {
-		this.user = user;
-	}
-
-	public String getDni() {
-		return this.dni;
-	}
-
-	public void setDni(final String dni) {
-		this.dni = dni;
-	}
-
-	public String getEmail() {
-		return this.email;
-	}
-
-	public void setEmail(final String email) {
-		this.email = email;
-	}
-
-	public Integer getPhoneNumber() {
-		return this.phoneNumber;
-	}
-
-	public void setPhoneNumber(final Integer phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
-	public String getFirstName() {
-		return this.firstName;
-	}
-
-	public void setFirstName(final String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return this.lastName;
-	}
-
-	public void setLastName(final String lastName) {
-		this.lastName = lastName;
-	}
 
 }
