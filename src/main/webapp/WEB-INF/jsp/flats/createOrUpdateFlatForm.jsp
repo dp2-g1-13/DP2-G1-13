@@ -13,7 +13,6 @@
 
     <form:form modelAttribute="flat" class="form-horizontal" id="add-flat-form" enctype="multipart/form-data">
         <div class="form-group has-feedback">
-            <flat
             <flatbook:textAreaField name="description" label="Description"/>
             <flatbook:inputField name="squareMeters" label="Square meters"/>
             <flatbook:inputField name="numberRooms" label="Number of rooms"/>

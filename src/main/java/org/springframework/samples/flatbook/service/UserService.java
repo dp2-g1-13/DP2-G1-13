@@ -1,47 +1,45 @@
-/*
- * Copyright 2002-2013 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.springframework.samples.flatbook.service;
 
+package org.springframework.samples.flatbook.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.flatbook.model.User;
+import org.springframework.samples.flatbook.model.Authorities;
+import org.springframework.samples.flatbook.model.AuthoritiesType;
+import org.springframework.samples.flatbook.model.Person;
+import org.springframework.samples.flatbook.model.SaveType;
+import org.springframework.samples.flatbook.repository.AuthoritiesRepository;
 import org.springframework.samples.flatbook.repository.UserRepository;
+import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Mostly used as a facade for all Petclinic controllers Also a placeholder
- * for @Transactional and @Cacheable annotations
- *
- * @author Michael Isvy
- */
 @Service
 public class UserService {
 
-	private UserRepository userRepository;
+	@Autowired
+	private UserRepository			userRepository;
 
 	@Autowired
-	public UserService(UserRepository userRepository) {
-		this.userRepository = userRepository;
+	private AuthoritiesRepository	authoritiesRepository;
+
+
+	@Transactional(rollbackFor = DuplicatedUsernameException.class)
+	public void saveUser(final Person user, final AuthoritiesType authority, final SaveType type) throws DataAccessException, DuplicatedUsernameException {
+		user.setEnabled(true);
+
+		if (SaveType.NEW.equals(type) && this.userRepository.findById(user.getUsername()).orElse(null) != null) {
+			throw new DuplicatedUsernameException();
+		} else if (SaveType.NEW.equals(type) && this.userRepository.findById(user.getUsername()).orElse(null) == null) {
+			this.userRepository.save(user);
+			this.authoritiesRepository.save(new Authorities(user.getUsername(), authority));
+		} else {
+			this.userRepository.save(user);
+		}
+
 	}
 
-	@Transactional
-	public void saveUser(User user) throws DataAccessException {
-		user.setEnabled(true);
-		userRepository.save(user);
+	public Person findUserById(final String username) {
+		return this.userRepository.findById(username).get();
 	}
+
 }

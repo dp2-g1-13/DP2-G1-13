@@ -35,6 +35,15 @@ import lombok.Setter;
 @Table(name = "tennants")
 public class Tennant extends Person {
 
+	public Tennant() {
+
+	}
+
+	public Tennant(final Person person) {
+		super(person);
+	}
+
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")
 	private Flat				flat;

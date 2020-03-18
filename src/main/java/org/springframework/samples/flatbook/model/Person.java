@@ -16,16 +16,11 @@
 
 package org.springframework.samples.flatbook.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import lombok.Getter;
@@ -36,6 +31,20 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Person extends User {
+
+	public Person() {
+
+	}
+
+	public Person(final Person person) {
+		super(person);
+		this.firstName = person.firstName;
+		this.lastName = person.lastName;
+		this.dni = person.dni;
+		this.email = person.email;
+		this.phoneNumber = person.phoneNumber;
+	}
+
 
 	@Column(name = "first_name")
 	@NotBlank
@@ -58,11 +67,6 @@ public class Person extends User {
 	@Column(name = "phone_number")
 	@NotBlank
 	@Pattern(regexp = "^[0-9]{9}$")
-	protected Integer	phoneNumber;
-
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "username")
-	@NotNull
-	protected User		user;
+	protected String	phoneNumber;
 
 }

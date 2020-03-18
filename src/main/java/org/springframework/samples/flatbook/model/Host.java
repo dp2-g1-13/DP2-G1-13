@@ -34,6 +34,15 @@ import lombok.Setter;
 @Table(name = "hosts")
 public class Host extends Person {
 
+	public Host() {
+
+	}
+
+	public Host(final Person person) {
+		super(person);
+	}
+
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "host_id")
 	private Set<Flat> flats;
