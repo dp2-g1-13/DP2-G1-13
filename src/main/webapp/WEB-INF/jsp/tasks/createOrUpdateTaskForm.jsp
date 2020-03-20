@@ -10,13 +10,13 @@
 <jsp:attribute name="customScript">
         <script>
             $(function () {
-                $("#creationDate").datepicker({dateFormat: 'yy/mm/dd'});
+                $("#creationDate").datepicker({dateFormat: 'dd/mm/yy'});
             });
         </script>
     </jsp:attribute>
 <jsp:body>
     <h2>
-        <c:if test="${flat['new']}">New </c:if> task
+        <c:if test="${task['new']}">New </c:if> Task
     </h2>
 
     <form:form modelAttribute="task" class="form-horizontal" id="add-task-form">

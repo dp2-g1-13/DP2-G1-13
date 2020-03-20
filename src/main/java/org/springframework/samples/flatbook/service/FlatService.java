@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.model.Flat;
+import org.springframework.samples.flatbook.model.Tennant;
 import org.springframework.samples.flatbook.repository.DBImageRepository;
 import org.springframework.samples.flatbook.repository.FlatRepository;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,11 @@ public class FlatService {
     @Transactional(readOnly = true)
     public Flat findFlatById(int flatId) throws DataAccessException {
         return this.flatRepository.findById(flatId);
+    }
+    
+    @Transactional(readOnly = true)
+    public Collection<Tennant> findTennantsById(int id) throws DataAccessException {
+    	return this.flatRepository.findTennantsById(id);
     }
 
     @Transactional(readOnly = true)

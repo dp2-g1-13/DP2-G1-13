@@ -3,16 +3,18 @@ package org.springframework.samples.flatbook.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Task;
 import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.TaskService;
+import org.springframework.samples.flatbook.service.TennantService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Map;
 
@@ -22,31 +24,32 @@ public class TaskController {
     private static final String VIEWS_TASKS_CREATE_OR_UPDATE_FORM = "tasks/createOrUpdateTaskForm";
 
     private final TaskService taskService;
+    private final TennantService tennantService;
+    private final FlatService flatService;
 
     @Autowired
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, TennantService tennantService, FlatService flatService) {
         this.taskService = taskService;
-    }
-
-    @InitBinder
-    public void setAllowedFields(WebDataBinder dataBinder) {
-        dataBinder.setDisallowedFields("id");
+        this.tennantService = tennantService;
+        this.flatService = flatService;
     }
 
     @GetMapping(value = "/tasks/new")
-    public String initCreationForm(Map<String, Object> model, final Tennant tennant) {
-        Task task = new Task();
-        Collection<Tennant> asignees = this.taskService.findAsigneesByTennantId(tennant.getId());
-        model.put("asignees", asignees.stream().map(x -> x.getFirstName()));
+    public String initCreationForm(Map<String, Object> model, Principal principal) {
+    	Task task = new Task();
+    	Tennant tennant = tennantService.findTennantById(principal.getName());
+        Collection<Tennant> asignees = this.flatService.findTennantsById(tennant.getFlat().getId());
+        model.put("asignees", asignees);
         model.put("task", task);
         return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
     }
 
     @PostMapping(value = "/tasks/new")
-    public String processCreationForm(@Valid Task task, final Tennant tennant, BindingResult result) {
+    public String processCreationForm(@Valid Task task, BindingResult result, Principal principal) {
         if(result.hasErrors()) {
            return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
         } else {
+        	Tennant tennant = tennantService.findTennantById(principal.getName());
         	task.setCreator(tennant);
             this.taskService.saveTask(task);
             return "redirect:/tasks/" + task.getId();
