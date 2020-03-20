@@ -1,8 +1,11 @@
 package org.springframework.samples.flatbook.service;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Task;
+import org.springframework.samples.flatbook.model.Tennant;
 import org.springframework.samples.flatbook.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,11 @@ public class TaskService {
     @Transactional(readOnly = true)
     public Task findTaskById(int taskId) throws DataAccessException {
         return this.taskRepository.findById(taskId);
+    }
+    
+    @Transactional(readOnly = true)
+    public Collection<Tennant> findAsigneesByTennantId(int taskId) throws DataAccessException {
+    	return this.taskRepository.findAsigneesByTennantId(taskId);
     }
     
     @Transactional
