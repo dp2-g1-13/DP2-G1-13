@@ -48,6 +48,7 @@ public class Task extends BaseEntity {
 	@NotBlank
 	private String		description;
 
+	@Column(name = "status")
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	private TaskStatus	status;

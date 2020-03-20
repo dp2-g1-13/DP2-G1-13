@@ -19,7 +19,8 @@ package org.springframework.samples.flatbook.model;
 import java.time.LocalDate;
 
 import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,14 +28,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Simple business object representing a pet.
- *
- * @author Ken Krebs
- * @author Juergen Hoeller
- * @author Sam Brannen
- */
-@MappedSuperclass
+@Entity
+@Table(name = "review")
 @Getter
 @Setter
 public class Review extends BaseEntity {

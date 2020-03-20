@@ -2,6 +2,7 @@
 package org.springframework.samples.flatbook.model;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -28,41 +29,41 @@ public class Flat extends BaseEntity {
 	@Column(name = "description")
 	@NotBlank
 	@Size(min = 30)
-	private String					description;
+	private String				description;
 
 	@Column(name = "square_meters")
 	@NotNull
 	@Positive
-	private Integer					squareMeters;
+	private Integer				squareMeters;
 
 	@Column(name = "number_rooms")
 	@NotNull
 	@Positive
-	private Integer					numberRooms;
+	private Integer				numberRooms;
 
 	@Column(name = "number_baths")
 	@NotNull
 	@Positive
-	private Integer					numberBaths;
+	private Integer				numberBaths;
 
 	@Column(name = "available_services")
 	@NotBlank
-	private String					availableServices;
+	private String				availableServices;
 
 	@NotNull
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "flat", fetch = FetchType.EAGER)
-	private Collection<DBImage>		images;
+	private Collection<DBImage>	images;
 
 	@NotNull
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "address_id")
-	private Address					address;
+	private Address				address;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")
-	private Collection<FlatReview>	flatReviews;
+	private Set<FlatReview>		flatReviews;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "flat")
-	private Collection<Tennant>		tennants;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "flat")
+	private Set<Tennant>		tennants;
 
 }
