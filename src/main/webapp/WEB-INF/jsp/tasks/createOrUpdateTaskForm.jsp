@@ -7,13 +7,6 @@
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
 
 <flatbook:layout pageName="tasks">
-<jsp:attribute name="customScript">
-        <script>
-            $(function () {
-                $("#creationDate").datepicker({dateFormat: 'dd/mm/yy'});
-            });
-        </script>
-    </jsp:attribute>
 <jsp:body>
     <h2>
         <c:if test="${task['new']}">New </c:if> Task
@@ -21,11 +14,13 @@
 
     <form:form modelAttribute="task" class="form-horizontal" id="add-task-form">
         <div class="form-group has-feedback">
+        	<flatbook:hidden name="id"/>
+            <flatbook:hidden name="creator"/>
+            <flatbook:hidden name="creationDate"/>
+            <flatbook:hidden name="status"/>
             <flatbook:inputField name="title" label="Title"/>
             <flatbook:textAreaField name="description" label="Description"/>
-            <input type="hidden" name="status" value="To Do"/>
-            <flatbook:inputField name="creationDate" label="Creation date"/>
-            <flatbook:selectField name="asignees" label="Asignees" names="${asignees}" size="4"/>
+            <flatbook:selectField name="asignee" label="Asignee" names="${roommates}" size="4"/>
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">

@@ -63,6 +63,6 @@ public class Task extends BaseEntity {
 	private Tennant		creator;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	private Tennant		asignees;
+	private Tennant		asignee;
 
 }

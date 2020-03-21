@@ -6,7 +6,6 @@ public enum TaskStatus {
 
 	private final String type;
 
-
 	private TaskStatus(final String type) {
 		this.type = type;
 	}
@@ -14,4 +13,10 @@ public enum TaskStatus {
 	public String getType() {
 		return this.type;
 	}
+	
+	@Override
+	public String toString() {
+		return this.type;
+	}
+	
 }
