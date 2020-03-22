@@ -23,6 +23,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
+import org.springframework.samples.flatbook.model.mappers.PersonForm;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,13 +38,15 @@ public class Person extends User {
 
 	}
 
-	public Person(final Person person) {
-		super(person);
-		this.firstName = person.firstName;
-		this.lastName = person.lastName;
-		this.dni = person.dni;
-		this.email = person.email;
-		this.phoneNumber = person.phoneNumber;
+	public Person(final PersonForm person) {
+		this.username = person.getUsername();
+		this.password = person.getPassword();
+		this.enabled = true;
+		this.firstName = person.getFirstName();
+		this.lastName = person.getLastName();
+		this.dni = person.getDni();
+		this.email = person.getEmail();
+		this.phoneNumber = person.getPhoneNumber();
 	}
 
 
@@ -54,17 +58,17 @@ public class Person extends User {
 	@NotBlank
 	protected String	lastName;
 
-	@Column(name = "dni")
+	@Column(name = "dni", unique = true)
 	@Pattern(regexp = "^[0-9]{8}[A-Z]$")
 	@NotBlank
 	protected String	dni;
 
-	@Column(name = "email")
+	@Column(name = "email", unique = true)
 	@NotBlank
 	@Email
 	protected String	email;
 
-	@Column(name = "phone_number")
+	@Column(name = "phone_number", unique = true)
 	@NotBlank
 	@Pattern(regexp = "^[0-9]{9}$")
 	protected String	phoneNumber;

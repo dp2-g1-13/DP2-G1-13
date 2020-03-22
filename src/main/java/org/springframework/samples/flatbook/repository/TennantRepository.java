@@ -1,9 +1,16 @@
 
 package org.springframework.samples.flatbook.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.Collection;
+
+import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Tennant;
 
-public interface TennantRepository extends CrudRepository<Tennant, String> {
+public interface TennantRepository {
 
+	Collection<Tennant> findAll() throws DataAccessException;
+
+	Tennant findByUsername(String username) throws DataAccessException;
+
+	void save(Tennant tennant) throws DataAccessException;
 }

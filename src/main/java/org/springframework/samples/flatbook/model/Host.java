@@ -25,6 +25,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.springframework.samples.flatbook.model.mappers.PersonForm;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,7 +40,7 @@ public class Host extends Person {
 
 	}
 
-	public Host(final Person person) {
+	public Host(final PersonForm person) {
 		super(person);
 	}
 

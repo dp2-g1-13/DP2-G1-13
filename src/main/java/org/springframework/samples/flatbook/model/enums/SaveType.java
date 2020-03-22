@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.model;
+package org.springframework.samples.flatbook.model.enums;
 
 public enum SaveType {
 	EDIT("edit"), NEW("new");
