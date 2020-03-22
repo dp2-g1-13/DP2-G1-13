@@ -26,6 +26,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.springframework.samples.flatbook.model.mappers.PersonForm;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,6 +36,15 @@ import lombok.Setter;
 @Setter
 @Table(name = "tennants")
 public class Tennant extends Person {
+
+	public Tennant() {
+
+	}
+
+	public Tennant(final PersonForm person) {
+		super(person);
+	}
+
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")

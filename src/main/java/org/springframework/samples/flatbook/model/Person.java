@@ -16,17 +16,14 @@
 
 package org.springframework.samples.flatbook.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+
+import org.springframework.samples.flatbook.model.mappers.PersonForm;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -37,6 +34,22 @@ import lombok.Setter;
 @Setter
 public class Person extends User {
 
+	public Person() {
+
+	}
+
+	public Person(final PersonForm person) {
+		this.username = person.getUsername();
+		this.password = person.getPassword();
+		this.enabled = true;
+		this.firstName = person.getFirstName();
+		this.lastName = person.getLastName();
+		this.dni = person.getDni();
+		this.email = person.getEmail();
+		this.phoneNumber = person.getPhoneNumber();
+	}
+
+
 	@Column(name = "first_name")
 	@NotBlank
 	protected String	firstName;
@@ -45,24 +58,19 @@ public class Person extends User {
 	@NotBlank
 	protected String	lastName;
 
-	@Column(name = "dni")
+	@Column(name = "dni", unique = true)
 	@Pattern(regexp = "^[0-9]{8}[A-Z]$")
 	@NotBlank
 	protected String	dni;
 
-	@Column(name = "email")
+	@Column(name = "email", unique = true)
 	@NotBlank
 	@Email
 	protected String	email;
 
-	@Column(name = "phone_number")
+	@Column(name = "phone_number", unique = true)
 	@NotBlank
 	@Pattern(regexp = "^[0-9]{9}$")
-	protected Integer	phoneNumber;
-
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "username")
-	@NotNull
-	protected User		user;
+	protected String	phoneNumber;
 
 }

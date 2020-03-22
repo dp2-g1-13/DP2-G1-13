@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.model;
+package org.springframework.samples.flatbook.model.enums;
 
 public enum RequestStatus {
 	ACCEPTED("Accepted"), PENDING("Pending"), REJECTED("Rejected");
@@ -11,7 +11,8 @@ public enum RequestStatus {
 		this.type = type;
 	}
 
-	public String getType() {
+	@Override
+	public String toString() {
 		return this.type;
 	}
 }

@@ -25,6 +25,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.springframework.samples.flatbook.model.mappers.PersonForm;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,6 +35,15 @@ import lombok.Setter;
 @Setter
 @Table(name = "hosts")
 public class Host extends Person {
+
+	public Host() {
+
+	}
+
+	public Host(final PersonForm person) {
+		super(person);
+	}
+
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "host_id")
