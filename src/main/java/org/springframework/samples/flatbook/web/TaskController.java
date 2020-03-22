@@ -10,6 +10,7 @@ import org.springframework.samples.flatbook.service.TennantService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,6 +35,11 @@ public class TaskController {
         this.taskService = taskService;
         this.tennantService = tennantService;
         this.flatService = flatService;
+    }
+    
+    @InitBinder
+    public void setAllowedFields(WebDataBinder dataBinder) {
+        dataBinder.setDisallowedFields("id");
     }
 
     @ModelAttribute("roommates")
