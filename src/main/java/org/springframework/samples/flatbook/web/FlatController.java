@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -53,6 +54,40 @@ public class FlatController {
 
             return "redirect:/flats/" + flat.getId();
         }
+    }
+
+    @GetMapping(value = "/flats/{flatId}/edit")
+    public String initEditForm(@PathVariable("flatId") int flatId, Map<String, Object> model) {
+        Flat flat = this.flatService.findFlatById(flatId);
+        model.put("flat", flat);
+        model.put("images", flat.getImages());
+        return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+    }
+
+    @PostMapping(value = "/flats/{flatId}/edit")
+    public String processEditForm(@Valid Flat flat, @PathVariable("flatId") int flatId, BindingResult result) {
+        if(result.hasErrors()) {
+            return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+        } else {
+            Set<DBImage> images = this.flatService.findFlatById(flatId).getImages();
+            images.addAll(flat.getImages());
+            flat.setImages(images);
+            flat.setId(flatId);
+            this.flatService.saveFlat(flat);
+
+            return "redirect:/flats/" + flat.getId();
+        }
+    }
+
+    @GetMapping(value = "/flats/{flatId}/images/{imageId}/delete")
+    public String processDeleteImage(@PathVariable("flatId") int flatId, @PathVariable("imageId") int imageId, Map<String, Object> model) {
+        Flat flat = this.flatService.findFlatById(flatId);
+        DBImage image = this.dbImageService.getImageById(imageId);
+        flat.deleteImage(image);
+        this.dbImageService.deleteImage(image);
+        model.put("flat", flat);
+        model.put("images", flat.getImages());
+        return "redirect:/flats/" + flat.getId() + "/edit";
     }
 
     @GetMapping(value = "/flats/{flatId}")

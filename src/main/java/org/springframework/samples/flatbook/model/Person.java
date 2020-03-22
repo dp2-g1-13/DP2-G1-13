@@ -63,7 +63,7 @@ public class Person extends BaseEntity {
 	@Column(name = "phone_number")
 	@NotBlank
 	@Pattern(regexp = "^[0-9]{9}$")
-	protected Integer	phoneNumber;
+	protected String	phoneNumber;
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "username")

@@ -3,7 +3,7 @@ package org.springframework.samples.flatbook.repository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.DBImage;
 
-import java.util.Collection;
+import java.util.Set;
 
 /**
  * Repository class for all DBImage domain objects
@@ -23,5 +23,7 @@ public interface DBImageRepository {
      */
     void save(DBImage image) throws DataAccessException;
 
-    Collection<DBImage> findManyByFlatId(int id) throws DataAccessException;
+    void delete(DBImage image) throws DataAccessException;
+
+    Set<DBImage> findManyByFlatId(int id) throws DataAccessException;
 }

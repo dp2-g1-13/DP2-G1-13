@@ -33,11 +33,6 @@ public class DBImage extends BaseEntity {
 	@Column(name = "data")
 	private byte[]	data;
 
-	@ManyToOne
-	@JoinColumn(name = "flat_id")
-	private Flat	flat;
-
-
 	public DBImage() {
 	}
 

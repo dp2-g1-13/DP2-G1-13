@@ -1,7 +1,7 @@
 
 package org.springframework.samples.flatbook.model;
 
-import java.util.Collection;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -49,20 +50,30 @@ public class Flat extends BaseEntity {
 	@NotBlank
 	private String					availableServices;
 
+	@Valid
 	@NotNull
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "flat", fetch = FetchType.EAGER)
-	private Collection<DBImage>		images;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<DBImage>		images;
 
+	@Valid
 	@NotNull
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "address_id")
 	private Address					address;
 
+	@Valid
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "flat_id")
-	private Collection<FlatReview>	flatReviews;
+	private Set<FlatReview>	flatReviews;
 
+	@Valid
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "flat")
-	private Collection<Tennant>		tennants;
+	private Set<Tennant>		tenants;
+
+	public void deleteImage(DBImage image) {
+	    if(image != null) {
+	        this.images.remove(image);
+        }
+    }
 
 }

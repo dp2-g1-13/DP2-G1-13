@@ -29,6 +29,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -54,20 +55,35 @@ public class Advertisement extends BaseEntity {
 	@NotBlank
 	private String			description;
 
-	@Column(name = "requeriments")
+	@Column(name = "requirements")
 	@NotBlank
-	private String			requeriments;
+	private String			requirements;
 
 	@Column(name = "creation_date")
-	@NotNull
+    @NotNull
 	private LocalDate		creationDate;
 
+	@Column(name = "price_per_month")
+    @Positive
+    @NotNull
+    private Double pricePerMonth;
+
 	@NotNull
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")
 	private Flat			flat;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "advertisement_id")
 	private List<Request>	requests;
+
+	public Advertisement() {}
+
+	public Advertisement(FormAdvertisement adv) {
+	    this.title = adv.getTitle();
+	    this.description = adv.getDescription();
+	    this.requirements = adv.getRequirements();
+	    this.creationDate = LocalDate.now();
+	    this.pricePerMonth =  adv.getPricePerMonth();
+    }
 }
