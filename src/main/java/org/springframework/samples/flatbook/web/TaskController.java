@@ -2,8 +2,8 @@ package org.springframework.samples.flatbook.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Task;
-import org.springframework.samples.flatbook.model.TaskStatus;
 import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.enums.TaskStatus;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.TaskService;
 import org.springframework.samples.flatbook.service.TennantService;
@@ -69,36 +69,49 @@ public class TaskController {
     }
 
     @GetMapping(value = "/tasks/{taskId}")
-    public ModelAndView showTask(@PathVariable("taskId") int taskId) {
-    	ModelAndView mav = new ModelAndView("tasks/taskDetails");
-		mav.addObject(this.taskService.findTaskById(taskId));
-		return mav;
+    public ModelAndView showTask(@PathVariable("taskId") int taskId, Principal principal, @ModelAttribute("roommates") Collection<Tennant> roommates) {
+    	Task task = this.taskService.findTaskById(taskId);
+    	Tennant logged = this.tennantService.findTennantById(principal.getName());
+    	if (task != null && roommates.contains(logged)) {
+    		ModelAndView mav = new ModelAndView("tasks/taskDetails");
+    		mav.addObject(this.taskService.findTaskById(taskId));
+    		return mav;
+		} else {
+			throw new IllegalArgumentException("Bad task id or you can not see the task.");
+		}
     }
     
     @GetMapping(value = "/tasks/{taskId}/remove")
-	public String processTaskRemoval(@PathVariable("taskId") final int taskId) {
+	public String processTaskRemoval(@PathVariable("taskId") final int taskId, Principal principal) {
     	Task task = this.taskService.findTaskById(taskId);
-		if (task != null) {
+    	Tennant creator = this.tennantService.findTennantById(principal.getName());
+		if (task != null && creator.equals(task.getCreator())) {
 			this.taskService.deleteTaskById(taskId);
 			return "redirect:/";
 		} else {
-			throw new IllegalArgumentException("Bad task id");
+			throw new IllegalArgumentException("Bad task id or you are not the creator of the task.");
 		}
 	}
     
     @GetMapping(value = "/tasks/{taskId}/edit")
-	public String initUpdateForm(@PathVariable("taskId") final int taskId, final ModelMap model) {
+	public String initUpdateForm(@PathVariable("taskId") final int taskId, final ModelMap model, Principal principal) {
 		Task task = this.taskService.findTaskById(taskId);
-		model.put("task", task);
-		return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
+    	Tennant creator = this.tennantService.findTennantById(principal.getName());
+		if (task != null && creator.equals(task.getCreator())) {
+			model.put("task", task);
+			return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
+		} else {
+			throw new IllegalArgumentException("Bad task id or you are not the creator of the task.");
+		}
 	}
 
 	@PostMapping(value = "/tasks/{taskId}/edit")
-	public String processUpdateForm(@Valid final Task task, final BindingResult result, final ModelMap model) {
+	public String processUpdateForm(@Valid final Task task, @PathVariable("taskId") final int taskId, final BindingResult result, final ModelMap model) {
 		if (result.hasErrors()) {
 			model.put("task", task);
 			return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
 		} else {
+			task.setId(taskId);
 			this.taskService.saveTask(task);
 			return "redirect:/";
 		}

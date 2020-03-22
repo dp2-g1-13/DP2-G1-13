@@ -1,4 +1,3 @@
-
 package org.springframework.samples.flatbook.model.enums;
 
 public enum TaskStatus {
@@ -8,11 +7,6 @@ public enum TaskStatus {
 
 	private TaskStatus(final String type) {
 		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return this.type;
 	}
 	
 	@Override

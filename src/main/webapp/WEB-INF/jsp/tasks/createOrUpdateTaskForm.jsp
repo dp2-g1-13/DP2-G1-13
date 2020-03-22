@@ -14,13 +14,12 @@
 
     <form:form modelAttribute="task" class="form-horizontal" id="add-task-form">
         <div class="form-group has-feedback">
-        	<flatbook:hidden name="id"/>
+        	<flatbook:inputField name="title" label="Title"/>
+        	<flatbook:textAreaField name="description" label="Description"/>
+        	<flatbook:selectField name="asignee" label="Asignee" names="${roommates}" size="4"/>
+        	<flatbook:hidden name="creationDate"/>
+        	<flatbook:hidden name="status"/>
             <flatbook:hidden name="creator"/>
-            <flatbook:hidden name="creationDate"/>
-            <flatbook:hidden name="status"/>
-            <flatbook:inputField name="title" label="Title"/>
-            <flatbook:textAreaField name="description" label="Description"/>
-            <flatbook:selectField name="asignee" label="Asignee" names="${roommates}" size="4"/>
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
