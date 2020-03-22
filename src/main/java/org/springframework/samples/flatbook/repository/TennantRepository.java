@@ -6,10 +6,11 @@ import java.util.Collection;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Tennant;
 
-public interface TennantRepository{
+public interface TennantRepository {
 
 	Collection<Tennant> findAll() throws DataAccessException;
-	
+
 	Tennant findByUsername(String username) throws DataAccessException;
-	
+
+	void save(Tennant tennant) throws DataAccessException;
 }

@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
+
 import lombok.Data;
 
 @Data

@@ -26,6 +26,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.springframework.samples.flatbook.model.mappers.PersonForm;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,7 +41,7 @@ public class Tennant extends Person {
 
 	}
 
-	public Tennant(final Person person) {
+	public Tennant(final PersonForm person) {
 		super(person);
 	}
 

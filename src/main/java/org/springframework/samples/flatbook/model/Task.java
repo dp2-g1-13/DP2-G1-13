@@ -30,6 +30,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.samples.flatbook.model.enums.TaskStatus;
 
 import lombok.Getter;
 import lombok.Setter;

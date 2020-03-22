@@ -2,7 +2,7 @@
 package org.springframework.samples.flatbook.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.flatbook.model.AuthoritiesType;
+import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.repository.AuthoritiesRepository;
 import org.springframework.stereotype.Service;
 

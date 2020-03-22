@@ -47,13 +47,9 @@
 			<ul class="nav navbar-nav navbar-right">
 				<sec:authorize access="!isAuthenticated()">
 					<li><a href="<c:url value="/login" />">Login</a></li>
-					<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> <span
-							class="glyphicon glyphicon-user"></span>  Register <span class="glyphicon glyphicon-chevron-down"></span>
+					<li class="dropdown"><a href="/users/new" > <span
+							class="glyphicon glyphicon-user"></span>  Register
 					</a>
-						<ul class="dropdown-menu">
-							<li><a href="<c:url value="/users/tennants/new" />">Become a Tennant</a></li>
-							<li><a href="<c:url value="/users/hosts/new" />">Become a Host</a></li>
-						</ul></li>
 				</sec:authorize>
 				<sec:authorize access="isAuthenticated()">
 					<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> <span
@@ -88,7 +84,7 @@
 										<div class="col-lg-12">
 											<p>
 												<a href="/users/<sec:authentication property="name"/>/edit" class="btn btn-primary btn-block">My Profile</a> 
-												<a href="#"	class="btn btn-danger btn-block">Change Password</a>
+												<a href="/users/<sec:authentication property="name"/>/editPassword"	class="btn btn-danger btn-block">Change Password</a>
 											</p>
 										</div>
 									</div>

@@ -15,17 +15,6 @@ import lombok.Data;
 @Table(name = "users")
 public class User {
 
-	public User() {
-
-	}
-
-	public User(final User user) {
-		this.username = user.username;
-		this.enabled = user.enabled;
-		this.password = user.password;
-	}
-
-
 	@Id
 	@NotBlank
 	@Size(min = 5, max = 20)

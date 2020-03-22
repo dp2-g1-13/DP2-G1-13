@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.model;
+package org.springframework.samples.flatbook.model.enums;
 
 public enum TaskStatus {
 	TODO("To Do"), INPROGRESS("In Progress"), DONE("Done");
@@ -10,7 +10,8 @@ public enum TaskStatus {
 		this.type = type;
 	}
 
-	public String getType() {
+	@Override
+	public String toString() {
 		return this.type;
 	}
 	
