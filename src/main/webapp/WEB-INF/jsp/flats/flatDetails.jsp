@@ -5,6 +5,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <flatbook:layout pageName="flats">
 
@@ -55,22 +56,29 @@
             </tr>
             </table>
         </div>
-        <div class="row">
-            <div class="col-md-1">
-                <spring:url value="/flats/{flatId}/edit" var="flatUrl">
-                    <spring:param name="flatId" value="${flat.id}"/>
-                </spring:url>
-                <a role="button" href="${fn:escapeXml(flatUrl)}" class="btn btn-default" aria-pressed="true">Edit flat</a>
-            </div>
-            <div class="col-md-1">
-                <spring:url value="/flats/{flatId}/advertisements/new" var="advertisementUrl">
-                    <spring:param name="flatId" value="${flat.id}"/>
-                </spring:url>
-                <a role="button" href="${fn:escapeXml(advertisementUrl)}" class="btn btn-default" aria-pressed="true">Publish an ad</a>
-            </div>
-        </div>
 
-        <br>
+        <sec:authorize access="isAuthenticated()">
+            <sec:authentication var="user" property="principal.username" />
+            <c:if test="${user == host}">
+                <div class="row">
+                    <div class="col-md-1">
+                        <spring:url value="/flats/{flatId}/edit" var="flatUrl">
+                            <spring:param name="flatId" value="${flat.id}"/>
+                        </spring:url>
+                        <a role="button" href="${fn:escapeXml(flatUrl)}" class="btn btn-default" aria-pressed="true">Edit flat</a>
+                    </div>
+                    <c:if test="${!existAd}">
+                        <div class="col-md-1">
+                            <spring:url value="/flats/{flatId}/advertisements/new" var="advertisementUrl">
+                                <spring:param name="flatId" value="${flat.id}"/>
+                            </spring:url>
+                            <a role="button" href="${fn:escapeXml(advertisementUrl)}" class="btn btn-default" aria-pressed="true">Publish an ad</a>
+                    </div>
+                    </c:if>
+                </div>
+                <br>
+            </c:if>
+        </sec:authorize>
 
         <c:if test="${images.size() > 0}">
         <div class="row">

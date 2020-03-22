@@ -12,5 +12,7 @@ public interface HostRepository {
 
 	Host findByUsername(String username) throws DataAccessException;
 
+	Host findByFlatId(int flatId) throws DataAccessException;
+
 	void save(Host host) throws DataAccessException;
 }

@@ -2,6 +2,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <flatbook:layout pageName="advertisements">
     <div class="container">
@@ -9,24 +10,31 @@
             <h2>Flat in <c:out value="${advertisement.flat.address.city}"/>: <c:out value="${advertisement.title}"/></h2>
         </div>
 
-        <div class="row" align="center">
-            <div class="col-md-4">
-                <button type="button" href="#" class="btn btn-primary">Make a request!</button>
-            </div>
-            <div class="col-md-4">
-                <spring:url value="/advertisements/{advId}/edit" var="advertisementEditUrl">
-                    <spring:param name="advId" value="${advertisement.id}"/>
-                </spring:url>
-                <a role="button" href="${fn:escapeXml(advertisementEditUrl)}" class="btn btn-default" aria-pressed="true">Edit advertisement</a>
-            </div>
-            <div class="col-md-4">
-                <spring:url value="/advertisements/{advId}/delete" var="advertisementDeleteUrl">
-                    <spring:param name="advId" value="${advertisement.id}"/>
-                </spring:url>
-                <a role="button" href="${fn:escapeXml(advertisementDeleteUrl)}" class="btn btn-danger" aria-pressed="true">Delete advertisement</a>
-            </div>
-        </div>
+        <sec:authorize access="isAuthenticated()">
+            <sec:authentication property="principal" var="user"/>
+            <div class="row" align="center">
+                <sec:authorize access="hasAnyAuthority('TENNANT')">
+                    <div class="col-md-1">
+                        <button type="button" href="#" class="btn btn-primary">Make a request!</button>
+                    </div>
+                </sec:authorize>
+                <c:if test="${user.username == host}">
+                <div class="col-md-6">
+                    <spring:url value="/advertisements/{advId}/edit" var="advertisementEditUrl">
+                        <spring:param name="advId" value="${advertisement.id}"/>
+                    </spring:url>
+                    <a role="button" href="${fn:escapeXml(advertisementEditUrl)}" class="btn btn-default" aria-pressed="true">Edit advertisement</a>
+                </div>
+                <div class="col-md-6">
+                    <spring:url value="/advertisements/{advId}/delete" var="advertisementDeleteUrl">
+                        <spring:param name="advId" value="${advertisement.id}"/>
+                    </spring:url>
+                    <a role="button" href="${fn:escapeXml(advertisementDeleteUrl)}" class="btn btn-danger" aria-pressed="true">Delete advertisement</a>
+                </div>
+                </c:if>
 
+            </div>
+        </sec:authorize>
         <br><br>
 
         <div class="row">

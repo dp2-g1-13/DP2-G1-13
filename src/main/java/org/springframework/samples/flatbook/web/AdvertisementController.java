@@ -5,7 +5,11 @@ import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.DBImageService;
 import org.springframework.samples.flatbook.service.FlatService;
+import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.exceptions.NotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -28,12 +32,14 @@ public class AdvertisementController {
     private AdvertisementService advertisementService;
     private FlatService flatService;
     private DBImageService dbImageService;
+    private HostService hostService;
 
     @Autowired
-    public AdvertisementController(AdvertisementService advertisementService, DBImageService dbImageService, FlatService flatService) {
+    public AdvertisementController(AdvertisementService advertisementService, DBImageService dbImageService, FlatService flatService, HostService hostService) {
         this.advertisementService = advertisementService;
         this.dbImageService = dbImageService;
         this.flatService = flatService;
+        this.hostService = hostService;
     }
 
     @InitBinder
@@ -44,8 +50,8 @@ public class AdvertisementController {
     @GetMapping(value = "/flats/{flatId}/advertisements/new")
     public String initCreationForm(@PathVariable("flatId") int flatId, Map<String, Object> model) {
         Flat flat = this.flatService.findFlatById(flatId);
-        if(flat == null) {
-            NotFoundException ex = new NotFoundException("Flat not found with id: " + flatId);
+        if(flat == null || !validateHost(flatId) || this.advertisementService.isAdvertisementWithFlatId(flat.getId())) {
+            RuntimeException ex = new RuntimeException("Illegal access");
             model.put("exception", ex);
             return "exception";
         }
@@ -60,8 +66,8 @@ public class AdvertisementController {
             return VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
         } else {
             Flat flat = this.flatService.findFlatById(flatId);
-            if(flat == null) {
-                NotFoundException ex = new NotFoundException("Flat not found with id: " + flatId);
+            if(flat == null || !validateHost(flatId) || this.advertisementService.isAdvertisementWithFlatId(flat.getId())) {
+                RuntimeException ex = new RuntimeException("Illegal access");
                 model.put("exception", ex);
                 return "exception";
             }
@@ -75,8 +81,8 @@ public class AdvertisementController {
     @GetMapping(value = "/advertisements/{advertisementId}/edit")
     public String initEditForm(@PathVariable("advertisementId") int advertisementId, Map<String, Object> model) {
         Advertisement adv = this.advertisementService.findAdvertisementById(advertisementId);
-        if(adv == null) {
-            NotFoundException ex = new NotFoundException("Advertisement not found with id: " + advertisementId);
+        if(adv == null || !validateHost(adv.getFlat().getId())) {
+            RuntimeException ex = new RuntimeException("Illegal access");
             model.put("exception", ex);
             return "exception";
         }
@@ -91,8 +97,8 @@ public class AdvertisementController {
             return VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
         } else {
             Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
-            if(advertisement == null) {
-                NotFoundException ex = new NotFoundException("Advertisement not found with id: " + advertisementId);
+            if(advertisement == null || !validateHost(advertisement.getFlat().getId())) {
+                RuntimeException ex = new RuntimeException("Illegal access");
                 model.put("exception", ex);
                 return "exception";
             }
@@ -109,8 +115,8 @@ public class AdvertisementController {
     @GetMapping(value = "/advertisements/{advertisementId}/delete")
     public String processDeleteAdvertisement(@PathVariable("advertisementId") int advertisementId, Map<String, Object> model) {
         Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
-        if(advertisement == null) {
-            NotFoundException ex = new NotFoundException("Advertisement not found with id: " + advertisementId);
+        if(advertisement == null || !validateHost(advertisement.getFlat().getId())) {
+            RuntimeException ex = new RuntimeException("Illegal access");
             model.put("exception", ex);
             return "exception";
         }
@@ -125,6 +131,8 @@ public class AdvertisementController {
         mav.addObject(advertisement);
         Collection<DBImage> images = this.dbImageService.getImagesByFlatId(advertisement.getFlat().getId());
         mav.addObject("images", images);
+        String hostUsername = this.hostService.findHostByFlatId(advertisement.getFlat().getId()).getUsername();
+        mav.addObject("host", hostUsername);
         return mav;
     }
 
@@ -159,5 +167,15 @@ public class AdvertisementController {
         }
     }
 
+    public Boolean validateHost(int flatId) {
+        Boolean userIsHost = true;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("admin"))) {
+            String username = ((User)auth.getPrincipal()).getUsername();
+            String hostUsername = this.hostService.findHostByFlatId(flatId).getUsername();
+            userIsHost = username.equals(hostUsername);
+        }
+        return userIsHost;
+    }
 
 }

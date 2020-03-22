@@ -12,22 +12,26 @@ import java.util.Set;
 public interface SpringDataAdvertisementRepository extends AdvertisementRepository, Repository<Advertisement, Integer> {
 
     @Override
-    @Query("SELECT adv FROM Advertisement adv JOIN adv.flat flat WHERE flat.address.city = :city")
+    @Query("SELECT CASE WHEN count(adv) > 0 THEN true ELSE false END FROM Advertisement adv WHERE adv.flat.id = :flat_id")
+    Boolean isAdvertisementWithFlatId(@Param("flat_id") int flatId) throws DataAccessException;
+
+    @Override
+    @Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city")
     Set<Advertisement> findByCity(@Param("city") String city) throws DataAccessException;
 
     @Override
-    @Query("SELECT adv FROM Advertisement adv JOIN adv.flat flat WHERE flat.address.city = :city AND flat.address.postalCode = :postal_code")
+    @Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND flat.address.postalCode = :postal_code")
     Set<Advertisement> findByCityAndPostalCode(@Param("city") String city, @Param("postal_code") Integer postalCode) throws DataAccessException;
 
     @Override
-    @Query("SELECT adv FROM Advertisement adv JOIN adv.flat flat WHERE flat.address.city = :city AND adv.pricePerMonth < :price_per_month")
+    @Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND adv.pricePerMonth < :price_per_month")
     Set<Advertisement> findByPricePerMonthLessThan(@Param("city") String city, @Param("price_per_month") double pricePerMonth) throws DataAccessException;
 
     @Override
-    @Query("SELECT adv FROM Advertisement adv JOIN adv.flat flat WHERE flat.address.city = :city AND flat.address.country = :country")
+    @Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND adv.flat.address.country = :country")
     Set<Advertisement> findByCityAndCountry(@Param("city") String city, @Param("country") String country) throws DataAccessException;
 
     @Override
-    @Query("SELECT adv FROM Advertisement adv JOIN adv.flat flat WHERE flat.address.city = :city AND flat.address.country = :country AND flat.address.postalCode = :postal_code")
+    @Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND adv.flat.address.country = :country AND adv.flat.address.postalCode = :postal_code")
     Set<Advertisement> findByCityAndCountryAndPostalCode(@Param("city")String city, @Param("country") String country, @Param("postal_code") Integer postalCode) throws DataAccessException;
 }

@@ -31,6 +31,7 @@ public class FormAdvertisement extends BaseEntity {
         this.description = adv.getDescription();
         this.requirements = adv.getRequirements();
         this.pricePerMonth = adv.getPricePerMonth();
+        this.id = adv.getId();
     }
 
 

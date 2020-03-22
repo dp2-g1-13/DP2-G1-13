@@ -1,23 +1,21 @@
 package org.springframework.samples.flatbook.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.flatbook.model.DBImage;
-import org.springframework.samples.flatbook.model.Flat;
-import org.springframework.samples.flatbook.service.DBImageService;
-import org.springframework.samples.flatbook.service.FlatService;
+import org.springframework.samples.flatbook.model.*;
+import org.springframework.samples.flatbook.service.*;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 public class FlatController {
@@ -26,11 +24,17 @@ public class FlatController {
 
     private final FlatService flatService;
     private final DBImageService dbImageService;
+    private final PersonService personService;
+    private final HostService hostService;
+    private final AdvertisementService advertisementService;
 
     @Autowired
-    public FlatController(FlatService flatService, DBImageService dbImageService) {
+    public FlatController(FlatService flatService, DBImageService dbImageService, PersonService personService, HostService hostService, AdvertisementService advertisementService) {
         this.flatService = flatService;
         this.dbImageService = dbImageService;
+        this.personService = personService;
+        this.hostService = hostService;
+        this.advertisementService = advertisementService;
     }
 
     @InitBinder
@@ -50,6 +54,9 @@ public class FlatController {
         if(result.hasErrors()) {
            return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
         } else {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Host host = (Host) this.personService.findUserById(((User)auth.getPrincipal()).getUsername());
+            host.addFlat(flat);
             this.flatService.saveFlat(flat);
 
             return "redirect:/flats/" + flat.getId();
@@ -58,6 +65,11 @@ public class FlatController {
 
     @GetMapping(value = "/flats/{flatId}/edit")
     public String initEditForm(@PathVariable("flatId") int flatId, Map<String, Object> model) {
+        if(!validateHost(flatId)) {
+            RuntimeException e = new RuntimeException("Illegal access");
+            model.put("exception", e);
+            return "exception";
+        }
         Flat flat = this.flatService.findFlatById(flatId);
         model.put("flat", flat);
         model.put("images", flat.getImages());
@@ -65,10 +77,15 @@ public class FlatController {
     }
 
     @PostMapping(value = "/flats/{flatId}/edit")
-    public String processEditForm(@Valid Flat flat, @PathVariable("flatId") int flatId, BindingResult result) {
+    public String processEditForm(@Valid Flat flat, @PathVariable("flatId") int flatId, BindingResult result, Map<String, Object> model) {
         if(result.hasErrors()) {
             return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
         } else {
+            if(!validateHost(flatId)) {
+                RuntimeException e = new RuntimeException("Illegal access");
+                model.put("exception", e);
+                return "exception";
+            }
             Set<DBImage> images = this.flatService.findFlatById(flatId).getImages();
             images.addAll(flat.getImages());
             flat.setImages(images);
@@ -81,6 +98,11 @@ public class FlatController {
 
     @GetMapping(value = "/flats/{flatId}/images/{imageId}/delete")
     public String processDeleteImage(@PathVariable("flatId") int flatId, @PathVariable("imageId") int imageId, Map<String, Object> model) {
+        if(!validateHost(flatId)) {
+            RuntimeException e = new RuntimeException("Illegal access");
+            model.put("exception", e);
+            return "exception";
+        }
         Flat flat = this.flatService.findFlatById(flatId);
         DBImage image = this.dbImageService.getImageById(imageId);
         flat.deleteImage(image);
@@ -95,10 +117,24 @@ public class FlatController {
         ModelAndView mav = new ModelAndView("flats/flatDetails");
         Flat flat = this.flatService.findFlatById(flatId);
         mav.addObject(flat);
+        Host host = this.hostService.findHostByFlatId(flat.getId());
+        mav.addObject("host", host.getUsername());
         Collection<DBImage> images = this.dbImageService.getImagesByFlatId(flat.getId());
         mav.addObject("images", images);
-//        mav.addObject("imagesEncoded", images.stream().map(x -> Base64.getEncoder().encodeToString(x.getData())).collect(Collectors.toList()));
+        Boolean existAd = this.advertisementService.isAdvertisementWithFlatId(flat.getId());
+        mav.addObject("existAd", existAd);
         return mav;
+    }
+
+    public Boolean validateHost(int flatId) {
+        Boolean userIsHost = true;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("admin"))) {
+            String username = ((User)auth.getPrincipal()).getUsername();
+            String hostUsername = this.hostService.findHostByFlatId(flatId).getUsername();
+            userIsHost = username.equals(hostUsername);
+        }
+        return userIsHost;
     }
 
 

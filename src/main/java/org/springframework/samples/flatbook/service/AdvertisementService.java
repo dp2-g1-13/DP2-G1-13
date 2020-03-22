@@ -15,22 +15,21 @@ import java.util.Set;
 @Service
 public class AdvertisementService {
 
-    private FlatRepository flatRepository;
-
     private AdvertisementRepository advertisementRepository;
 
-    private DBImageRepository dbImageRepository;
-
     @Autowired
-    public AdvertisementService(FlatRepository flatRepository, AdvertisementRepository advertisementRepository, DBImageRepository dbImageRepository) {
-        this.flatRepository = flatRepository;
+    public AdvertisementService(AdvertisementRepository advertisementRepository) {
         this.advertisementRepository = advertisementRepository;
-        this.dbImageRepository = dbImageRepository;
     }
 
     @Transactional(readOnly = true)
     public Advertisement findAdvertisementById(int id) throws DataAccessException {
         return this.advertisementRepository.findById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean isAdvertisementWithFlatId(int id) throws DataAccessException {
+        return this.advertisementRepository.isAdvertisementWithFlatId(id);
     }
 
     @Transactional(readOnly = true)
