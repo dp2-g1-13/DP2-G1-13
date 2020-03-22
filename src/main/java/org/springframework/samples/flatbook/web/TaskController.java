@@ -18,6 +18,7 @@ import javax.validation.Valid;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -94,14 +95,15 @@ public class TaskController {
 	}
     
     @GetMapping(value = "/tasks/{taskId}/edit")
-	public String initUpdateForm(@PathVariable("taskId") final int taskId, final ModelMap model, Principal principal) {
+	public String initUpdateForm(@PathVariable("taskId") final int taskId, final ModelMap model, Principal principal, @ModelAttribute("roommates") Collection<Tennant> roommates) {
 		Task task = this.taskService.findTaskById(taskId);
-    	Tennant creator = this.tennantService.findTennantById(principal.getName());
-		if (task != null && creator.equals(task.getCreator())) {
+		Tennant logged = this.tennantService.findTennantById(principal.getName());
+    	if (task != null && roommates.contains(logged)) {
+			model.put("taskStatus", Arrays.asList(TaskStatus.values()));
 			model.put("task", task);
 			return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
 		} else {
-			throw new IllegalArgumentException("Bad task id or you are not the creator of the task.");
+			throw new IllegalArgumentException("Bad task id or you can not edit the task.");
 		}
 	}
 

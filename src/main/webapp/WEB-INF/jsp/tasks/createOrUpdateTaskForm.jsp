@@ -18,7 +18,14 @@
         	<flatbook:textAreaField name="description" label="Description"/>
         	<flatbook:selectField name="asignee" label="Asignee" names="${roommates}" size="4"/>
         	<flatbook:hidden name="creationDate"/>
-        	<flatbook:hidden name="status"/>
+        	<c:choose>
+            	<c:when test="${task['new']}">
+                	<flatbook:hidden name="status"/>
+                </c:when>
+                <c:otherwise>
+                    <flatbook:selectField name="status" label="Status" names="${taskStatus}" size="4"/>
+                </c:otherwise>
+            </c:choose>
             <flatbook:hidden name="creator"/>
         </div>
         <div class="form-group">
