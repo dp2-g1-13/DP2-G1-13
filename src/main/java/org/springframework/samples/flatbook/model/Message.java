@@ -41,7 +41,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "messages")
-public class Message extends NamedEntity {
+public class Message extends BaseEntity {
 
 	@Column(name = "creation_moment")
 	@NotNull

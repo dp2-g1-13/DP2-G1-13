@@ -17,7 +17,7 @@
 package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -34,13 +34,6 @@ import javax.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Simple business object representing a pet.
- *
- * @author Ken Krebs
- * @author Juergen Hoeller
- * @author Sam Brannen
- */
 @Entity
 @Getter
 @Setter
@@ -67,15 +60,14 @@ public class Advertisement extends BaseEntity {
     @Positive
     @NotNull
     private Double pricePerMonth;
-
 	@NotNull
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")
 	private Flat			flat;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "advertisement_id")
-	private List<Request>	requests;
+	private Set<Request>	requests;
 
 	public Advertisement() {}
 
@@ -83,7 +75,7 @@ public class Advertisement extends BaseEntity {
 	    this.title = adv.getTitle();
 	    this.description = adv.getDescription();
 	    this.requirements = adv.getRequirements();
-	    this.creationDate = LocalDate.now();
 	    this.pricePerMonth =  adv.getPricePerMonth();
+	    this.creationDate = LocalDate.now();
     }
 }

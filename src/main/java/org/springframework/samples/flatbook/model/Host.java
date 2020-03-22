@@ -16,7 +16,7 @@
 
 package org.springframework.samples.flatbook.model;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -24,6 +24,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.springframework.samples.flatbook.model.mappers.PersonForm;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,8 +36,17 @@ import lombok.Setter;
 @Table(name = "hosts")
 public class Host extends Person {
 
+	public Host() {
+
+	}
+
+	public Host(final PersonForm person) {
+		super(person);
+	}
+
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "host_id")
-	private List<Flat> flats;
+	private Set<Flat> flats;
 
 }
