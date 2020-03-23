@@ -5,6 +5,7 @@ import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.model.Tennant;
 import org.springframework.samples.flatbook.service.FlatReviewService;
+import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.TennantService;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -16,20 +17,21 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.Set;
 
 @Controller
 public class FlatReviewController {
 
-    private static final String VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM = "flatReviews/createOrUpdateFlatReviewForm";
+    private static final String VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM = "flats/reviews/createOrUpdateFlatReviewForm";
 
     private final TennantService tennantService;
     private final FlatReviewService flatReviewService;
+    private final FlatService flatService;
 
     @Autowired
-    public FlatReviewController(FlatReviewService flatReviewService, TennantService tennantService) {
+    public FlatReviewController(FlatService flatService, FlatReviewService flatReviewService, TennantService tennantService) {
         this.flatReviewService = flatReviewService;
         this.tennantService = tennantService;
+        this.flatService = flatService;
     }
     
     @InitBinder
@@ -37,7 +39,7 @@ public class FlatReviewController {
         dataBinder.setDisallowedFields("id");
     }
     
-    @GetMapping(value = "/flat-reviews/new")
+    @GetMapping(value = "/flats/{flatId}/reviews/new")
     public String initCreationForm(Map<String, Object> model, Principal principal) {
     	Tennant user = tennantService.findTennantById(principal.getName());
     	FlatReview fr = new FlatReview();
@@ -47,31 +49,29 @@ public class FlatReviewController {
         return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
     }
 
-    @PostMapping(value = "/flat-reviews/new")
+    @PostMapping(value = "/flats/{flatId}/reviews/new")
     public String processCreationForm(@Valid FlatReview fr, BindingResult result, Principal principal) {
         if(result.hasErrors()) {
            return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
         } else {
         	fr.setCreationDate(LocalDate.now());
         	Flat f = tennantService.findTennantById(principal.getName()).getFlat();
-        	Set<FlatReview> frs = f.getFlatReviews();
-        	frs.add(fr);
-        	f.setFlatReviews(frs);
+        	f.getFlatReviews().add(fr);
             this.flatReviewService.saveFlatReview(fr);
+            this.flatService.saveFlat(f);
             return "redirect:/";
         }
     }
     
-    @GetMapping(value = "/flat-reviews/{flatReviewId}/remove")
-	public String processFlatReviewRemoval(@PathVariable("flatReviewId") final int flatReviewId, Principal principal) {
+    @GetMapping(value = "/flats/{flatId}/reviews/{flatReviewId}/remove")
+	public String processFlatReviewRemoval(@PathVariable("flatReviewId") final int flatReviewId, @PathVariable("flatId") final int flatId, Principal principal) {
     	FlatReview flatReview = this.flatReviewService.findFlatReviewById(flatReviewId);
     	Tennant creator = this.tennantService.findTennantById(principal.getName());
-		if (flatReview != null && creator.equals(flatReview.getCreator())) {
-			Flat reviewedFlat = this.flatReviewService.findFlatOfFlatReviewById(flatReviewId);
-			Set<FlatReview> reviews = reviewedFlat.getFlatReviews();
-			reviews.remove(flatReview);
-			reviewedFlat.setFlatReviews(reviews);
+    	Flat reviewedFlat = this.flatService.findFlatById(flatId);
+		if (reviewedFlat != null && creator.equals(flatReview.getCreator()) && flatReview != null) {
+			reviewedFlat.getFlatReviews().remove(flatReview);
 			this.flatReviewService.deleteFlatReviewById(flatReviewId);
+			this.flatService.saveFlat(reviewedFlat);
 			return "redirect:/";
 		} else {
 			throw new IllegalArgumentException("Bad flat review id or you are not the creator of the review.");

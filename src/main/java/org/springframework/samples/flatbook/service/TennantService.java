@@ -30,4 +30,9 @@ public class TennantService {
 		return this.tennantRepository.findAll();
 	}
 
+	@Transactional
+    public void saveTennant(Tennant tennant) throws DataAccessException {
+        this.tennantRepository.save(tennant);
+    }
+	
 }

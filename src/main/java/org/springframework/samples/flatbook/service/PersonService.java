@@ -1,6 +1,8 @@
 
 package org.springframework.samples.flatbook.service;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Authorities;
@@ -48,6 +50,11 @@ public class PersonService {
 
 	public Person findUserById(final String username) {
 		return this.personRepository.findByUsername(username);
+	}
+	
+	@Transactional(readOnly = true)
+	public Collection<Person> findAllPersons() throws DataAccessException {
+		return this.personRepository.findAll();
 	}
 
 }

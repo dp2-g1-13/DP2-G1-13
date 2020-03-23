@@ -33,6 +33,6 @@ import lombok.Setter;
 public class TennantReview extends Review {
 
 	@NotNull
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Person creator;
 }
