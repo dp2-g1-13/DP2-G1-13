@@ -2,6 +2,7 @@ package org.springframework.samples.flatbook.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.repository.FlatReviewRepository;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,11 @@ public class FlatReviewService {
         return this.flatReviewRepository.findById(flatReviewId);
     }
     
+    @Transactional(readOnly = true)
+    public Flat findFlatOfFlatReviewById(int flatReviewId) throws DataAccessException {
+        return this.flatReviewRepository.findFlatOfFlatReviewById(flatReviewId);
+    }
+    
     @Transactional
     public void saveFlatReview(FlatReview flatReview) throws DataAccessException {
         this.flatReviewRepository.save(flatReview);
@@ -29,6 +35,6 @@ public class FlatReviewService {
     
     @Transactional
 	public void deleteFlatReviewById(final int flatReviewId) {
-		this.flatReviewRepository.removeFlatReviewById(flatReviewId);
+		this.flatReviewRepository.deleteById(flatReviewId);
 	}
 }

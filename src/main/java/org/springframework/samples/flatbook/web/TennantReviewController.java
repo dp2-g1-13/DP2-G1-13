@@ -48,38 +48,35 @@ public class TennantReviewController {
     @GetMapping(value = "/tennant-reviews/{tennantId}/new")
     public String initCreationForm(Map<String, Object> model, Principal principal, @PathVariable("tennantId") final String tennantId) {
     	Tennant tToBeReviewed = tennantService.findTennantById(tennantId);
-    	Tennant tennant = tennantService.findTennantById(principal.getName());
-    	Host host = hostService.findHostById(principal.getName());
-    	if(tennant == tToBeReviewed) {
-    		throw new IllegalArgumentException("You can not review yourself.");
-    	}else if(tennant == null && host!=null && tToBeReviewed!=null) {
-    		Boolean allowed = false;
-        	for(Flat f: host.getFlats()) {
-        		if(f.getTennants().contains(tToBeReviewed)) {
-        			allowed = true;
-        			break;
-        		}
-        	}
-        	if(allowed) {
-        		Person creator = personService.findUserById(principal.getName());
-        		TennantReview tr = new TennantReview();
-                tr.setCreationDate(LocalDate.now());
-                tr.setCreator(creator);
-                model.put("tennantReview", tr);
-                return VIEWS_TENNANTREVIEWS_CREATE_OR_UPDATE_FORM;
-        	}else {
-        		throw new IllegalArgumentException("You can not make a review about this tennant.");
-        	}
-    	}else if (host == null && tennant != null && tToBeReviewed!=null && tennant.getFlat().getTennants().contains(tToBeReviewed)) {
+    	Boolean allowed = false;
+    	switch(isUserATennant(principal.getName())) {
+    		case 1:
+    			Tennant tennant = tennantService.findTennantById(principal.getName());
+    			if(tToBeReviewed!=null && tennant.getFlat()!=null && tennant.getFlat().getTennants().contains(tToBeReviewed) && tennant != tToBeReviewed) {
+    				allowed = true;
+    			}
+    			break;
+    		default:
+    			Host host = hostService.findHostById(principal.getName());
+    			if(tToBeReviewed!=null) {
+    				for(Flat f: host.getFlats()) {
+    	        		if(f.getTennants().contains(tToBeReviewed)) {
+    	        			allowed = true;
+    	        			break;
+    	        		}
+    	        	}
+    			}
+    	}
+    	if(allowed) {
     		Person creator = personService.findUserById(principal.getName());
     		TennantReview tr = new TennantReview();
             tr.setCreationDate(LocalDate.now());
             tr.setCreator(creator);
             model.put("tennantReview", tr);
             return VIEWS_TENNANTREVIEWS_CREATE_OR_UPDATE_FORM;
-		} else {
-			throw new IllegalArgumentException("Bad tennant id or you can not make a review about this tennant.");
-		}
+    	}else {
+    		throw new IllegalArgumentException("Bad tennant id or you can not make a review about this tennant.");
+    	}
     }
 
     @PostMapping(value = "/tennant-reviews/{tennantId}/new")
@@ -96,29 +93,30 @@ public class TennantReviewController {
             return "redirect:/";
         }
     }
-
-//    @GetMapping(value = "/tasks/{taskId}")
-//    public ModelAndView showTask(@PathVariable("taskId") int taskId, Principal principal, @ModelAttribute("roommates") Collection<Tennant> roommates) {
-//    	Task task = this.taskService.findTaskById(taskId);
-//    	Tennant logged = this.tennantService.findTennantById(principal.getName());
-//    	if (task != null && roommates.contains(logged)) {
-//    		ModelAndView mav = new ModelAndView("tasks/taskDetails");
-//    		mav.addObject(this.taskService.findTaskById(taskId));
-//    		return mav;
-//		} else {
-//			throw new IllegalArgumentException("Bad task id or you can not see the task.");
-//		}
-//    }
     
     @GetMapping(value = "/tennant-reviews/{tennantReviewId}/remove")
 	public String processTennantReviewRemoval(@PathVariable("tennantReviewId") final int tennantReviewId, Principal principal) {
     	TennantReview tennantReview = this.tennantReviewService.findTennantReviewById(tennantReviewId);
-    	Person creator = this.tennantService.findTennantById(principal.getName());
+    	Person creator = this.personService.findUserById(principal.getName());
 		if (tennantReview != null && creator.equals(tennantReview.getCreator())) {
+			Tennant reviewedTennant = this.tennantReviewService.findTennantOfTennantReviewById(tennantReviewId);
+			Set<TennantReview> reviews = reviewedTennant.getReviews();
+			reviews.remove(tennantReview);
+			reviewedTennant.setReviews(reviews);
 			this.tennantReviewService.deleteTennantReviewById(tennantReviewId);
 			return "redirect:/";
 		} else {
-			throw new IllegalArgumentException("Bad flat review id or you are not the creator of the review.");
+			throw new IllegalArgumentException("Bad tennant review id or you are not the creator of the review.");
 		}
 	}
+    
+    private int isUserATennant(String username) {
+    	Tennant tennant = tennantService.findTennantById(username);
+    	Host host = hostService.findHostById(username);
+    	int res = 0;
+    	if(tennant != null && host == null) {
+    		res = 1;
+    	}
+		return res;
+    }
 }

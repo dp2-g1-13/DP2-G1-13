@@ -1,6 +1,7 @@
 package org.springframework.samples.flatbook.repository;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.FlatReview;
 
 import java.util.Collection;
@@ -11,8 +12,10 @@ public interface FlatReviewRepository {
 
     FlatReview findById(int id) throws DataAccessException;
     
-    void removeFlatReviewById(int id) throws DataAccessException;
+    void deleteById(int id) throws DataAccessException;
     
     void save(FlatReview flatReview) throws DataAccessException;
 
+    Flat findFlatOfFlatReviewById(int flatReviewId) throws DataAccessException;
+    
 }

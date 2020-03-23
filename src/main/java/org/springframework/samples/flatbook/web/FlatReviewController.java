@@ -61,25 +61,16 @@ public class FlatReviewController {
             return "redirect:/";
         }
     }
-
-//    @GetMapping(value = "/tasks/{taskId}")
-//    public ModelAndView showTask(@PathVariable("taskId") int taskId, Principal principal, @ModelAttribute("roommates") Collection<Tennant> roommates) {
-//    	Task task = this.taskService.findTaskById(taskId);
-//    	Tennant logged = this.tennantService.findTennantById(principal.getName());
-//    	if (task != null && roommates.contains(logged)) {
-//    		ModelAndView mav = new ModelAndView("tasks/taskDetails");
-//    		mav.addObject(this.taskService.findTaskById(taskId));
-//    		return mav;
-//		} else {
-//			throw new IllegalArgumentException("Bad task id or you can not see the task.");
-//		}
-//    }
     
     @GetMapping(value = "/flat-reviews/{flatReviewId}/remove")
 	public String processFlatReviewRemoval(@PathVariable("flatReviewId") final int flatReviewId, Principal principal) {
     	FlatReview flatReview = this.flatReviewService.findFlatReviewById(flatReviewId);
     	Tennant creator = this.tennantService.findTennantById(principal.getName());
 		if (flatReview != null && creator.equals(flatReview.getCreator())) {
+			Flat reviewedFlat = this.flatReviewService.findFlatOfFlatReviewById(flatReviewId);
+			Set<FlatReview> reviews = reviewedFlat.getFlatReviews();
+			reviews.remove(flatReview);
+			reviewedFlat.setFlatReviews(reviews);
 			this.flatReviewService.deleteFlatReviewById(flatReviewId);
 			return "redirect:/";
 		} else {
