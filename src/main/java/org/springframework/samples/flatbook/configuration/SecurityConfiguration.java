@@ -40,6 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/flat-reviews/**").authenticated()
 				.antMatchers("/tennant-reviews/**").authenticated()
 				.antMatchers("/flats/**").authenticated()
+				.antMatchers("/messages/**").authenticated()
 				.antMatchers("/logout").permitAll()
 				.anyRequest().denyAll()
 				.and()

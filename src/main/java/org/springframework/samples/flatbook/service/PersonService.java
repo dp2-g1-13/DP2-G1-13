@@ -12,6 +12,8 @@ import org.springframework.samples.flatbook.model.enums.SaveType;
 import org.springframework.samples.flatbook.model.mappers.PersonForm;
 import org.springframework.samples.flatbook.repository.AuthoritiesRepository;
 import org.springframework.samples.flatbook.repository.PersonRepository;
+import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
+import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

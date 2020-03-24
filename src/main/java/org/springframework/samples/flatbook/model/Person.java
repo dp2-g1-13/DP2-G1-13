@@ -68,7 +68,7 @@ public class Person extends User {
 	@Email
 	protected String	email;
 
-	@Column(name = "phone_number", unique = true)
+	@Column(name = "phone_number")
 	@NotBlank
 	@Pattern(regexp = "^[0-9]{9}$")
 	protected String	phoneNumber;
