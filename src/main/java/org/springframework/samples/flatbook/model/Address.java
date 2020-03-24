@@ -7,6 +7,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -27,8 +28,8 @@ public class Address extends BaseEntity {
 
 	@Column(name = "postal_code")
 	@NotNull
-	@Positive
-	private Integer	postalCode;
+    @Size(min = 3, max = 9)
+	private String	postalCode;
 
 	@Column(name = "country")
 	@NotBlank

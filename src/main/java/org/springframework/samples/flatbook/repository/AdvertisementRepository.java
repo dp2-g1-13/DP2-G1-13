@@ -13,11 +13,11 @@ public interface AdvertisementRepository {
 
     Set<Advertisement> findByCity(String city) throws DataAccessException;
 
-    Set<Advertisement> findByCityAndPostalCode(String city, Integer postalCode) throws DataAccessException;
+    Set<Advertisement> findByCityAndPostalCode(String city, String postalCode) throws DataAccessException;
 
     Set<Advertisement> findByCityAndCountry(String city, String country) throws DataAccessException;
 
-    Set<Advertisement> findByCityAndCountryAndPostalCode(String city, String country, Integer postalCode) throws DataAccessException;
+    Set<Advertisement> findByCityAndCountryAndPostalCode(String city, String country, String postalCode) throws DataAccessException;
 
     Set<Advertisement> findByPricePerMonthLessThan(String city, double pricePerMonth) throws DataAccessException;
 

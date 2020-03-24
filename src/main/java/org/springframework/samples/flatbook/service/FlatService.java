@@ -30,17 +30,13 @@ public class FlatService {
     }
 
     @Transactional(readOnly = true)
-    public Set<Flat> findFlatsByCity(String city) throws DataAccessException {
-        return this.flatRepository.findByCity(city);
+    public Set<Flat> findAllFlats() throws DataAccessException {
+        return this.flatRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public Set<Flat> findFlatsByCityAndPostalCode(String city, int postalCode) throws DataAccessException {
-        return this.flatRepository.findByCityAndPostalCode(city, postalCode);
-    }
-
-    public Set<Flat> findAllFlats() throws DataAccessException {
-        return this.flatRepository.findAll();
+    public Set<Flat> findFlatByHostUsername(String username) throws DataAccessException {
+        return this.flatRepository.findByHostUsername(username);
     }
 
     @Transactional

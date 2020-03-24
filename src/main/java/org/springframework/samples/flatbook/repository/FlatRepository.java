@@ -11,11 +11,7 @@ public interface FlatRepository {
 
     Flat findById(int id) throws DataAccessException;
 
-//    Set<Flat> findByHostId(int hostId) throws DataAccessException;
-
-    Set<Flat> findByCity(String city) throws DataAccessException;
-
-    Set<Flat> findByCityAndPostalCode(String city, Integer postalCode) throws DataAccessException;
+    Set<Flat> findByHostUsername(String username) throws DataAccessException;
 
     void save(Flat flat) throws DataAccessException;
 }

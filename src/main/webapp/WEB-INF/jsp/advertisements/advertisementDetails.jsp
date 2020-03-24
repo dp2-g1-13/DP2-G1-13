@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
 
 <flatbook:layout pageName="advertisements">
     <div class="container">
@@ -49,7 +50,8 @@
                 </tr>
                 <tr>
                     <th>Price per month</th>
-                    <td><c:out value="${advertisement.pricePerMonth}"/> &euro;</td>
+
+                    <td><fmt:formatNumber type="number" maxFractionDigits="2" value="${advertisement.pricePerMonth}"/> &euro;</td>
                 </tr>
             </table>
         </div>

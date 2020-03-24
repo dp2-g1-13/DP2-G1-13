@@ -38,7 +38,7 @@ public class AdvertisementService {
     }
 
     @Transactional(readOnly = true)
-    public Set<Advertisement> findAdvertisementsByCityAndPostalCode(String city, Integer postalCode) throws DataAccessException {
+    public Set<Advertisement> findAdvertisementsByCityAndPostalCode(String city, String postalCode) throws DataAccessException {
         return this.advertisementRepository.findByCityAndPostalCode(city, postalCode);
     }
 
@@ -48,7 +48,7 @@ public class AdvertisementService {
     }
 
     @Transactional(readOnly = true)
-    public Set<Advertisement> findAdvertisementsByCityAndCountryAndPostalCode(String city, String country, Integer postalCode) throws DataAccessException {
+    public Set<Advertisement> findAdvertisementsByCityAndCountryAndPostalCode(String city, String country, String postalCode) throws DataAccessException {
         return this.advertisementRepository.findByCityAndCountryAndPostalCode(city, country, postalCode);
     }
 

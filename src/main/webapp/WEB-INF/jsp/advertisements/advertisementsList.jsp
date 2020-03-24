@@ -10,12 +10,13 @@
 
     <c:forEach items="${selections}" var="advertisement">
         <div class="panel panel-default">
-            <div class="panel-heading"><h4>${advertisement.title}</h4></div>
+            <div class="panel-heading"><h4><c:out value="${advertisement.title}" /></h4></div>
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <p>${advertisement.description}</p>
-                        <p><strong>${advertisement.pricePerMonth} &euro;</strong></p>
+                        <p><c:out value="${advertisement.description}"/></p>
+
+                        <p><strong><fmt:formatNumber type="number" maxFractionDigits="2" value="${advertisement.pricePerMonth}" /> &euro;</strong></p>
                     </div>
                     <div class="col-md-6">
                         <spring:url value="/advertisements/{advertisementId}" var="advertisementUrl">

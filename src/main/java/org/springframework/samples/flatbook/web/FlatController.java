@@ -3,6 +3,7 @@ package org.springframework.samples.flatbook.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,6 +43,11 @@ public class FlatController {
         dataBinder.setDisallowedFields("id");
     }
 
+    @InitBinder("flat")
+    public void initBinder(WebDataBinder dataBinder) {
+        dataBinder.addValidators(new FlatValidator());
+    }
+
     @GetMapping(value = "/flats/new")
     public String initCreationForm(Map<String, Object> model) {
         Flat flat = new Flat();
@@ -64,7 +70,7 @@ public class FlatController {
     }
 
     @GetMapping(value = "/flats/{flatId}/edit")
-    public String initEditForm(@PathVariable("flatId") int flatId, Map<String, Object> model) {
+    public String initUpdateForm(@PathVariable("flatId") int flatId, Map<String, Object> model) {
         if(!validateHost(flatId)) {
             RuntimeException e = new RuntimeException("Illegal access");
             model.put("exception", e);
@@ -77,7 +83,7 @@ public class FlatController {
     }
 
     @PostMapping(value = "/flats/{flatId}/edit")
-    public String processEditForm(@Valid Flat flat, @PathVariable("flatId") int flatId, BindingResult result, Map<String, Object> model) {
+    public String processUpdateForm(@Valid Flat flat, @PathVariable("flatId") int flatId, BindingResult result, Map<String, Object> model) {
         if(result.hasErrors()) {
             return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
         } else {
@@ -92,7 +98,7 @@ public class FlatController {
             flat.setId(flatId);
             this.flatService.saveFlat(flat);
 
-            return "redirect:/flats/" + flat.getId();
+            return "redirect:/flats/{flatId}";
         }
     }
 

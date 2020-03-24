@@ -11,19 +11,8 @@ import java.util.Set;
 
 public interface SpringDataFlatRepository extends FlatRepository, Repository<Flat, Integer> {
 
-//    @Override
-//    @Query("SELECT flat FROM Flat flat JOIN flat.host h WHERE h.id = :hostId")
-//    Set<Flat> findByHostId(@Param("hostId") int hostId);
-
     @Override
-    @Query("SELECT flat FROM Flat flat JOIN flat.address a WHERE a.city = :city")
-    Set<Flat> findByCity(@Param("city") String city);
+    @Query("SELECT host.flats FROM Host host WHERE host.username = :hostUsername")
+    Set<Flat> findByHostUsername(@Param("hostUsername") String username);
 
-    @Override
-    @Query("SELECT flat FROM Flat flat JOIN flat.address a WHERE a.city = :city AND a.postalCode = :postalCode")
-    Set<Flat> findByCityAndPostalCode(@Param("city") String city, @Param("postalCode") Integer postalCode);
-
-//    @Override
-//    @Query("SELECT flat From Flat flat")
-//    Set<Flat> findAll() throws DataAccessException;
 }

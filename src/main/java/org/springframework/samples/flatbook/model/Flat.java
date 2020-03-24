@@ -28,7 +28,7 @@ public class Flat extends BaseEntity {
 
 	@Column(name = "description")
 	@NotBlank
-	@Size(min = 30)
+	@Size(min = 30, max = 10000)
 	private String					description;
 
 	@Column(name = "square_meters")
@@ -51,6 +51,7 @@ public class Flat extends BaseEntity {
 	private String					availableServices;
 
 	@Valid
+//    @Size(min = 6)
 	@NotNull
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<DBImage>		images;
