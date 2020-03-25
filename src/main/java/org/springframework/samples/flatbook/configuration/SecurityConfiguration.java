@@ -44,6 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/flats/{flatId:[0-9]+}/edit").hasAnyAuthority("HOST", "admin")
                 .antMatchers("/flats/{flatId:[0-9]+}/images/{imageId:[0-9]+}/delete").hasAnyAuthority("HOST", "admin")
                 .antMatchers("/flats/new").hasAnyAuthority("HOST")
+                .antMatchers("/flats/my-flats").hasAuthority("HOST")
                 .antMatchers("/flats/{flatId:[0-9]+}/advertisements/new").hasAnyAuthority("HOST")
 				.antMatchers("/logout").permitAll()
 				.anyRequest().denyAll()

@@ -113,9 +113,7 @@ public class FlatController {
         DBImage image = this.dbImageService.getImageById(imageId);
         flat.deleteImage(image);
         this.dbImageService.deleteImage(image);
-        model.put("flat", flat);
-        model.put("images", flat.getImages());
-        return "redirect:/flats/" + flat.getId() + "/edit";
+        return "redirect:/flats/{flatId}/edit";
     }
 
     @GetMapping(value = "/flats/{flatId}")
@@ -125,10 +123,19 @@ public class FlatController {
         mav.addObject(flat);
         Host host = this.hostService.findHostByFlatId(flat.getId());
         mav.addObject("host", host.getUsername());
-        Collection<DBImage> images = this.dbImageService.getImagesByFlatId(flat.getId());
-        mav.addObject("images", images);
+        mav.addObject("images", flat.getImages());
         Boolean existAd = this.advertisementService.isAdvertisementWithFlatId(flat.getId());
         mav.addObject("existAd", existAd);
+        return mav;
+    }
+
+    @GetMapping(value = "/flats/my-flats")
+    public ModelAndView showFlatsOfHost() {
+        ModelAndView mav = new ModelAndView("flats/flatsOfHost");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = ((User)auth.getPrincipal()).getUsername();
+        Set<Flat> flats = this.flatService.findFlatByHostUsername(username);
+        mav.addObject("flats", flats);
         return mav;
     }
 

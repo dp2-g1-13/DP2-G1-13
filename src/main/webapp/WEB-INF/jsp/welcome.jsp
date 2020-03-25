@@ -12,10 +12,6 @@
         <div class="col-md-12">
             <spring:url value="/resources/images/pets.png" htmlEscape="true" var="petsImage"/>
             <img class="img-responsive" src="${petsImage}"/>
-            <sec:authorize access="hasAuthority('HOST')">
-                <a href="${pageContext.request.contextPath}/flats/new">Prueba flats</a>
-                <a href="${pageContext.request.contextPath}/advertisements/new">Prueba advertisements</a>
-            </sec:authorize>
         </div>
     </div>
     <div class="row">

@@ -51,7 +51,7 @@
                 <tr>
                     <th>Price per month</th>
 
-                    <td><fmt:formatNumber type="number" maxFractionDigits="2" value="${advertisement.pricePerMonth}"/> &euro;</td>
+                    <td>${advertisement.pricePerMonth}</td>
                 </tr>
             </table>
         </div>
