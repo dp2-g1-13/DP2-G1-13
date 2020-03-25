@@ -81,7 +81,7 @@ public class TennantReviewController {
     	TennantReview tennantReview = this.tennantReviewService.findTennantReviewById(tennantReviewId);
     	Person creator = this.personService.findUserById(principal.getName());
     	Tennant reviewedTennant = this.tennantService.findTennantById(tennantId);
-    	if (reviewedTennant != null && creator.equals(tennantReview.getCreator()) && tennantReview != null) {
+    	if (tennantReview != null && reviewedTennant != null && creator.equals(tennantReview.getCreator())) {
 			reviewedTennant.getReviews().remove(tennantReview);
 			this.tennantReviewService.deleteTennantReviewById(tennantReviewId);
 			this.tennantService.saveTennant(reviewedTennant);

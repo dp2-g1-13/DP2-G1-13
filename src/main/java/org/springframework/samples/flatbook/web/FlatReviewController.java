@@ -68,7 +68,7 @@ public class FlatReviewController {
     	FlatReview flatReview = this.flatReviewService.findFlatReviewById(flatReviewId);
     	Tennant creator = this.tennantService.findTennantById(principal.getName());
     	Flat reviewedFlat = this.flatService.findFlatById(flatId);
-		if (reviewedFlat != null && creator.equals(flatReview.getCreator()) && flatReview != null) {
+		if (flatReview != null && reviewedFlat != null && creator.equals(flatReview.getCreator())) {
 			reviewedFlat.getFlatReviews().remove(flatReview);
 			this.flatReviewService.deleteFlatReviewById(flatReviewId);
 			this.flatService.saveFlat(reviewedFlat);
