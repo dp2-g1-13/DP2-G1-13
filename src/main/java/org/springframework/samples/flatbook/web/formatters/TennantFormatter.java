@@ -16,7 +16,6 @@
 package org.springframework.samples.flatbook.web.formatters;
 
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +40,12 @@ import org.springframework.stereotype.Component;
  * @author Michael Isvy
  */
 @Component
-public class RoommateFormatter implements Formatter<Tennant> {
+public class TennantFormatter implements Formatter<Tennant> {
 
 	private final TennantService tennantService;
 
 	@Autowired
-	public RoommateFormatter(TennantService tennantService) {
+	public TennantFormatter(TennantService tennantService) {
 		this.tennantService = tennantService;
 	}
 
@@ -57,12 +56,11 @@ public class RoommateFormatter implements Formatter<Tennant> {
 
 	@Override
 	public Tennant parse(String text, Locale locale) throws ParseException {
-		Collection<Tennant> findTennants = this.tennantService.findAllTennants();
-		for (Tennant t : findTennants) {
-			if (t.getUsername().equals(text)) {
-				return t;
-			}
+		Tennant res = this.tennantService.findTennantById(text);
+		if(res != null) {
+			return res;
+		}else {
+			throw new ParseException("tennant not found: " + text, 0);
 		}
-		throw new ParseException("tennant not found: " + text, 0);
 	}
 }

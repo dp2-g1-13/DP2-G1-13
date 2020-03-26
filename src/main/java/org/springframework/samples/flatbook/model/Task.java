@@ -28,6 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.flatbook.model.enums.TaskStatus;
@@ -57,6 +58,7 @@ public class Task extends BaseEntity {
 	@NotNull
 	@Column(name = "creation_date")
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@PastOrPresent
 	private LocalDate	creationDate;
 
 	@NotNull

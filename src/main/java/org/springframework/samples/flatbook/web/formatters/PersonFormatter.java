@@ -16,7 +16,6 @@
 package org.springframework.samples.flatbook.web.formatters;
 
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +56,11 @@ public class PersonFormatter implements Formatter<Person> {
 
 	@Override
 	public Person parse(String text, Locale locale) throws ParseException {
-		Collection<Person> findPersons = this.personService.findAllPersons();
-		for (Person p : findPersons) {
-			if (p.getUsername().equals(text)) {
-				return p;
-			}
+		Person res = this.personService.findUserById(text);
+		if(res != null) {
+			return res;
+		}else {
+			throw new ParseException("person not found: " + text, 0);
 		}
-		throw new ParseException("person not found: " + text, 0);
 	}
 }
