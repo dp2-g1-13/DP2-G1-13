@@ -40,27 +40,38 @@ public class FlatReviewController {
     }
     
     @GetMapping(value = "/flats/{flatId}/reviews/new")
-    public String initCreationForm(Map<String, Object> model, Principal principal) {
+    public String initCreationForm(Map<String, Object> model, Principal principal, @PathVariable("flatId") final Integer flatId) {
     	Tennant user = tennantService.findTennantById(principal.getName());
-    	FlatReview fr = new FlatReview();
-        fr.setCreator(user);
-        fr.setCreationDate(LocalDate.now());
-        model.put("flatReview", fr);
-        return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
+    	Flat flat = this.flatService.findFlatById(flatId);
+    	if(user != null && flat != null && flat.getTennants().contains(user)) {
+    		FlatReview fr = new FlatReview();
+            fr.setCreator(user);
+            fr.setCreationDate(LocalDate.now());
+            model.put("flatReview", fr);
+            return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
+    	}else {
+    		throw new IllegalArgumentException("Bad flat id or you can not write a review of the flat.");
+    	}
     }
 
     @PostMapping(value = "/flats/{flatId}/reviews/new")
-    public String processCreationForm(@Valid FlatReview fr, BindingResult result, Principal principal) {
-        if(result.hasErrors()) {
-           return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
-        } else {
-        	fr.setCreationDate(LocalDate.now());
-        	Flat f = tennantService.findTennantById(principal.getName()).getFlat();
-        	f.getFlatReviews().add(fr);
-            this.flatReviewService.saveFlatReview(fr);
-            this.flatService.saveFlat(f);
-            return "redirect:/";
-        }
+    public String processCreationForm(@Valid FlatReview fr, BindingResult result, Principal principal, @PathVariable("flatId") final Integer flatId) {
+    	Tennant user = tennantService.findTennantById(principal.getName());
+    	Flat flat = this.flatService.findFlatById(flatId);
+    	if(user != null && flat != null && flat.getTennants().contains(user)) {
+    		if(result.hasErrors()) {
+    			return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
+    		} else {
+    			fr.setCreationDate(LocalDate.now());
+        		Flat f = tennantService.findTennantById(principal.getName()).getFlat();
+        		f.getFlatReviews().add(fr);
+        		this.flatReviewService.saveFlatReview(fr);
+        		this.flatService.saveFlat(f);
+        		return "redirect:/";
+    		}
+    	}else {
+    		throw new IllegalArgumentException("Bad flat id or you can not write a review of the flat.");
+    	}
     }
     
     @GetMapping(value = "/flats/{flatId}/reviews/{flatReviewId}/remove")
@@ -68,7 +79,7 @@ public class FlatReviewController {
     	FlatReview flatReview = this.flatReviewService.findFlatReviewById(flatReviewId);
     	Tennant creator = this.tennantService.findTennantById(principal.getName());
     	Flat reviewedFlat = this.flatService.findFlatById(flatId);
-		if (flatReview != null && reviewedFlat != null && creator.equals(flatReview.getCreator())) {
+		if (creator != null && flatReview != null && reviewedFlat != null && creator.equals(flatReview.getCreator())) {
 			reviewedFlat.getFlatReviews().remove(flatReview);
 			this.flatReviewService.deleteFlatReviewById(flatReviewId);
 			this.flatService.saveFlat(reviewedFlat);

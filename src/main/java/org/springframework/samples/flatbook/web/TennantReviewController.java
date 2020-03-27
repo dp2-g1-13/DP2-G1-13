@@ -64,16 +64,21 @@ public class TennantReviewController {
 
     @PostMapping(value = "/tennants/{tennantId}/reviews/new")
     public String processCreationForm(@Valid TennantReview tr, BindingResult result, Principal principal, @PathVariable("tennantId") final String tennantId) {
-        if(result.hasErrors()) {
-        	return VIEWS_TENNANTREVIEWS_CREATE_OR_UPDATE_FORM;
-        } else {
-        	tr.setCreationDate(LocalDate.now());
-        	Tennant t = tennantService.findTennantById(tennantId);
-        	t.getReviews().add(tr);
-            this.tennantReviewService.saveTennantReview(tr);
-            this.tennantService.saveTennant(t);
-            return "redirect:/";
-        }
+    	Tennant tToBeReviewed = tennantService.findTennantById(tennantId);
+    	if(isAllowed(principal.getName(), tToBeReviewed)) {
+    		if(result.hasErrors()) {
+    			return VIEWS_TENNANTREVIEWS_CREATE_OR_UPDATE_FORM;
+    		} else {
+    			tr.setCreationDate(LocalDate.now());
+    			Tennant t = tennantService.findTennantById(tennantId);
+    			t.getReviews().add(tr);
+    			this.tennantReviewService.saveTennantReview(tr);
+    			this.tennantService.saveTennant(t);
+    			return "redirect:/";
+    		}
+    	}else {
+    		throw new IllegalArgumentException("Bad tennant id or you can not make a review about this tennant.");
+    	}
     }
     
     @GetMapping(value = "/tennants/{tennantId}/reviews/{tennantReviewId}/remove")
