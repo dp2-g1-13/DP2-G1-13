@@ -3,9 +3,9 @@ package org.springframework.samples.flatbook.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.FlatReview;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.service.FlatReviewService;
-import org.springframework.samples.flatbook.service.TennantService;
+import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -23,13 +23,13 @@ public class FlatReviewController {
 
     private static final String VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM = "flatReviews/createOrUpdateFlatReviewForm";
 
-    private final TennantService tennantService;
+    private final TenantService tenantService;
     private final FlatReviewService flatReviewService;
 
     @Autowired
-    public FlatReviewController(FlatReviewService flatReviewService, TennantService tennantService) {
+    public FlatReviewController(FlatReviewService flatReviewService, TenantService tenantService) {
         this.flatReviewService = flatReviewService;
-        this.tennantService = tennantService;
+        this.tenantService = tenantService;
     }
     
     @InitBinder
@@ -39,7 +39,7 @@ public class FlatReviewController {
     
     @GetMapping(value = "/flat-reviews/new")
     public String initCreationForm(Map<String, Object> model, Principal principal) {
-    	Tennant user = tennantService.findTennantById(principal.getName());
+    	Tenant user = tenantService.findTenantById(principal.getName());
     	FlatReview fr = new FlatReview();
         fr.setCreator(user);
         fr.setCreationDate(LocalDate.now());
@@ -53,7 +53,7 @@ public class FlatReviewController {
            return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
         } else {
         	fr.setCreationDate(LocalDate.now());
-        	Flat f = tennantService.findTennantById(principal.getName()).getFlat();
+        	Flat f = tenantService.findTenantById(principal.getName()).getFlat();
         	Set<FlatReview> frs = f.getFlatReviews();
         	frs.add(fr);
         	f.setFlatReviews(frs);
@@ -65,7 +65,7 @@ public class FlatReviewController {
     @GetMapping(value = "/flat-reviews/{flatReviewId}/remove")
 	public String processFlatReviewRemoval(@PathVariable("flatReviewId") final int flatReviewId, Principal principal) {
     	FlatReview flatReview = this.flatReviewService.findFlatReviewById(flatReviewId);
-    	Tennant creator = this.tennantService.findTennantById(principal.getName());
+    	Tenant creator = this.tenantService.findTenantById(principal.getName());
 		if (flatReview != null && creator.equals(flatReview.getCreator())) {
 			Flat reviewedFlat = this.flatReviewService.findFlatOfFlatReviewById(flatReviewId);
 			Set<FlatReview> reviews = reviewedFlat.getFlatReviews();

@@ -8,17 +8,23 @@
 
 <flatbook:layout pageName="persons">
 
-    
-    <div class="container col-md-8" align="center">
-    <form:form modelAttribute="message" class="form-horizontal" id="add-person-form">
+    <h2>
+        Change password
+    </h2>
+    <form:form modelAttribute="personForm" class="form-horizontal" id="add-person-form">
         <div class="form-group has-feedback">
-            <flatbook:textAreaField label="body" name="previousPassword"/>
-            <form:hidden path="sender.username"/>
-            <form:hidden path="receiver.username"/>
-            <form:hidden path="creationDate"/>
-            <button class="btn btn-default" type="submit">Submit</button>
+            <flatbook:inputPassword label="Previous password" name="previousPassword"/>
+            <flatbook:inputPassword label="New password" name="password"/>
+            <flatbook:inputPassword label="Confirm password" name="confirmPassword"/>
+            <form:hidden path="username"/>
+            <form:hidden path="saveType"/>
+            <form:hidden path="authority"/>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                 <button class="btn btn-default" type="submit">Submit</button>
+            </div>
         </div>
     </form:form>
-    </div>
 
 </flatbook:layout>

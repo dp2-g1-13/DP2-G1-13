@@ -12,7 +12,7 @@ public interface MessageRepository {
 
 	Message findById(int id) throws DataAccessException;
 
-	void save(Message tennant) throws DataAccessException;
+	void save(Message tenant) throws DataAccessException;
 
 	Collection<Message> findByParticipant(String username) throws DataAccessException;
 

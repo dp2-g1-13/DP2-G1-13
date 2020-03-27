@@ -22,7 +22,7 @@ import org.springframework.samples.flatbook.model.mappers.PersonForm;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-public class PersonFormValidator implements Validator {
+public class PasswordValidator implements Validator {
 
 	private static final String	PASSWORD_PATTERN		= "must have 2 uppers, 2 lowers, 2 simbols, 2 numbers and 8 characters min";
 	private static final String	PASSWORDS_DOESNT_MATCH	= "password doesnt match";
@@ -35,15 +35,15 @@ public class PersonFormValidator implements Validator {
 
 		if (personForm.getPassword() != null) {
 			if (personForm.getPassword() == "") {
-				errors.rejectValue("password", PersonFormValidator.REQUIRED, PersonFormValidator.REQUIRED);
+				errors.rejectValue("password", PasswordValidator.REQUIRED, PasswordValidator.REQUIRED);
 			} else {
 				String pattern = "^(?=(.*[0-9]){2})(?=(.*[!-\\.<-@_]){2})(?=(.*[A-Z]){2})(?=(.*[a-z]){2})\\S{8,100}$";
 				boolean matches = Pattern.matches(pattern, personForm.getPassword());
 
 				if (!matches) {
-					errors.rejectValue("password", PersonFormValidator.PASSWORD_PATTERN, PersonFormValidator.PASSWORD_PATTERN);
+					errors.rejectValue("password", PasswordValidator.PASSWORD_PATTERN, PasswordValidator.PASSWORD_PATTERN);
 				} else if (!personForm.getConfirmPassword().equals(personForm.getPassword())) {
-					errors.rejectValue("confirmPassword", PersonFormValidator.PASSWORDS_DOESNT_MATCH, PersonFormValidator.PASSWORDS_DOESNT_MATCH);
+					errors.rejectValue("confirmPassword", PasswordValidator.PASSWORDS_DOESNT_MATCH, PasswordValidator.PASSWORDS_DOESNT_MATCH);
 				}
 			}
 		}

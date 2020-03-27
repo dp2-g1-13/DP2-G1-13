@@ -1,6 +1,5 @@
-package org.springframework.samples.flatbook.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
+package org.springframework.samples.flatbook.model;
 
 import java.util.Locale;
 import java.util.Set;
@@ -8,13 +7,14 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 /**
  * @author Michael Isvy Simple test to make sure that Bean Validation is working (useful
- * when upgrading to a new version of Hibernate Validator/ Bean Validation)
+ *         when upgrading to a new version of Hibernate Validator/ Bean Validation)
  */
 class ValidatorTests {
 
@@ -32,13 +32,13 @@ class ValidatorTests {
 		person.setFirstName("");
 		person.setLastName("smith");
 
-		Validator validator = createValidator();
+		Validator validator = this.createValidator();
 		Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
 
-		assertThat(constraintViolations.size()).isEqualTo(1);
+		Assertions.assertThat(constraintViolations.size()).isEqualTo(1);
 		ConstraintViolation<Person> violation = constraintViolations.iterator().next();
-		assertThat(violation.getPropertyPath().toString()).isEqualTo("firstName");
-		assertThat(violation.getMessage()).isEqualTo("must not be empty");
+		Assertions.assertThat(violation.getPropertyPath().toString()).isEqualTo("firstName");
+		Assertions.assertThat(violation.getMessage()).isEqualTo("must not be empty");
 	}
 
 }

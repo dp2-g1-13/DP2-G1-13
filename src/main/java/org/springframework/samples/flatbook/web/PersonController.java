@@ -17,7 +17,8 @@ import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
-import org.springframework.samples.flatbook.web.validators.PersonFormValidator;
+import org.springframework.samples.flatbook.web.validators.PasswordValidator;
+import org.springframework.samples.flatbook.web.validators.PersonAuthorityValidator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -31,28 +32,34 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class PersonController {
 
-	@Autowired
-	PersonService			personService;
+	private static final String	USERS_UPDATE_PASSWORD				= "users/updatePassword";
+
+	private static final String	USERS_CREATE_OR_UPDATE_USER_FORM	= "users/createOrUpdateUserForm";
 
 	@Autowired
-	AuthoritiesService		authoritiesService;
+	PersonService				personService;
 
-	public static String	USERNAME_DUPLICATED	= "username in use";
-	public static String	DNI_DUPLICATED		= "dni in use";
-	public static String	EMAIL_DUPLICATED	= "email in use";
-	public static String	WRONG_PASSWORD		= "wrong password";
+	@Autowired
+	AuthoritiesService			authoritiesService;
+
+	public static String		USERNAME_DUPLICATED					= "username in use";
+	public static String		DNI_DUPLICATED						= "dni in use";
+	public static String		EMAIL_DUPLICATED					= "email in use";
+	public static String		WRONG_PASSWORD						= "wrong password";
 
 
 	@ModelAttribute("types")
 	public List<AuthoritiesType> getTypes(final ModelMap model) {
-		return Arrays.asList(AuthoritiesType.HOST, AuthoritiesType.TENNANT);
+		return Arrays.asList(AuthoritiesType.HOST, AuthoritiesType.TENANT);
 	}
 
 	@InitBinder("personForm")
 	public void initBinder(final WebDataBinder dataBinder, final HttpServletRequest http) {
-		dataBinder.addValidators(new PersonFormValidator());
 		if (http.getRequestURI().split("[/]")[http.getRequestURI().split("[/]").length - 1].equals("editPassword")) {
-			dataBinder.setValidator(new PersonFormValidator());
+			dataBinder.setValidator(new PasswordValidator());
+		} else {
+			dataBinder.addValidators(new PasswordValidator());
+			dataBinder.addValidators(new PersonAuthorityValidator());
 		}
 	}
 
@@ -61,13 +68,13 @@ public class PersonController {
 		PersonForm person = new PersonForm();
 		person.setSaveType(SaveType.NEW);
 		model.put("personForm", person);
-		return "users/createOrUpdateUserForm";
+		return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 	}
 
 	@PostMapping("/users/new")
 	public String registerUser(final ModelMap model, @Valid final PersonForm user, final BindingResult result) throws DataAccessException {
 		if (result.hasErrors()) {
-			return "users/createOrUpdateUserForm";
+			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else {
 			try {
 				user.setSaveType(SaveType.NEW);
@@ -75,13 +82,13 @@ public class PersonController {
 				return "redirect:/login";
 			} catch (DuplicatedUsernameException e) {
 				result.rejectValue("username", PersonController.USERNAME_DUPLICATED, PersonController.USERNAME_DUPLICATED);
-				return "users/createOrUpdateUserForm";
+				return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 			} catch (DuplicatedDniException e) {
 				result.rejectValue("dni", PersonController.DNI_DUPLICATED, PersonController.DNI_DUPLICATED);
-				return "users/createOrUpdateUserForm";
+				return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 			} catch (DuplicatedEmailException e) {
 				result.rejectValue("email", PersonController.EMAIL_DUPLICATED, PersonController.EMAIL_DUPLICATED);
-				return "users/createOrUpdateUserForm";
+				return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 			}
 		}
 	}
@@ -92,13 +99,13 @@ public class PersonController {
 		user.setAuthority(this.authoritiesService.findAuthorityById(username));
 		user.setSaveType(SaveType.EDIT);
 		model.put("personForm", user);
-		return "users/createOrUpdateUserForm";
+		return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 	}
 
 	@PostMapping("/users/{username}/edit")
 	public String updateUserProfile(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username) throws DataAccessException {
 		if (result.hasErrors()) {
-			return "users/createOrUpdateUserForm";
+			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else {
 			user.setSaveType(SaveType.EDIT);
 			user.setUsername(username);
@@ -108,7 +115,7 @@ public class PersonController {
 				this.personService.saveUser(user);
 			} catch (DuplicatedUsernameException | DuplicatedDniException | DuplicatedEmailException e) {
 			}
-			return "users/createOrUpdateUserForm";
+			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		}
 	}
 
@@ -118,18 +125,18 @@ public class PersonController {
 		user.setAuthority(this.authoritiesService.findAuthorityById(username));
 		user.setSaveType(SaveType.EDIT);
 		model.put("personForm", user);
-		return "users/updatePassword";
+		return PersonController.USERS_UPDATE_PASSWORD;
 	}
 
 	@PostMapping("/users/{username}/editPassword")
 	public String updatePassword(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username) throws DataAccessException {
 		if (result.hasErrors()) {
-			return "users/updatePassword";
+			return PersonController.USERS_UPDATE_PASSWORD;
 		} else {
 			PersonForm previous = new PersonForm(this.personService.findUserById(username));
 			if (!previous.getPassword().equals(user.getPreviousPassword())) {
 				result.rejectValue("previousPassword", PersonController.WRONG_PASSWORD, PersonController.WRONG_PASSWORD);
-				return "users/updatePassword";
+				return PersonController.USERS_UPDATE_PASSWORD;
 			}
 			previous.setPassword(user.getPassword());
 			previous.setAuthority(this.authoritiesService.findAuthorityById(username));

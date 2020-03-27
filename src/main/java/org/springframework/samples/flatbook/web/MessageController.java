@@ -53,7 +53,7 @@ public class MessageController {
 	@GetMapping("/list")
 	public String messageList(final ModelMap model, final Principal principal) {
 		model.put("messages", this.messageService.findMessagesByParticipant(principal.getName()));
-		return "users/messages/conversationList";
+		return MessageController.USERS_MESSAGES_CONVERSATION_LIST;
 	}
 
 	@GetMapping("/{username}")

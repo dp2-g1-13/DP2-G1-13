@@ -8,11 +8,10 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
 
@@ -37,9 +36,9 @@ public class PersonForm {
 		this.phoneNumber = person.getPhoneNumber();
 	}
 
-	public PersonForm(final Tennant person) {
+	public PersonForm(final Tenant person) {
 		this((Person) person);
-		this.authority = AuthoritiesType.TENNANT;
+		this.authority = AuthoritiesType.TENANT;
 	}
 
 	public PersonForm(final Host person) {
@@ -50,8 +49,7 @@ public class PersonForm {
 
 	@Id
 	@NotBlank
-	@Size(min = 5, max = 20)
-	@Pattern(regexp = "[a-zA-Z0-9]{5,20}")
+	@Pattern(regexp = "^[a-zA-Z0-9]{5,20}$")
 	String				username;
 
 	String				password;

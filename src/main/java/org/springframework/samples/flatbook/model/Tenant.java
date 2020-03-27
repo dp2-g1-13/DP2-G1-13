@@ -34,14 +34,14 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "tennants")
-public class Tennant extends Person {
+@Table(name = "tenants")
+public class Tenant extends Person {
 
-	public Tennant() {
+	public Tenant() {
 
 	}
 
-	public Tennant(final PersonForm person) {
+	public Tenant(final PersonForm person) {
 		super(person);
 	}
 
@@ -54,5 +54,5 @@ public class Tennant extends Person {
 	private Set<Request>		requests;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<TennantReview>	reviews;
+	private Set<TenantReview>	reviews;
 }

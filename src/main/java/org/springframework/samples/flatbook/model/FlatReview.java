@@ -34,5 +34,5 @@ public class FlatReview extends Review {
 
 	@NotNull
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Tennant creator;
+	private Tenant creator;
 }

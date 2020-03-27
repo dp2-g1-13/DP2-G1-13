@@ -6,7 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
 import org.springframework.samples.flatbook.model.mappers.PersonForm;
@@ -30,7 +30,7 @@ public class PersonService {
 
 	@Transactional(rollbackFor = DuplicatedUsernameException.class)
 	public void saveUser(final PersonForm user) throws DataAccessException, DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : new Tennant(user);
+		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : new Tenant(user);
 		SaveType type = user.getSaveType();
 
 		if (SaveType.NEW.equals(type) && this.personRepository.findByUsername(user.getUsername()) != null) {
