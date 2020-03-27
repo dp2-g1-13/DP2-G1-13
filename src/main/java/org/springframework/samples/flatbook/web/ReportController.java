@@ -39,22 +39,32 @@ public class ReportController {
     public String initCreationForm(Map<String, Object> model, Principal principal, @PathVariable("userId") final String userId) {
     	Person reported = personService.findUserById(userId);
     	Person creator = personService.findUserById(principal.getName());
-    	Report r = new Report();
-    	r.setCreationDate(LocalDate.now());
-    	r.setReceiver(reported);
-    	r.setSender(creator);
-        model.put("report", r);
-        return VIEWS_REPORTS_CREATE_OR_UPDATE_FORM;
+    	if(reported != null) {
+    		Report r = new Report();
+        	r.setCreationDate(LocalDate.now());
+        	r.setReceiver(reported);
+        	r.setSender(creator);
+            model.put("report", r);
+            return VIEWS_REPORTS_CREATE_OR_UPDATE_FORM;
+    	}else {
+    		throw new IllegalArgumentException("Bad user id.");
+    	}
+        
     }
 
     @PostMapping(value = "/users/{userId}/reports/new")
     public String processCreationForm(@Valid Report r, BindingResult result, Principal principal, @PathVariable("userId") final String userId) {
-        if(result.hasErrors()) {
-           return VIEWS_REPORTS_CREATE_OR_UPDATE_FORM;
-        } else {
-        	r.setCreationDate(LocalDate.now());
-            this.reportService.saveReport(r);
-            return "redirect:/";
-        }
+    	Person reported = personService.findUserById(userId);
+    	if(reported != null) {
+    		if(result.hasErrors()) {
+    	           return VIEWS_REPORTS_CREATE_OR_UPDATE_FORM;
+    	        } else {
+    	        	r.setCreationDate(LocalDate.now());
+    	            this.reportService.saveReport(r);
+    	            return "redirect:/";
+    	        }
+    	}else {
+    		throw new IllegalArgumentException("Bad user id.");
+    	}
     }
 }
