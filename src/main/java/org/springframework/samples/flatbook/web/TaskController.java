@@ -10,9 +10,7 @@ import org.springframework.samples.flatbook.service.TennantService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 
@@ -38,48 +36,40 @@ public class TaskController {
         this.flatService = flatService;
     }
     
-    @InitBinder
-    public void setAllowedFields(WebDataBinder dataBinder) {
-        dataBinder.setDisallowedFields("id");
-    }
-
-    @ModelAttribute("roommates")
-	public Collection<Tennant> populateRoommates(Principal principal) {
-		return this.flatService.findTennantsById(this.tennantService.findTennantById(principal.getName()).getFlat().getId());
-	}
-    
     @GetMapping(value = "/tasks/new")
     public String initCreationForm(Map<String, Object> model, Principal principal) {
-    	Task task = new Task();
-    	task.setCreator(tennantService.findTennantById(principal.getName()));
-    	task.setCreationDate(LocalDate.now());
-    	task.setStatus(TaskStatus.TODO);
-        model.put("task", task);
-        return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
+    	Integer creatorFlatId = this.tennantService.findTennantById(principal.getName()).getFlat().getId();
+    	if(creatorFlatId != null) {
+    		Collection<Tennant> roommates = this.flatService.findTennantsById(creatorFlatId);
+    		Task task = new Task();
+        	task.setCreator(tennantService.findTennantById(principal.getName()));
+        	task.setCreationDate(LocalDate.now());
+        	task.setStatus(TaskStatus.TODO);
+            model.put("task", task);
+            model.put("roommates", roommates);
+            return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
+    	}else {
+    		throw new RuntimeException("You can't create a task if you dont live in a flat.");
+    	}
     }
 
     @PostMapping(value = "/tasks/new")
-    public String processCreationForm(@Valid Task task, BindingResult result) {
-        if(result.hasErrors()) {
-           return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
-        } else {
-        	task.setCreationDate(LocalDate.now());
-            this.taskService.saveTask(task);
-            return "redirect:/";
-        }
-    }
-
-    @GetMapping(value = "/tasks/{taskId}")
-    public ModelAndView showTask(@PathVariable("taskId") int taskId, Principal principal, @ModelAttribute("roommates") Collection<Tennant> roommates) {
-    	Task task = this.taskService.findTaskById(taskId);
-    	Tennant logged = this.tennantService.findTennantById(principal.getName());
-    	if (task != null && roommates.contains(logged)) {
-    		ModelAndView mav = new ModelAndView("tasks/taskDetails");
-    		mav.addObject(this.taskService.findTaskById(taskId));
-    		return mav;
-		} else {
-			throw new IllegalArgumentException("Bad task id or you can not see the task.");
-		}
+    public String processCreationForm(Map<String, Object> model, @Valid Task task, BindingResult result, Principal principal) {
+    	Integer creatorFlatId = this.tennantService.findTennantById(principal.getName()).getFlat().getId();
+    	Collection<Tennant> roommates = this.flatService.findTennantsById(creatorFlatId);
+    	if(creatorFlatId != null && roommates.contains(task.getAsignee())) {
+    		if(result.hasErrors()) {
+    			model.put("roommates", roommates);
+            	return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
+            } else {
+            	task.setCreationDate(LocalDate.now());
+            	task.setStatus(TaskStatus.TODO);
+                this.taskService.saveTask(task);
+                return "redirect:/";
+            }
+    	}else {
+    		throw new RuntimeException("Oops!");
+    	}
     }
     
     @GetMapping(value = "/tasks/{taskId}/remove")
@@ -95,12 +85,14 @@ public class TaskController {
 	}
     
     @GetMapping(value = "/tasks/{taskId}/edit")
-	public String initUpdateForm(@PathVariable("taskId") final int taskId, final ModelMap model, Principal principal, @ModelAttribute("roommates") Collection<Tennant> roommates) {
+	public String initUpdateForm(@PathVariable("taskId") final int taskId, final ModelMap model, Principal principal) {
 		Task task = this.taskService.findTaskById(taskId);
-		Tennant logged = this.tennantService.findTennantById(principal.getName());
-    	if (task != null && roommates.contains(logged)) {
+		Integer creatorFlatId = this.tennantService.findTennantById(principal.getName()).getFlat().getId();
+		Collection<Tennant> roommates = this.flatService.findTennantsById(creatorFlatId);
+    	if (creatorFlatId != null && task != null && roommates.contains(task.getCreator())) {
 			model.put("taskStatus", Arrays.asList(TaskStatus.values()));
 			model.put("task", task);
+			model.put("roommates", roommates);
 			return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
 		} else {
 			throw new IllegalArgumentException("Bad task id or you can not edit the task.");
@@ -108,14 +100,21 @@ public class TaskController {
 	}
 
 	@PostMapping(value = "/tasks/{taskId}/edit")
-	public String processUpdateForm(@Valid final Task task, @PathVariable("taskId") final int taskId, final BindingResult result, final ModelMap model) {
-		if (result.hasErrors()) {
-			model.put("task", task);
-			return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
-		} else {
-			task.setId(taskId);
-			this.taskService.saveTask(task);
-			return "redirect:/";
-		}
+	public String processUpdateForm(@Valid final Task task, final BindingResult result, @PathVariable("taskId") final int taskId,  final ModelMap model, Principal principal) {
+		Integer creatorFlatId = this.tennantService.findTennantById(principal.getName()).getFlat().getId();
+		Collection<Tennant> roommates = this.flatService.findTennantsById(creatorFlatId);
+		if (creatorFlatId != null && roommates.contains(task.getCreator())) {
+			if (result.hasErrors()) {
+				model.put("roommates", roommates);
+				model.put("taskStatus", Arrays.asList(TaskStatus.values()));
+				return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
+			} else {
+				task.setId(taskId);
+				this.taskService.saveTask(task);
+				return "redirect:/";
+			}
+		}else {
+    		throw new RuntimeException("Oops!");
+    	}
 	}
 }
