@@ -16,7 +16,6 @@
 
 package org.springframework.samples.flatbook.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;

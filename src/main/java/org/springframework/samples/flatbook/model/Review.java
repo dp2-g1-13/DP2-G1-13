@@ -24,6 +24,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -48,6 +49,7 @@ public class Review extends BaseEntity {
 	@NotNull
 	@Column(name = "creation_date")
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@PastOrPresent
 	private LocalDate	creationDate;
 
 }
