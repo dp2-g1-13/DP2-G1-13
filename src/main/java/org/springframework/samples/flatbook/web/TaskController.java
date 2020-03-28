@@ -36,9 +36,29 @@ public class TaskController {
         this.flatService = flatService;
     }
     
+    private Integer getCreatorFlatId(String creatorUsername) {
+		Integer res = null;
+		try {
+			res = this.tennantService.findTennantById(creatorUsername).getFlat().getId();
+			return res;
+		} catch (NullPointerException e) {
+			return res;
+		}
+	}
+    
+    private Collection<Tennant> getCreatorRoommates(Integer creatorFlatId) {
+    	Collection<Tennant> res = null;
+		try {
+			res = this.flatService.findTennantsById(creatorFlatId);
+			return res;
+		} catch (NullPointerException e) {
+			return res;
+		}
+	}
+    
     @GetMapping(value = "/tasks/new")
     public String initCreationForm(Map<String, Object> model, Principal principal) {
-    	Integer creatorFlatId = this.tennantService.findTennantById(principal.getName()).getFlat().getId();
+    	Integer creatorFlatId = getCreatorFlatId(principal.getName());
     	if(creatorFlatId != null) {
     		Collection<Tennant> roommates = this.flatService.findTennantsById(creatorFlatId);
     		Task task = new Task();
@@ -55,9 +75,9 @@ public class TaskController {
 
     @PostMapping(value = "/tasks/new")
     public String processCreationForm(Map<String, Object> model, @Valid Task task, BindingResult result, Principal principal) {
-    	Integer creatorFlatId = this.tennantService.findTennantById(principal.getName()).getFlat().getId();
-    	Collection<Tennant> roommates = this.flatService.findTennantsById(creatorFlatId);
-    	if(creatorFlatId != null && roommates.contains(task.getAsignee())) {
+    	Integer creatorFlatId = getCreatorFlatId(principal.getName());
+    	Collection<Tennant> roommates = getCreatorRoommates(creatorFlatId);
+    	if(creatorFlatId != null && roommates!=null && roommates.contains(task.getAsignee())) {
     		if(result.hasErrors()) {
     			model.put("roommates", roommates);
             	return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
@@ -87,9 +107,9 @@ public class TaskController {
     @GetMapping(value = "/tasks/{taskId}/edit")
 	public String initUpdateForm(@PathVariable("taskId") final int taskId, final ModelMap model, Principal principal) {
 		Task task = this.taskService.findTaskById(taskId);
-		Integer creatorFlatId = this.tennantService.findTennantById(principal.getName()).getFlat().getId();
-		Collection<Tennant> roommates = this.flatService.findTennantsById(creatorFlatId);
-    	if (creatorFlatId != null && task != null && roommates.contains(task.getCreator())) {
+		Integer creatorFlatId = getCreatorFlatId(principal.getName());
+		Collection<Tennant> roommates = getCreatorRoommates(creatorFlatId);
+    	if (creatorFlatId != null && task != null && roommates!=null && roommates.contains(task.getCreator())) {
 			model.put("taskStatus", Arrays.asList(TaskStatus.values()));
 			model.put("task", task);
 			model.put("roommates", roommates);
@@ -101,9 +121,9 @@ public class TaskController {
 
 	@PostMapping(value = "/tasks/{taskId}/edit")
 	public String processUpdateForm(@Valid final Task task, final BindingResult result, @PathVariable("taskId") final int taskId,  final ModelMap model, Principal principal) {
-		Integer creatorFlatId = this.tennantService.findTennantById(principal.getName()).getFlat().getId();
-		Collection<Tennant> roommates = this.flatService.findTennantsById(creatorFlatId);
-		if (creatorFlatId != null && roommates.contains(task.getCreator())) {
+		Integer creatorFlatId = getCreatorFlatId(principal.getName());
+		Collection<Tennant> roommates = getCreatorRoommates(creatorFlatId);
+		if (creatorFlatId != null && roommates!=null && roommates.contains(task.getCreator())) {
 			if (result.hasErrors()) {
 				model.put("roommates", roommates);
 				model.put("taskStatus", Arrays.asList(TaskStatus.values()));

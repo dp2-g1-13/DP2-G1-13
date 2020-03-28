@@ -16,6 +16,7 @@ import org.springframework.samples.flatbook.web.formatters.TennantFormatter;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.BindingResult;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class TaskControllerTests {
 	private static final Integer TEST_FLAT_ID = 1;
     private static final String TEST_CREATOR_USERNAME = "creator";
     private static final String TEST_ASIGNEE_USERNAME = "asignee";
+    private static final String TEST_NOTALLOWED_USERNAME = "notallowed";
 
     @Autowired
     private MockMvc mockMvc;
@@ -59,14 +61,21 @@ public class TaskControllerTests {
     @BeforeEach
     void setup() {
     	
+    	Flat flat = new Flat();
+        flat.setId(TEST_FLAT_ID);
+    	
         Tennant creator = new Tennant();
         creator.setUsername(TEST_CREATOR_USERNAME);
-        Flat flat = new Flat();
-        flat.setId(TEST_FLAT_ID);
         creator.setFlat(flat);
         
         Tennant asignee = new Tennant();
         asignee.setUsername(TEST_ASIGNEE_USERNAME);
+        asignee.setFlat(flat);
+        
+        Set<Tennant> tennants = new HashSet<>();
+        tennants.add(creator);
+        tennants.add(asignee);
+        flat.setTennants(tennants);
         
         TaskStatus status = TaskStatus.TODO;
         LocalDate creationDate = LocalDate.now();
@@ -74,22 +83,24 @@ public class TaskControllerTests {
         Task task = new Task();
         task.setId(TEST_TASK_ID);
         task.setAsignee(asignee);
+        task.setCreator(creator);
         task.setCreationDate(creationDate);
         task.setAsignee(asignee);
         task.setTitle("title");
         task.setDescription("description");
         task.setStatus(status);
         
-        Collection<Tennant> flatTennants = new ArrayList<>();
-        flatTennants.add(creator);
-        flatTennants.add(asignee);
-        
-        given(this.flatService.findTennantsById(TEST_FLAT_ID)).willReturn(flatTennants);
+        Tennant notAllowed = new Tennant();
+        notAllowed.setUsername(TEST_NOTALLOWED_USERNAME);
+
+        given(this.flatService.findTennantsById(TEST_FLAT_ID)).willReturn(flat.getTennants());
         given(this.tennantService.findTennantById(TEST_CREATOR_USERNAME)).willReturn(creator);
+        given(this.tennantService.findTennantById(TEST_ASIGNEE_USERNAME)).willReturn(asignee);
+        given(this.tennantService.findTennantById(TEST_NOTALLOWED_USERNAME)).willReturn(notAllowed);
         given(this.taskService.findTaskById(TEST_TASK_ID)).willReturn(task);
     }
 
-    @WithMockUser(value = "creator", roles = {"TENNANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
     @Test
     void testInitCreationForm() throws Exception {
         mockMvc.perform(get("/tasks/new"))
@@ -98,70 +109,52 @@ public class TaskControllerTests {
             .andExpect(model().attributeExists("task"));
     }
 
-//    @WithMockUser(value = "spring", roles = {"HOST"})
-//    @Test
-//    void testProcessCreationFormSuccess() throws Exception {
-//        MockMultipartFile file1 = new MockMultipartFile("images", "image1.png", "image/png", "image1".getBytes());
-//        MockMultipartFile file2 = new MockMultipartFile("images", "image2.png", "image/png", "image2".getBytes());
-//        MockMultipartFile file3 = new MockMultipartFile("images", "image3.png", "image/png", "image3".getBytes());
-//        MockMultipartFile file4 = new MockMultipartFile("images", "image4.png", "image/png", "image4".getBytes());
-//        MockMultipartFile file5 = new MockMultipartFile("images", "image5.png", "image/png", "image5".getBytes());
-//        MockMultipartFile file6 = new MockMultipartFile("images", "image6.png", "image/png", "image6".getBytes());
-//
-//        mockMvc.perform(multipart("/flats/new")
-//            .file(file1)
-//            .file(file2)
-//            .file(file3)
-//            .file(file4)
-//            .file(file5)
-//            .file(file6)
-//            .with(csrf())
-//            .param("description", "this is a sample description with more than 30 chars")
-//            .param("squareMeters", "90")
-//            .param("numberRooms", "2")
-//            .param("numberBaths", "2")
-//            .param("availableServices", "Wifi and cable TV")
-//            .param("address.address", "Avenida de la República Argentina")
-//            .param("address.postalCode", "41011")
-//            .param("address.city", "Sevilla")
-//            .param("address.country", "Spain"))
-//            .andExpect(status().is3xxRedirection());
-//    }
-//
-//    @WithMockUser(value = "spring", roles = {"HOST"})
-//    @Test
-//    void testProcessCreationFormHasErrors() throws Exception {
-//        MockMultipartFile file1 = new MockMultipartFile("images", "image1.png", "image/png", "image1".getBytes());
-//        MockMultipartFile file2 = new MockMultipartFile("images", "image2.png", "image/png", "image2".getBytes());
-//        MockMultipartFile file3 = new MockMultipartFile("images", "image3.png", "image/png", "image3".getBytes());
-//        MockMultipartFile file4 = new MockMultipartFile("images", "image4.png", "image/png", "image4".getBytes());
-//        MockMultipartFile file5 = new MockMultipartFile("images", "image5.png", "image/png", "image5".getBytes());
-//        MockMultipartFile file6 = new MockMultipartFile("images", "image6.png", "image/png", "image6".getBytes());
-//
-//        mockMvc.perform(multipart("/flats/new")
-//            .file(file1)
-//            .file(file2)
-//            .file(file3)
-//            .file(file4)
-//            .file(file5)
-//            .file(file6)
-//            .with(csrf())
-//            .param("description", "sample description w 29 chars")
-//            .param("squareMeters", "90")
-//            .param("numberBaths", "0")
-//            .param("availableServices", "Wifi and cable TV")
-//            .param("address.address", "Avenida de la República Argentina")
-//            .param("address.postalCode", "41011")
-//            .param("address.city", "Sevilla")
-//            .param("address.country", "Spain"))
-//            .andExpect(status().isOk())
-//            .andExpect(model().attributeHasErrors("flat"))
-//            .andExpect(model().attributeHasFieldErrors("flat", "description"))
-//            .andExpect(model().attributeHasFieldErrors("flat", "numberRooms"))
-//            .andExpect(model().attributeHasFieldErrors("flat", "numberBaths"))
-//            .andExpect(view().name("flats/createOrUpdateFlatForm"));
-//    }
-//
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @Test
+    void testProcessCreationFormSuccess() throws Exception {
+        mockMvc.perform(post("/tasks/new")
+            .with(csrf())
+            .param("asignee", TEST_ASIGNEE_USERNAME)
+        	.param("creationDate", "01/01/2005")
+        	.param("creator", TEST_CREATOR_USERNAME)
+        	.param("description", "description")
+        	.param("status", "TODO")
+            .param("title", "title"))
+            .andExpect(status().is3xxRedirection());
+    }
+
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @Test
+    void testProcessCreationFormHasErrors() throws Exception {
+
+        mockMvc.perform(post("/tasks/new")
+            .with(csrf())
+            .param("asignee", TEST_ASIGNEE_USERNAME)
+        	.param("description", "description")
+        	.param("status", "TODO"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeHasErrors("task"))
+            .andExpect(model().attributeHasFieldErrors("task", "title"))
+            .andExpect(model().attributeHasFieldErrors("task", "creator"))
+            .andExpect(model().attributeHasFieldErrors("task", "creationDate"))
+            .andExpect(view().name("tasks/createOrUpdateTaskForm"));
+    }
+    
+    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENNANT"})
+    @Test
+    void testProcessCreationFormNotAllowedUser() throws Exception {
+
+        mockMvc.perform(post("/tasks/new")
+            .with(csrf())
+            .param("asignee", TEST_ASIGNEE_USERNAME)
+        	.param("creationDate", "01/01/2005")
+        	.param("creator", TEST_NOTALLOWED_USERNAME)
+        	.param("description", "description")
+        	.param("status", "TODO")
+            .param("title", "title"))
+            .andExpect(view().name("exception"));
+    }
+
 //    @WithMockUser(value = "spring", roles = {"HOST"})
 //    @Test
 //    void testInitUpdateForm() throws Exception {
