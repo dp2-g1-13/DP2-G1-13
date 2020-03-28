@@ -1,6 +1,7 @@
 
 package org.springframework.samples.flatbook.web;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +32,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class PersonController {
+
+	private static final String	ONLY_CAN_EDIT_YOUR_OWN_PROFILE		= "Only can edit your own profile";
+
+	private static final String	ONLY_CAN_EDIT_YOUR_OWN_PASSWORD		= "Only can edit your own password";
 
 	private static final String	USERS_UPDATE_PASSWORD				= "users/updatePassword";
 
@@ -94,18 +99,25 @@ public class PersonController {
 	}
 
 	@GetMapping("/users/{username}/edit")
-	public String findUserProfile(final ModelMap model, @PathVariable("username") final String username) {
-		PersonForm user = new PersonForm(this.personService.findUserById(username));
-		user.setAuthority(this.authoritiesService.findAuthorityById(username));
-		user.setSaveType(SaveType.EDIT);
-		model.put("personForm", user);
-		return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
+	public String findUserProfile(final ModelMap model, @PathVariable("username") final String username, final Principal principal) {
+		if (username.equals(principal.getName()) || this.authoritiesService.findAuthorityById(principal.getName()).equals(AuthoritiesType.ADMIN)) {
+			PersonForm user = new PersonForm(this.personService.findUserById(username));
+			user.setAuthority(this.authoritiesService.findAuthorityById(username));
+			user.setSaveType(SaveType.EDIT);
+			model.put("personForm", user);
+			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
+		} else {
+			throw new RuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
+		}
+
 	}
 
 	@PostMapping("/users/{username}/edit")
-	public String updateUserProfile(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username) throws DataAccessException {
+	public String updateUserProfile(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username, final Principal principal) throws DataAccessException {
 		if (result.hasErrors()) {
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
+		} else if (!username.equals(principal.getName()) && !this.authoritiesService.findAuthorityById(principal.getName()).equals(AuthoritiesType.ADMIN)) {
+			throw new RuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
 		} else {
 			user.setSaveType(SaveType.EDIT);
 			user.setUsername(username);
@@ -115,23 +127,29 @@ public class PersonController {
 				this.personService.saveUser(user);
 			} catch (DuplicatedUsernameException | DuplicatedDniException | DuplicatedEmailException e) {
 			}
-			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
+			return "redirect:/";
 		}
 	}
 
 	@GetMapping("/users/{username}/editPassword")
-	public String initPassword(final ModelMap model, @PathVariable("username") final String username) {
-		PersonForm user = new PersonForm(this.personService.findUserById(username));
-		user.setAuthority(this.authoritiesService.findAuthorityById(username));
-		user.setSaveType(SaveType.EDIT);
-		model.put("personForm", user);
-		return PersonController.USERS_UPDATE_PASSWORD;
+	public String initPassword(final ModelMap model, @PathVariable("username") final String username, final Principal principal) {
+		if (username.equals(principal.getName())) {
+			PersonForm user = new PersonForm(this.personService.findUserById(username));
+			user.setAuthority(this.authoritiesService.findAuthorityById(username));
+			user.setSaveType(SaveType.EDIT);
+			model.put("personForm", user);
+			return PersonController.USERS_UPDATE_PASSWORD;
+		} else {
+			throw new RuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
+		}
 	}
 
 	@PostMapping("/users/{username}/editPassword")
-	public String updatePassword(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username) throws DataAccessException {
+	public String updatePassword(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username, final Principal principal) throws DataAccessException {
 		if (result.hasErrors()) {
 			return PersonController.USERS_UPDATE_PASSWORD;
+		} else if (!username.equals(principal.getName())) {
+			throw new RuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
 		} else {
 			PersonForm previous = new PersonForm(this.personService.findUserById(username));
 			if (!previous.getPassword().equals(user.getPreviousPassword())) {
