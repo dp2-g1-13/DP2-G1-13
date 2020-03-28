@@ -17,14 +17,17 @@
 package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
@@ -49,7 +52,20 @@ public class Request extends BaseEntity {
 
 	@NotNull
 	@Column(name = "creation_date")
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private LocalDate		creationDate;
+	@DateTimeFormat(pattern = "dd/MM/yyyy HH:mm")
+    @PastOrPresent
+	private LocalDateTime creationDate;
+
+    @NotNull
+    @Column(name = "start_date")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Future
+    private LocalDate startDate;
+
+    @NotNull
+    @Column(name = "finish_date")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Future
+    private LocalDate finishDate;
 
 }

@@ -16,6 +16,7 @@
 
 package org.springframework.samples.flatbook.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -55,4 +56,11 @@ public class Tennant extends Person {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<TennantReview>	reviews;
+
+	public void addRequest(Request request) {
+        if(this.requests == null) {
+            this.requests = new HashSet<>();
+        }
+        requests.add(request);
+    }
 }

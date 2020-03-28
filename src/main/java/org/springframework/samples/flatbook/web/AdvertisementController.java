@@ -2,19 +2,15 @@ package org.springframework.samples.flatbook.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.*;
-import org.springframework.samples.flatbook.service.AdvertisementService;
-import org.springframework.samples.flatbook.service.DBImageService;
-import org.springframework.samples.flatbook.service.FlatService;
-import org.springframework.samples.flatbook.service.HostService;
-import org.springframework.samples.flatbook.service.exceptions.NotFoundException;
+import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
+import org.springframework.samples.flatbook.service.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -33,18 +29,18 @@ public class AdvertisementController {
     private FlatService flatService;
     private DBImageService dbImageService;
     private HostService hostService;
+    private RequestService requestService;
+    private PersonService personService;
 
     @Autowired
-    public AdvertisementController(AdvertisementService advertisementService, DBImageService dbImageService, FlatService flatService, HostService hostService) {
+    public AdvertisementController(AdvertisementService advertisementService, DBImageService dbImageService, FlatService flatService, HostService hostService,
+                                   RequestService requestService, PersonService personService) {
         this.advertisementService = advertisementService;
         this.dbImageService = dbImageService;
         this.flatService = flatService;
         this.hostService = hostService;
-    }
-
-    @InitBinder
-    public void setAllowedFields(WebDataBinder dataBinder) {
-        dataBinder.setDisallowedFields("id");
+        this.requestService = requestService;
+        this.personService = personService;
     }
 
     @GetMapping(value = "/flats/{flatId}/advertisements/new")
@@ -55,13 +51,13 @@ public class AdvertisementController {
             model.put("exception", ex);
             return "exception";
         }
-        FormAdvertisement advertisement = new FormAdvertisement();
-        model.put("advertisement", advertisement);
+        AdvertisementForm advertisement = new AdvertisementForm();
+        model.put("formAdvertisement", advertisement);
         return VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
     }
 
     @PostMapping(value = "/flats/{flatId}/advertisements/new")
-        public String processCreationForm(@Valid FormAdvertisement adv, @PathVariable("flatId") int flatId, BindingResult result, Map<String, Object> model) {
+        public String processCreationForm(ModelMap model, @Valid AdvertisementForm adv, BindingResult result, @PathVariable("flatId") int flatId) {
         if(result.hasErrors()) {
             return VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
         } else {
@@ -86,13 +82,13 @@ public class AdvertisementController {
             model.put("exception", ex);
             return "exception";
         }
-        FormAdvertisement fa = new FormAdvertisement(adv);
-        model.put("advertisement", fa);
+        AdvertisementForm fa = new AdvertisementForm(adv);
+        model.put("formAdvertisement", fa);
         return VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
     }
 
     @PostMapping(value = "/advertisements/{advertisementId}/edit")
-    public String processEditForm(@Valid FormAdvertisement adv, @PathVariable("advertisementId") int advertisementId, BindingResult result, Map<String, Object> model) {
+    public String processEditForm(@Valid AdvertisementForm adv, @PathVariable("advertisementId") int advertisementId, BindingResult result, Map<String, Object> model) {
         if(result.hasErrors()) {
             return VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
         } else {
@@ -133,6 +129,14 @@ public class AdvertisementController {
         mav.addObject("images", images);
         String hostUsername = this.hostService.findHostByFlatId(advertisement.getFlat().getId()).getUsername();
         mav.addObject("host", hostUsername);
+        Person person = this.personService.findUserById(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername());
+        if(person instanceof Tennant) {
+            mav.addObject("requestMade", this.requestService.isThereRequestOfTenantByAdvertisementId(person.getUsername(), advertisementId));
+            mav.addObject("hasFlat", ((Tennant) person).getFlat() != null);
+        }
+
+
+
         return mav;
     }
 
@@ -148,11 +152,11 @@ public class AdvertisementController {
         String country = sp.length > 1? sp[1].trim() : null;
 
         Set<Advertisement> results;
-        if(country == null && address.getPostalCode() == null) {
+        if(country == null && (address.getPostalCode() == null || address.getPostalCode().isEmpty())) {
             results = this.advertisementService.findAdvertisementsByCity(city);
-        } else if(country == null && address.getPostalCode() != null) {
+        } else if(country == null && address.getPostalCode() != null && !address.getPostalCode().isEmpty()) {
             results = this.advertisementService.findAdvertisementsByCityAndPostalCode(city, address.getPostalCode());
-        } else if(country != null && address.getPostalCode() == null){
+        } else if(country != null && (address.getPostalCode() == null || address.getPostalCode().isEmpty())){
             results = this.advertisementService.findAdvertisementsByCityAndCountry(city, country);
         } else {
             results = this.advertisementService.findAdvertisementsByCityAndCountryAndPostalCode(city, country, address.getPostalCode());

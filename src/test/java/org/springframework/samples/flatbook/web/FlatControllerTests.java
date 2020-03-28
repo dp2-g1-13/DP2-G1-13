@@ -11,6 +11,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.samples.flatbook.configuration.SecurityConfiguration;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,8 +26,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = FlatController.class,
-    includeFilters = {@ComponentScan.Filter(value = FlatFormatter.class, type = FilterType.ASSIGNABLE_TYPE),
-        @ComponentScan.Filter(value = MultipartToDBImageConverter.class, type = FilterType.ASSIGNABLE_TYPE)},
+    includeFilters = {@ComponentScan.Filter(value = MultipartToDBImageConverter.class, type = FilterType.ASSIGNABLE_TYPE),
+        @ComponentScan.Filter(value = FlatValidator.class, type = FilterType.ASSIGNABLE_TYPE)},
     excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class),
     excludeAutoConfiguration= SecurityConfiguration.class)
 class FlatControllerTests {
@@ -70,7 +71,8 @@ class FlatControllerTests {
         image.setId(TEST_IMAGE_ID);
         images.add(image);
         images.add(new DBImage());
-//        images.add(new DBImage());
+        images.add(new DBImage());
+        images.add(new DBImage());
         images.add(new DBImage());
         images.add(new DBImage());
         images.add(new DBImage());
@@ -189,27 +191,53 @@ class FlatControllerTests {
             .andExpect(model().attribute("flat", hasProperty("address", hasProperty("city", is("Sevilla")))))
             .andExpect(model().attribute("flat", hasProperty("address", hasProperty("country", is("Spain")))))
             .andExpect(model().attributeExists("images"))
-            .andExpect(model().attribute("images", hasSize(5)))
+            .andExpect(model().attribute("images", hasSize(7)))
             .andExpect(view().name("flats/createOrUpdateFlatForm"));
     }
 
-//    @WithMockUser(value = "spring", roles = {"HOST"})
-//    @Test
-//    void testProcessUpdateFormSuccess() throws Exception {
-//        mockMvc.perform(multipart("/flats/{flatId}/edit", TEST_FLAT_ID)
-//            .with(csrf())
-//            .param("description", "this is a sample description with more than 30 chars")
-//            .param("squareMeters", "90")
-//            .param("numberRooms", "2")
-//            .param("numberBaths", "2")
-//            .param("availableServices", "Wifi and cable TV")
-//            .param("address.address", "Calle Luis Montoto")
-//            .param("address.postalCode", "41003")
-//            .param("address.city", "Sevilla")
-//            .param("address.country", "Spain"))
-//            .andExpect(status().is3xxRedirection())
-//            .andExpect(view().name("redirect:/flats/{flatId}"));
-//    }
+    @WithMockUser(value = "spring", roles = {"HOST"})
+    @Test
+    void testProcessUpdateFormSuccess() throws Exception {
+        MockMultipartFile file1 = new MockMultipartFile("images", "image1.png", "image/png", "image1".getBytes());
+
+        mockMvc.perform(multipart("/flats/{flatId}/edit", TEST_FLAT_ID)
+            .file(file1)
+            .with(csrf())
+            .param("description", "this is a sample description with more than 30 chars")
+            .param("squareMeters", "90")
+            .param("numberRooms", "2")
+            .param("numberBaths", "2")
+            .param("availableServices", "Wifi and cable TV")
+            .param("address.address", "Calle Luis Montoto")
+            .param("address.postalCode", "41003")
+            .param("address.city", "Sevilla")
+            .param("address.country", "Spain"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/flats/{flatId}"));
+    }
+
+    @WithMockUser(value = "spring", roles = {"HOST"})
+    @Test
+    void testProcessUpdateFormWithErrors() throws Exception {
+        MockMultipartFile file1 = new MockMultipartFile("images", "", "application/octet-stream", new byte[]{});
+
+        mockMvc.perform(multipart("/flats/{flatId}/edit", TEST_FLAT_ID)
+            .file(file1)
+            .with(csrf())
+            .param("description", "sample description w 29 chars")
+            .param("squareMeters", "90")
+            .param("numberRooms", "2")
+            .param("numberBaths", "2")
+            .param("address.address", "Calle Luis Montoto")
+            .param("address.postalCode", "41003")
+            .param("address.city", "Sevilla"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeHasErrors("flat"))
+            .andExpect(model().attributeHasFieldErrors("flat", "description"))
+            .andExpect(model().attributeHasFieldErrors("flat", "availableServices"))
+            .andExpect(model().attributeHasFieldErrors("flat", "address.country"))
+            .andExpect(view().name("flats/createOrUpdateFlatForm"));
+    }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
     @Test

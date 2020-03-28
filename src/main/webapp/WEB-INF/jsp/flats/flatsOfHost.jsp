@@ -10,21 +10,38 @@
         <h2>These are your flats:</h2>
     </div>
 
-    <c:forEach items="${flats}" var="flat">
+    <c:forEach var="i" begin="0" end="${flats.size()-1}">
         <div class="row">
             <div class="panel panel-default">
-                <div class="panel-heading"><h4>Flat in <c:out value="${flat.address.address}"/>, <c:out value="${flat.address.city}"/></h4></div>
+                <div class="panel-heading"><h4>Flat in <c:out value="${flats.get(i).address.address}"/>, <c:out value="${flats.get(i).address.city}"/></h4></div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <p class="resp"><c:out value="${flat.description}"/></p>
+                        <div class="col-md-12">
+                            <p class="resp"><c:out value="${flats.get(i).description}"/></p>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+                    <br>
+                    <div class="row" align="center">
+                        <div class="col-md-4">
                             <spring:url value="/flats/{flatId}" var="flatUrl">
-                                <spring:param name="flatId" value="${flat.id}"/>
+                                <spring:param name="flatId" value="${flats.get(i).id}"/>
                             </spring:url>
                             <a role="button" href="${fn:escapeXml(flatUrl)}" class="btn btn-default" aria-pressed="true">See details</a>
                         </div>
+                        <c:if test="${advIds.get(i) != null}">
+                        <div class="col-md-4">
+                            <spring:url value="/advertisements/{advId}" var="advUrl">
+                                <spring:param name="advId" value="${advIds.get(i)}"/>
+                            </spring:url>
+                            <a role="button" href="${fn:escapeXml(advUrl)}" class="btn btn-default" aria-pressed="true">See advertisement</a>
+                        </div>
+                        <div class="col-md-4">
+                            <spring:url value="/advertisements/{advId}/requests/list" var="requestsUrl">
+                                <spring:param name="advId" value="${advIds.get(i)}"/>
+                            </spring:url>
+                            <a role="button" href="${fn:escapeXml(requestsUrl)}" class="btn btn-default" aria-pressed="true">See requests</a>
+                        </div>
+                        </c:if>
                     </div>
                 </div>
             </div>

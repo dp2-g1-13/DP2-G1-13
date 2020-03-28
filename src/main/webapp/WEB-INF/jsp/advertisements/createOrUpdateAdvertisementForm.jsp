@@ -7,21 +7,20 @@
 
 <flatbook:layout pageName="advertisements">
     <h2>
-    <c:if test="${advertisement['new']}">New </c:if> Advertisement
+    <c:if test="${formAdvertisement['new']}">New </c:if> Advertisement
     </h2>
 
-    <form:form modelAttribute="advertisement" class="form-horizontal" id="add-advertisement-form">
+    <form:form modelAttribute="formAdvertisement" class="form-horizontal" id="add-advertisement-form">
         <div class="form-group has-feedback">
             <flatbook:inputField name="title" label="Title"/>
             <flatbook:textAreaField name="description" label="Description"/>
             <flatbook:inputField name="requirements" label="Requirements"/>
             <flatbook:inputField name="pricePerMonth" label="Price per month (in Euros)"/>
-<%--            <flatbook:selectField name="flat" label="Flats" names="${flats}" size="${flats.size()}"/>--%>
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <c:choose>
-                    <c:when test="${advertisement['new']}">
+                    <c:when test="${formAdvertisement['new']}">
                         <button class="btn btn-default" type="submit">Add Advertisement</button>
                     </c:when>
                     <c:otherwise>

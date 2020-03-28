@@ -4,16 +4,11 @@
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!-- %@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %-->  
 
 <flatbook:layout pageName="home">
     <h2><fmt:message key="welcome"/></h2>
-    <div class="row">
-        <div class="col-md-12">
-            <spring:url value="/resources/images/pets.png" htmlEscape="true" var="petsImage"/>
-            <img class="img-responsive" src="${petsImage}"/>
-        </div>
-    </div>
     <div class="row">
         <div class="col-md-12">
             <form:form modelAttribute="address" action="/advertisements" method="get" class="form-horizontal"
@@ -44,4 +39,11 @@
             </form:form>
         </div>
     </div>
+    <sec:authorize access="hasAuthority('TENNANT')">
+        <c:if test="${!hasFlat}">
+            <div class="row">
+                <a role="button" class="btn btn-default btn-lg" href="${pageContext.request.contextPath}/requests/list" aria-pressed="true">See your requests</a>
+            </div>
+        </c:if>
+    </sec:authorize>
 </flatbook:layout>

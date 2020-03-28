@@ -16,6 +16,14 @@ public interface SpringDataAdvertisementRepository extends AdvertisementReposito
     Boolean isAdvertisementWithFlatId(@Param("flat_id") int flatId) throws DataAccessException;
 
     @Override
+    @Query("SELECT adv FROM Advertisement adv WHERE adv.flat.id = :flat_id")
+    Advertisement findAdvertisementWithFlatId(@Param("flat_id") int flatId) throws DataAccessException;
+
+    @Override
+    @Query("SELECT adv FROM Advertisement adv JOIN adv.requests req WHERE req.id = :request_id")
+    Advertisement findAdvertisementWithRequestId(@Param("request_id") int requestId) throws DataAccessException;
+
+    @Override
     @Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city")
     Set<Advertisement> findByCity(@Param("city") String city) throws DataAccessException;
 

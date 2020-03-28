@@ -22,13 +22,13 @@ import lombok.Setter;
 @Table(name = "images")
 public class DBImage extends BaseEntity {
 
-	@NotEmpty
+
 	@Column(name = "filename")
 	private String	filename;
-	@NotEmpty
+
 	@Column(name = "file_type")
 	private String	fileType;
-	@NotEmpty
+
 	@Lob
 	@Column(name = "data")
 	private byte[]	data;

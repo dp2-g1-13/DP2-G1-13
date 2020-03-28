@@ -12,5 +12,7 @@ public interface TennantRepository {
 
 	Tennant findByUsername(String username) throws DataAccessException;
 
+	Tennant findByRequestId(int requestId) throws DataAccessException;
+
 	void save(Tennant tennant) throws DataAccessException;
 }

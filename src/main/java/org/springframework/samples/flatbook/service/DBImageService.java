@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.repository.DBImageRepository;
+import org.springframework.samples.flatbook.repository.FlatRepository;
 import org.springframework.samples.flatbook.service.exceptions.FileStorageException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.Set;
 public class DBImageService {
 
     private DBImageRepository dbImageRepository;
+    private FlatRepository flatRepository;
 
     @Autowired
     public DBImageService(DBImageRepository dbImageRepository) {

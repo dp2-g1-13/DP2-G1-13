@@ -1,7 +1,9 @@
-package org.springframework.samples.flatbook.model;
+package org.springframework.samples.flatbook.model.mappers;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.samples.flatbook.model.Advertisement;
+import org.springframework.samples.flatbook.model.BaseEntity;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -9,7 +11,7 @@ import javax.validation.constraints.Positive;
 
 @Getter
 @Setter
-public class FormAdvertisement extends BaseEntity {
+public class AdvertisementForm extends BaseEntity {
 
     @NotBlank
     private String			title;
@@ -24,9 +26,9 @@ public class FormAdvertisement extends BaseEntity {
     @NotNull
     private Double pricePerMonth;
 
-    public FormAdvertisement() {}
+    public AdvertisementForm() {}
 
-    public FormAdvertisement(Advertisement adv) {
+    public AdvertisementForm(Advertisement adv) {
         this.title = adv.getTitle();
         this.description = adv.getDescription();
         this.requirements = adv.getRequirements();

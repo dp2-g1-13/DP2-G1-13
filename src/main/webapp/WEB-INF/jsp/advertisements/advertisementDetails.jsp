@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <flatbook:layout pageName="advertisements">
     <div class="container">
@@ -15,9 +15,21 @@
             <sec:authentication property="principal" var="user"/>
             <div class="row" align="center">
                 <sec:authorize access="hasAnyAuthority('TENNANT')">
-                    <div class="col-md-1">
-                        <button type="button" href="#" class="btn btn-primary">Make a request!</button>
-                    </div>
+                    <c:if test="${!hasFlat}">
+                        <div class="col-md-1">
+                            <spring:url value="/advertisements/{advId}/requests/new" var="requestUrl">
+                                <spring:param name="advId" value="${advertisement.id}"/>
+                            </spring:url>
+                            <c:choose>
+                                <c:when test="${!requestMade}">
+                                    <a role="button" href="${fn:escapeXml(requestUrl)}" class="btn btn-primary" aria-pressed="true">Make a request!</a>
+                                </c:when>
+                                <c:otherwise>
+                                    <button type="button" class="btn btn-primary" disabled>You have already made a request</button>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </c:if>
                 </sec:authorize>
                 <c:if test="${user.username == host}">
                 <div class="col-md-6">
@@ -50,8 +62,7 @@
                 </tr>
                 <tr>
                     <th>Price per month</th>
-
-                    <td>${advertisement.pricePerMonth}</td>
+                    <td><fmt:formatNumber value="${advertisement.pricePerMonth}" currencySymbol="&euro;" maxFractionDigits="2" type="currency"/></td>
                 </tr>
             </table>
         </div>

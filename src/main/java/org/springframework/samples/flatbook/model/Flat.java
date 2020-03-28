@@ -51,7 +51,6 @@ public class Flat extends BaseEntity {
 	private String					availableServices;
 
 	@Valid
-//    @Size(min = 6)
 	@NotNull
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<DBImage>		images;

@@ -13,10 +13,10 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class FlatController {
@@ -44,8 +44,10 @@ public class FlatController {
     }
 
     @InitBinder("flat")
-    public void initBinder(WebDataBinder dataBinder) {
-        dataBinder.addValidators(new FlatValidator());
+    public void initBinder(final WebDataBinder dataBinder, final HttpServletRequest http) {
+        if (http.getRequestURI().split("[/]")[http.getRequestURI().split("[/]").length - 1].equals("new")) {
+            dataBinder.addValidators(new FlatValidator());
+        }
     }
 
     @GetMapping(value = "/flats/new")
@@ -60,6 +62,10 @@ public class FlatController {
         if(result.hasErrors()) {
            return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
         } else {
+            if(flat.getImages().size() < 6) {
+                result.rejectValue("images", "", "a minimum of 6 images is required.");
+                return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+            }
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Host host = (Host) this.personService.findUserById(((User)auth.getPrincipal()).getUsername());
             host.addFlat(flat);
@@ -83,7 +89,7 @@ public class FlatController {
     }
 
     @PostMapping(value = "/flats/{flatId}/edit")
-    public String processUpdateForm(@Valid Flat flat, @PathVariable("flatId") int flatId, BindingResult result, Map<String, Object> model) {
+    public String processUpdateForm(@Valid Flat flat, BindingResult result, @PathVariable("flatId") int flatId, Map<String, Object> model) {
         if(result.hasErrors()) {
             return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
         } else {
@@ -92,8 +98,14 @@ public class FlatController {
                 model.put("exception", e);
                 return "exception";
             }
-            Set<DBImage> images = this.flatService.findFlatById(flatId).getImages();
-            images.addAll(flat.getImages());
+            Set<DBImage> newImages = flat.getImages().stream().filter(x -> !x.getFileType().equals("application/octet-stream")).collect(Collectors.toSet());
+            Flat oldFlat = this.flatService.findFlatById(flatId);
+            if(oldFlat.getImages().size() + newImages.size() < 6) {
+                result.rejectValue("images", "", "a minimum of 6 images is required.");
+                return VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+            }
+            Set<DBImage> images = oldFlat.getImages();
+            images.addAll(newImages);
             flat.setImages(images);
             flat.setId(flatId);
             this.flatService.saveFlat(flat);
@@ -110,10 +122,16 @@ public class FlatController {
             return "exception";
         }
         Flat flat = this.flatService.findFlatById(flatId);
-        DBImage image = this.dbImageService.getImageById(imageId);
-        flat.deleteImage(image);
-        this.dbImageService.deleteImage(image);
-        return "redirect:/flats/{flatId}/edit";
+        if(flat.getImages().size() == 6) {
+            RuntimeException e = new RuntimeException("Illegal access");
+            model.put("exception", e);
+            return "exception";
+        } else {
+            DBImage image = this.dbImageService.getImageById(imageId);
+            flat.deleteImage(image);
+            this.dbImageService.deleteImage(image);
+            return "redirect:/flats/{flatId}/edit";
+        }
     }
 
     @GetMapping(value = "/flats/{flatId}")
@@ -134,8 +152,14 @@ public class FlatController {
         ModelAndView mav = new ModelAndView("flats/flatsOfHost");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = ((User)auth.getPrincipal()).getUsername();
-        Set<Flat> flats = this.flatService.findFlatByHostUsername(username);
+        List<Flat> flats = new ArrayList<>(this.flatService.findFlatByHostUsername(username));
+        List<Integer> advIds = flats.stream()
+            .map(x -> {
+                Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(x.getId());
+                return adv == null? null : adv.getId();
+            }).collect(Collectors.toList());
         mav.addObject("flats", flats);
+        mav.addObject("advIds", advIds);
         return mav;
     }
 

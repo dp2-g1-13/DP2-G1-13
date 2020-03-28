@@ -17,6 +17,7 @@
 package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -33,6 +34,7 @@ import javax.validation.constraints.Positive;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
 
 @Entity
 @Getter
@@ -71,11 +73,18 @@ public class Advertisement extends BaseEntity {
 
 	public Advertisement() {}
 
-	public Advertisement(FormAdvertisement adv) {
+	public Advertisement(AdvertisementForm adv) {
 	    this.title = adv.getTitle();
 	    this.description = adv.getDescription();
 	    this.requirements = adv.getRequirements();
 	    this.pricePerMonth =  adv.getPricePerMonth();
 	    this.creationDate = LocalDate.now();
+    }
+
+    public void addRequest(Request request) {
+        if(this.requests == null) {
+            this.requests = new HashSet<>();
+        }
+        requests.add(request);
     }
 }

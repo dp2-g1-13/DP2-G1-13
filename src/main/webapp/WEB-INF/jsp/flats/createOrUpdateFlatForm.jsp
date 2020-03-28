@@ -74,7 +74,9 @@
                         <spring:param name="flatId" value="${flat.id}"/>
                         <spring:param name="imageId" value="${image.id}"/>
                     </spring:url>
-                    <a role="button" href="${fn:escapeXml(deleteImageUrl)}" class="btn btn-danger" aria-pressed="true">Delete image</a>
+                    <c:if test="${images.size() > 6}">
+                        <a role="button" href="${fn:escapeXml(deleteImageUrl)}" class="btn btn-danger" aria-pressed="true">Delete image</a>
+                    </c:if>
                 </div>
             </div>
             </c:forEach>

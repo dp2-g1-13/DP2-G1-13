@@ -6,6 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.repository.HostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class HostService {
@@ -19,5 +20,10 @@ public class HostService {
 
     public Host findHostByFlatId(int flatId) throws DataAccessException {
         return this.hostRepository.findByFlatId(flatId);
+    }
+
+    @Transactional(readOnly = true)
+    public Host findHostOfAdvertisementByRequestId(int requestId) throws DataAccessException {
+        return this.hostRepository.findHostOfAdvertisementByRequestId(requestId);
     }
 }

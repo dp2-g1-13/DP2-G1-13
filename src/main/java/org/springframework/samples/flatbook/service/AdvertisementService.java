@@ -33,6 +33,16 @@ public class AdvertisementService {
     }
 
     @Transactional(readOnly = true)
+    public Advertisement findAdvertisementWithFlatId(int id) throws DataAccessException {
+        return this.advertisementRepository.findAdvertisementWithFlatId(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Advertisement findAdvertisementWithRequestId(int requestId) throws DataAccessException {
+        return this.advertisementRepository.findAdvertisementWithRequestId(requestId);
+    }
+
+    @Transactional(readOnly = true)
     public Set<Advertisement> findAdvertisementsByCity(String city) throws DataAccessException {
         return this.advertisementRepository.findByCity(city);
     }

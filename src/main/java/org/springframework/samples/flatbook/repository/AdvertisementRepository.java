@@ -11,6 +11,10 @@ public interface AdvertisementRepository {
 
     Boolean isAdvertisementWithFlatId(int flatId) throws DataAccessException;
 
+    Advertisement findAdvertisementWithFlatId(int flatId) throws DataAccessException;
+
+    Advertisement findAdvertisementWithRequestId(int requestId) throws DataAccessException;
+
     Set<Advertisement> findByCity(String city) throws DataAccessException;
 
     Set<Advertisement> findByCityAndPostalCode(String city, String postalCode) throws DataAccessException;
