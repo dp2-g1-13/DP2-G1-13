@@ -70,10 +70,9 @@ public class TennantReviewController {
     			return VIEWS_TENNANTREVIEWS_CREATE_OR_UPDATE_FORM;
     		} else {
     			tr.setCreationDate(LocalDate.now());
-    			Tennant t = tennantService.findTennantById(tennantId);
-    			t.getReviews().add(tr);
+    			tToBeReviewed.getReviews().add(tr);
     			this.tennantReviewService.saveTennantReview(tr);
-    			this.tennantService.saveTennant(t);
+    			this.tennantService.saveTennant(tToBeReviewed);
     			return "redirect:/";
     		}
     	}else {

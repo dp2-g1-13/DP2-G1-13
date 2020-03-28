@@ -63,10 +63,9 @@ public class FlatReviewController {
     			return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
     		} else {
     			fr.setCreationDate(LocalDate.now());
-        		Flat f = tennantService.findTennantById(principal.getName()).getFlat();
-        		f.getFlatReviews().add(fr);
+        		flat.getFlatReviews().add(fr);
         		this.flatReviewService.saveFlatReview(fr);
-        		this.flatService.saveFlat(f);
+        		this.flatService.saveFlat(flat);
         		return "redirect:/";
     		}
     	}else {
