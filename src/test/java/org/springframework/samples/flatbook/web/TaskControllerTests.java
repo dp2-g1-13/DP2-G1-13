@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.samples.flatbook.configuration.SecurityConfiguration;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.TaskStatus;
@@ -16,13 +15,9 @@ import org.springframework.samples.flatbook.web.formatters.TennantFormatter;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.validation.BindingResult;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
@@ -45,9 +40,6 @@ public class TaskControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private TaskController taskController;
 
     @MockBean
     private TaskService taskService;
@@ -152,64 +144,63 @@ public class TaskControllerTests {
         	.param("description", "description")
         	.param("status", "TODO")
             .param("title", "title"))
+        	.andExpect(status().is2xxSuccessful())
             .andExpect(view().name("exception"));
     }
 
-//    @WithMockUser(value = "spring", roles = {"HOST"})
-//    @Test
-//    void testInitUpdateForm() throws Exception {
-//        mockMvc.perform(get("/flats/{flatId}/edit", TEST_FLAT_ID))
-//            .andExpect(status().isOk())
-//            .andExpect(model().attributeExists("flat"))
-//            .andExpect(model().attribute("flat", hasProperty("description", is("this is a sample description with more than 30 chars"))))
-//            .andExpect(model().attribute("flat", hasProperty("squareMeters", is(90))))
-//            .andExpect(model().attribute("flat", hasProperty("numberRooms", is(2))))
-//            .andExpect(model().attribute("flat", hasProperty("numberBaths", is(2))))
-//            .andExpect(model().attribute("flat", hasProperty("availableServices", is("Wifi and cable TV"))))
-//            .andExpect(model().attribute("flat", hasProperty("address", hasProperty("address", is("Avenida de la República Argentina")))))
-//            .andExpect(model().attribute("flat", hasProperty("address", hasProperty("postalCode", is("41011")))))
-//            .andExpect(model().attribute("flat", hasProperty("address", hasProperty("city", is("Sevilla")))))
-//            .andExpect(model().attribute("flat", hasProperty("address", hasProperty("country", is("Spain")))))
-//            .andExpect(model().attributeExists("images"))
-//            .andExpect(model().attribute("images", hasSize(5)))
-//            .andExpect(view().name("flats/createOrUpdateFlatForm"));
-//    }
-//
-////    @WithMockUser(value = "spring", roles = {"HOST"})
-////    @Test
-////    void testProcessUpdateFormSuccess() throws Exception {
-////        mockMvc.perform(multipart("/flats/{flatId}/edit", TEST_FLAT_ID)
-////            .with(csrf())
-////            .param("description", "this is a sample description with more than 30 chars")
-////            .param("squareMeters", "90")
-////            .param("numberRooms", "2")
-////            .param("numberBaths", "2")
-////            .param("availableServices", "Wifi and cable TV")
-////            .param("address.address", "Calle Luis Montoto")
-////            .param("address.postalCode", "41003")
-////            .param("address.city", "Sevilla")
-////            .param("address.country", "Spain"))
-////            .andExpect(status().is3xxRedirection())
-////            .andExpect(view().name("redirect:/flats/{flatId}"));
-////    }
-//
-//    @WithMockUser(value = "spring", roles = {"HOST"})
-//    @Test
-//    void testProcessDeleteImage() throws Exception {
-//        mockMvc.perform(get("/flats/{flatId}/images/{imageId}/delete", TEST_FLAT_ID, TEST_IMAGE_ID))
-//            .andExpect(status().is3xxRedirection())
-//            .andExpect(view().name("redirect:/flats/{flatId}/edit"));
-//    }
-//
-//    @WithMockUser(value = "spring", roles = {"HOST"})
-//    @Test
-//    void testShowFlat() throws Exception {
-//        mockMvc.perform(get("/flats/{flatId}", TEST_FLAT_ID))
-//            .andExpect(status().isOk())
-//            .andExpect(model().attributeExists("flat"))
-//            .andExpect(model().attributeExists("images"))
-//            .andExpect(model().attributeExists("host"));
-//
-//    }
-	
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @Test
+    void testInitUpdateForm() throws Exception {
+    	
+    	Flat flat = new Flat();
+        flat.setId(TEST_FLAT_ID);
+        
+        Tennant asignee = new Tennant();
+        asignee.setUsername(TEST_ASIGNEE_USERNAME);
+        asignee.setFlat(flat);
+    	
+        Tennant creator = new Tennant();
+        creator.setUsername(TEST_CREATOR_USERNAME);
+        creator.setFlat(flat);
+    	
+        mockMvc.perform(get("/tasks/{taskId}/edit", TEST_TASK_ID))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("task"))
+            .andExpect(model().attribute("task", hasProperty("title", is("title"))))
+            .andExpect(model().attribute("task", hasProperty("description", is("description"))))
+            .andExpect(model().attribute("task", hasProperty("creator", is(creator))))
+            .andExpect(model().attribute("task", hasProperty("asignee", is(asignee))))
+            .andExpect(model().attribute("task", hasProperty("creationDate", is(LocalDate.now()))))
+            .andExpect(model().attribute("task", hasProperty("status", is(TaskStatus.TODO))))
+            .andExpect(view().name("tasks/createOrUpdateTaskForm"));
+    }
+
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @Test
+    void testProcessUpdateFormSuccess() throws Exception {
+        mockMvc.perform(post("/tasks/{taskId}/edit", TEST_TASK_ID)
+            .with(csrf())
+            .param("title", "updated title")
+            .param("description", "updated description")
+            .param("asignee", TEST_ASIGNEE_USERNAME)
+        	.param("creationDate", "01/01/2005")
+        	.param("creator", TEST_CREATOR_USERNAME)
+        	.param("status", "TODO"))
+            .andExpect(status().is3xxRedirection());
+    }
+
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @Test
+    void testProcessTaskRemovalSucess() throws Exception {
+        mockMvc.perform(get("/tasks/{taskId}/remove", TEST_TASK_ID))
+            .andExpect(status().is3xxRedirection());
+    }
+    
+    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENNANT"})
+    @Test
+    void testProcessTaskRemovalNotAllowed() throws Exception {
+        mockMvc.perform(get("/tasks/{taskId}/remove", TEST_TASK_ID))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(view().name("exception"));
+    }
 }
