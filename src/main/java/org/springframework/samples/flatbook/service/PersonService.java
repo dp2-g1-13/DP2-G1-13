@@ -21,16 +21,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PersonService {
 
-	@Autowired
 	private PersonRepository		personRepository;
 
-	@Autowired
 	private AuthoritiesRepository	authoritiesRepository;
 
 
+	@Autowired
+	public PersonService(final PersonRepository personRepository, final AuthoritiesRepository authoritiesRepository) {
+		this.personRepository = personRepository;
+		this.authoritiesRepository = authoritiesRepository;
+	}
+
 	@Transactional(rollbackFor = DuplicatedUsernameException.class)
 	public void saveUser(final PersonForm user) throws DataAccessException, DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : new Tenant(user);
+		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : user.getAuthority().equals(AuthoritiesType.HOST) ? new Tenant(user) : null;
 		SaveType type = user.getSaveType();
 
 		if (SaveType.NEW.equals(type) && this.personRepository.findByUsername(user.getUsername()) != null) {
@@ -42,7 +46,7 @@ public class PersonService {
 		} else if (SaveType.NEW.equals(type) && this.personRepository.findByUsername(user.getUsername()) == null) {
 			this.personRepository.save(person);
 			this.authoritiesRepository.save(new Authorities(user.getUsername(), user.getAuthority()));
-		} else {
+		} else if (SaveType.EDIT.equals(type)) {
 			this.personRepository.save(person);
 		}
 

@@ -12,7 +12,7 @@ import org.springframework.samples.flatbook.model.mappers.PersonForm;
 import org.springframework.samples.flatbook.util.TestUtils;
 import org.springframework.samples.flatbook.web.validators.PersonAuthorityValidator;
 
-public class AuthorityValidatorTests {
+public class PersonAuthorityValidatorTests {
 
 	private static PersonForm				personForm;
 	private static PersonAuthorityValidator	personAuthorityValidator;
@@ -20,34 +20,34 @@ public class AuthorityValidatorTests {
 
 	@BeforeAll
 	static void instaciateValidator() {
-		AuthorityValidatorTests.personAuthorityValidator = new PersonAuthorityValidator();
+		PersonAuthorityValidatorTests.personAuthorityValidator = new PersonAuthorityValidator();
 	}
 
 	@BeforeEach
 	void instanciatePersonForm() {
 		LocaleContextHolder.setLocale(Locale.ENGLISH);
-		AuthorityValidatorTests.personForm = new PersonForm();
-		AuthorityValidatorTests.personForm.setAuthority(AuthoritiesType.TENANT);
+		PersonAuthorityValidatorTests.personForm = new PersonForm();
+		PersonAuthorityValidatorTests.personForm.setAuthority(AuthoritiesType.TENANT);
 	}
 
 	@Test
 	void shouldNotValidateWhenAthorityIsEmpty() {
 
-		AuthorityValidatorTests.personForm.setAuthority(null);
+		PersonAuthorityValidatorTests.personForm.setAuthority(null);
 
-		TestUtils.multipleAssert(AuthorityValidatorTests.personAuthorityValidator, AuthorityValidatorTests.personForm, "authority->required");
+		TestUtils.multipleAssert(PersonAuthorityValidatorTests.personAuthorityValidator, PersonAuthorityValidatorTests.personForm, "authority->required");
 	}
 
 	@Test
 	void shouldNotValidateWhenAthorityIsAdmin() {
 
-		AuthorityValidatorTests.personForm.setAuthority(AuthoritiesType.ADMIN);
+		PersonAuthorityValidatorTests.personForm.setAuthority(AuthoritiesType.ADMIN);
 
-		TestUtils.multipleAssert(AuthorityValidatorTests.personAuthorityValidator, AuthorityValidatorTests.personForm, "authority->cant be an admin");
+		TestUtils.multipleAssert(PersonAuthorityValidatorTests.personAuthorityValidator, PersonAuthorityValidatorTests.personForm, "authority->cant be an admin");
 	}
 
 	@Test
 	void shouldValidate() {
-		TestUtils.multipleAssert(AuthorityValidatorTests.personAuthorityValidator, AuthorityValidatorTests.personForm, (String[]) null);
+		TestUtils.multipleAssert(PersonAuthorityValidatorTests.personAuthorityValidator, PersonAuthorityValidatorTests.personForm, (String[]) null);
 	}
 }

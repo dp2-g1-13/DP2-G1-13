@@ -36,7 +36,7 @@ public class MessageController {
 	public static final String	CANT_RECEIVE_YOUR_OWN_MESSAGE		= "cant receive your own message";
 
 	@Autowired
-	MessageService				messageService;
+	MessageService				messageServiceTests;
 
 	@Autowired
 	PersonService				personService;
@@ -52,14 +52,14 @@ public class MessageController {
 
 	@GetMapping("/list")
 	public String messageList(final ModelMap model, final Principal principal) {
-		model.put("messages", this.messageService.findMessagesByParticipant(principal.getName()));
+		model.put("messages", this.messageServiceTests.findMessagesByParticipant(principal.getName()));
 		return MessageController.USERS_MESSAGES_CONVERSATION_LIST;
 	}
 
 	@GetMapping("/{username}")
 	public String chargeConversation(final ModelMap model, final Principal principal, @PathVariable("username") final String username) {
 		((Message) model.getAttribute("message")).setReceiver(this.personService.findUserById(username));
-		List<Message> messages = this.messageService.findMessagesByParticipant(principal.getName()).get(username);
+		List<Message> messages = this.messageServiceTests.findMessagesByParticipant(principal.getName()).get(username);
 		messages.sort(Comparator.naturalOrder());
 		model.put("messages", messages);
 		return MessageController.USERS_MESSAGES_CONVERSATION;
@@ -88,7 +88,7 @@ public class MessageController {
 			}
 			try {
 				message.setCreationMoment(LocalDateTime.now());
-				this.messageService.saveMessage(message);
+				this.messageServiceTests.saveMessage(message);
 			} catch (UserNotExistException e) {
 				result.rejectValue("receiver.username", MessageController.USER_DOESNT_EXIST, MessageController.USER_DOESNT_EXIST);
 				return redirection;

@@ -2,7 +2,6 @@
 package org.springframework.samples.flatbook.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -30,16 +29,6 @@ public class MessageService {
 	public MessageService(final MessageRepository messageRepository, final PersonRepository personRepository) {
 		this.messageRepository = messageRepository;
 		this.personRepository = personRepository;
-	}
-
-	@Transactional(readOnly = true)
-	public Message findMessageById(final Integer id) throws DataAccessException {
-		return this.messageRepository.findById(id);
-	}
-
-	@Transactional(readOnly = true)
-	public Collection<Message> findAllMessages() throws DataAccessException {
-		return this.messageRepository.findAll();
 	}
 
 	@Transactional

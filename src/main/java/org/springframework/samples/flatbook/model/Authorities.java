@@ -7,6 +7,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 
@@ -19,6 +20,7 @@ public class Authorities {
 
 	@Id
 	@NotNull
+	@Pattern(regexp = "^[a-zA-Z0-9]{5,20}$")
 	String			username;
 
 	@NotNull

@@ -9,12 +9,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthoritiesService {
 
-	@Autowired
 	private AuthoritiesRepository authoritiesRepository;
 
 
+	@Autowired
+	public AuthoritiesService(final AuthoritiesRepository authoritiesRepository) {
+		this.authoritiesRepository = authoritiesRepository;
+	}
+
 	public AuthoritiesType findAuthorityById(final String username) {
-		return this.authoritiesRepository.findById(username).get().getAuthority();
+		return this.authoritiesRepository.findById(username).getAuthority();
 	}
 
 }
