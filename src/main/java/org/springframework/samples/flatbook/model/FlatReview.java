@@ -30,7 +30,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "flat_reviews")
-public class FlatReview extends BaseEntity {
+public class FlatReview extends Review {
 
 	@NotNull
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

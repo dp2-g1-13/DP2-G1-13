@@ -16,7 +16,6 @@
 
 package org.springframework.samples.flatbook.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -30,9 +29,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "tennant_reviews")
-public class TennantReview extends BaseEntity {
+public class TennantReview extends Review {
 
 	@NotNull
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Person creator;
 }
