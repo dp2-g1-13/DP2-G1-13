@@ -6,7 +6,7 @@ import java.util.Locale;
 import org.springframework.format.Formatter;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 
-public class AuthorityFormatter implements Formatter<AuthoritiesType> {
+public class AuthoritiesFormatter implements Formatter<AuthoritiesType> {
 
 	@Override
 	public String print(final AuthoritiesType object, final Locale locale) {

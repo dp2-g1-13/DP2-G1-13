@@ -23,7 +23,7 @@ import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
-import org.springframework.samples.flatbook.web.formatters.AuthorityFormatter;
+import org.springframework.samples.flatbook.web.formatters.AuthoritiesFormatter;
 import org.springframework.samples.flatbook.web.validators.PasswordValidator;
 import org.springframework.samples.flatbook.web.validators.PersonAuthorityValidator;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
@@ -34,7 +34,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @WebMvcTest(controllers = PersonController.class, includeFilters = {
-	@ComponentScan.Filter(value = AuthorityFormatter.class, type = FilterType.ASSIGNABLE_TYPE), @ComponentScan.Filter(value = PasswordValidator.class, type = FilterType.ASSIGNABLE_TYPE),
+	@ComponentScan.Filter(value = AuthoritiesFormatter.class, type = FilterType.ASSIGNABLE_TYPE), @ComponentScan.Filter(value = PasswordValidator.class, type = FilterType.ASSIGNABLE_TYPE),
 	@ComponentScan.Filter(value = PersonAuthorityValidator.class, type = FilterType.ASSIGNABLE_TYPE)
 }, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class), excludeAutoConfiguration = SecurityConfiguration.class)
 class PersonControllerTests {
@@ -100,7 +100,8 @@ class PersonControllerTests {
 	@Test
 	void testProcessCreationFormSuccess() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/new")
-			.with(SecurityMockMvcRequestPostProcessors.csrf()).param("firstName", PersonControllerTests.FIRSTNAME).param("lastName", PersonControllerTests.LASTNAME)
+			.with(SecurityMockMvcRequestPostProcessors.csrf()).param("firstName", PersonControllerTests.FIRSTNAME)
+			.param("lastName", PersonControllerTests.LASTNAME)
 			.param("username", PersonControllerTests.USERNAME)
 			.param("password", PersonControllerTests.PASSWORD)
 			.param("confirmPassword", PersonControllerTests.PASSWORD)
@@ -118,7 +119,8 @@ class PersonControllerTests {
 		Mockito.doThrow(DuplicatedUsernameException.class).when(this.personService).saveUser(ArgumentMatchers.any(PersonForm.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/new")
-			.with(SecurityMockMvcRequestPostProcessors.csrf()).param("firstName", PersonControllerTests.FIRSTNAME).param("lastName", PersonControllerTests.LASTNAME)
+			.with(SecurityMockMvcRequestPostProcessors.csrf()).param("firstName", PersonControllerTests.FIRSTNAME)
+			.param("lastName", PersonControllerTests.LASTNAME)
 			.param("username", PersonControllerTests.USERNAME)
 			.param("password", PersonControllerTests.PASSWORD)
 			.param("confirmPassword", PersonControllerTests.PASSWORD)
@@ -136,7 +138,8 @@ class PersonControllerTests {
 		Mockito.doThrow(DuplicatedDniException.class).when(this.personService).saveUser(ArgumentMatchers.any(PersonForm.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/new")
-			.with(SecurityMockMvcRequestPostProcessors.csrf()).param("firstName", PersonControllerTests.FIRSTNAME).param("lastName", PersonControllerTests.LASTNAME)
+			.with(SecurityMockMvcRequestPostProcessors.csrf()).param("firstName", PersonControllerTests.FIRSTNAME)
+			.param("lastName", PersonControllerTests.LASTNAME)
 			.param("username", PersonControllerTests.USERNAME)
 			.param("password", PersonControllerTests.PASSWORD)
 			.param("confirmPassword", PersonControllerTests.PASSWORD)
@@ -154,7 +157,8 @@ class PersonControllerTests {
 		Mockito.doThrow(DuplicatedEmailException.class).when(this.personService).saveUser(ArgumentMatchers.any(PersonForm.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/new")
-			.with(SecurityMockMvcRequestPostProcessors.csrf()).param("firstName", PersonControllerTests.FIRSTNAME).param("lastName", PersonControllerTests.LASTNAME)
+			.with(SecurityMockMvcRequestPostProcessors.csrf()).param("firstName", PersonControllerTests.FIRSTNAME)
+			.param("lastName", PersonControllerTests.LASTNAME)
 			.param("username", PersonControllerTests.USERNAME)
 			.param("password", PersonControllerTests.PASSWORD)
 			.param("confirmPassword", PersonControllerTests.PASSWORD)

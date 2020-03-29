@@ -1,7 +1,6 @@
 
 package org.springframework.samples.flatbook.service;
 
-import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.assertj.core.api.Assertions;
@@ -14,9 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Authorities;
-import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
-import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
 import org.springframework.samples.flatbook.model.mappers.PersonForm;
@@ -45,8 +42,6 @@ public class PersonServiceTests {
 
 	private Person					person;
 	private PersonForm				personForm;
-	private Tenant					tenant;
-	private Host					host;
 	private Authorities				authorities;
 
 	private PersonService			personService;
@@ -67,9 +62,6 @@ public class PersonServiceTests {
 		this.personForm = new PersonForm(this.person);
 		this.personForm.setAuthority(AuthoritiesType.TENANT);
 		this.personForm.setSaveType(SaveType.NEW);
-
-		this.tenant = new Tenant(this.personForm);
-		this.host = new Host(this.personForm);
 
 		this.authorities = new Authorities(USERNAME, AuthoritiesType.TENANT);
 
@@ -93,8 +85,8 @@ public class PersonServiceTests {
 
 	@Test
 	void shouldSaveANewPerson() throws DataAccessException, DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-		Mockito.doNothing().when(this.personRepository).save(ArgumentMatchers.isA(Person.class));
-		Mockito.doNothing().when(this.authoritiesRepository).save(ArgumentMatchers.isA(Authorities.class));
+		Mockito.lenient().doNothing().when(this.personRepository).save(ArgumentMatchers.isA(Person.class));
+		Mockito.lenient().doNothing().when(this.authoritiesRepository).save(ArgumentMatchers.isA(Authorities.class));
 
 		this.personService.saveUser(this.personForm);
 
@@ -104,7 +96,7 @@ public class PersonServiceTests {
 
 	@Test
 	void shouldEditAPerson() throws DataAccessException, DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-		Mockito.doNothing().when(this.personRepository).save(ArgumentMatchers.isA(Person.class));
+		Mockito.lenient().doNothing().when(this.personRepository).save(ArgumentMatchers.isA(Person.class));
 		Mockito.lenient().doThrow(NullPointerException.class).when(this.authoritiesRepository).save(ArgumentMatchers.isA(Authorities.class));
 
 		this.personForm.setSaveType(SaveType.EDIT);

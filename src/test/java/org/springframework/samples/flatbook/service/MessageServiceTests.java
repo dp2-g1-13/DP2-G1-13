@@ -30,18 +30,18 @@ import org.springframework.stereotype.Service;
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class MessageServiceTests {
 
-	private static final String	FIRSTNAME_1	= "Ramon";
-	private static final String	LASTNAME_1	= "Fernandez";
-	private static final String	DNI_1		= "23330000A";
-	private static final String	EMAIL_1		= "b@b.com";
-	private static final String	USERNAME_1	= "ababa";
-	private static final String	TELEPHONE_1	= "777789789";
-	private static final String	FIRSTNAME_2	= "Dani";
-	private static final String	LASTNAME_2	= "Sanchez";
-	private static final String	DNI_2		= "23330000B";
-	private static final String	EMAIL_2		= "a@a.com";
-	private static final String	USERNAME_2	= "asasa";
-	private static final String	TELEPHONE_2	= "675789789";
+	private static final String	FIRSTNAME1	= "Ramon";
+	private static final String	LASTNAME1	= "Fernandez";
+	private static final String	DNI1		= "23330000A";
+	private static final String	EMAIL1		= "b@b.com";
+	private static final String	USERNAME1	= "ababa";
+	private static final String	TELEPHONE1	= "777789789";
+	private static final String	FIRSTNAME2	= "Dani";
+	private static final String	LASTNAME2	= "Sanchez";
+	private static final String	DNI2		= "23330000B";
+	private static final String	EMAIL2		= "a@a.com";
+	private static final String	USERNAME2	= "asasa";
+	private static final String	TELEPHONE2	= "675789789";
 	private static final String	PASSWORD	= "HOst__Pa77S";
 
 	private static final String	BODY		= "Hola";
@@ -68,23 +68,23 @@ public class MessageServiceTests {
 	void setupMock() {
 		this.person1 = new Person();
 		this.person1.setPassword(MessageServiceTests.PASSWORD);
-		this.person1.setUsername(MessageServiceTests.USERNAME_1);
-		this.person1.setDni(MessageServiceTests.DNI_1);
-		this.person1.setEmail(MessageServiceTests.EMAIL_1);
+		this.person1.setUsername(MessageServiceTests.USERNAME1);
+		this.person1.setDni(MessageServiceTests.DNI1);
+		this.person1.setEmail(MessageServiceTests.EMAIL1);
 		this.person1.setEnabled(true);
-		this.person1.setFirstName(MessageServiceTests.FIRSTNAME_1);
-		this.person1.setLastName(MessageServiceTests.LASTNAME_1);
-		this.person1.setPhoneNumber(MessageServiceTests.TELEPHONE_1);
+		this.person1.setFirstName(MessageServiceTests.FIRSTNAME1);
+		this.person1.setLastName(MessageServiceTests.LASTNAME1);
+		this.person1.setPhoneNumber(MessageServiceTests.TELEPHONE1);
 
 		this.person2 = new Person();
 		this.person2.setPassword(MessageServiceTests.PASSWORD);
-		this.person2.setUsername(MessageServiceTests.USERNAME_2);
-		this.person2.setDni(MessageServiceTests.DNI_2);
-		this.person2.setEmail(MessageServiceTests.EMAIL_2);
+		this.person2.setUsername(MessageServiceTests.USERNAME2);
+		this.person2.setDni(MessageServiceTests.DNI2);
+		this.person2.setEmail(MessageServiceTests.EMAIL2);
 		this.person2.setEnabled(true);
-		this.person2.setFirstName(MessageServiceTests.FIRSTNAME_2);
-		this.person2.setLastName(MessageServiceTests.LASTNAME_2);
-		this.person2.setPhoneNumber(MessageServiceTests.TELEPHONE_2);
+		this.person2.setFirstName(MessageServiceTests.FIRSTNAME2);
+		this.person2.setLastName(MessageServiceTests.LASTNAME2);
+		this.person2.setPhoneNumber(MessageServiceTests.TELEPHONE2);
 
 		this.message = new Message();
 		this.message.setBody(MessageServiceTests.BODY);
@@ -98,7 +98,7 @@ public class MessageServiceTests {
 
 	@Test
 	void shouldFindMessagesByParticipan() {
-		Map<String, List<Message>> messagesByConversation = this.messageService.findMessagesByParticipant(MessageServiceTests.USERNAME_1);
+		Map<String, List<Message>> messagesByConversation = this.messageService.findMessagesByParticipant(MessageServiceTests.USERNAME1);
 		Assertions.assertThat(messagesByConversation.entrySet().size()).isEqualTo(1);
 		Assertions.assertThat(messagesByConversation.entrySet().iterator().next().getValue().size()).isEqualTo(5);
 	}
@@ -112,7 +112,7 @@ public class MessageServiceTests {
 	@Test
 	void shouldSaveMessage() throws DataAccessException, UserNotExistException {
 		Mockito.lenient().doNothing().when(this.messageRepositoryMocked).save(ArgumentMatchers.isA(Message.class));
-		Mockito.lenient().when(this.personRepository.findByUsername(MessageServiceTests.USERNAME_1)).thenReturn(this.person1);
+		Mockito.lenient().when(this.personRepository.findByUsername(MessageServiceTests.USERNAME1)).thenReturn(this.person1);
 
 		this.messageServiceMocked.saveMessage(this.message);
 
@@ -122,7 +122,7 @@ public class MessageServiceTests {
 	@Test
 	void shouldThrowUserNotExistsExceptionWhenTryToSendToAnNotExistingUser() throws DataAccessException, UserNotExistException {
 		Mockito.lenient().doNothing().when(this.messageRepositoryMocked).save(ArgumentMatchers.isA(Message.class));
-		Mockito.lenient().when(this.personRepository.findByUsername(MessageServiceTests.USERNAME_1)).thenReturn(null);
+		Mockito.lenient().when(this.personRepository.findByUsername(MessageServiceTests.USERNAME1)).thenReturn(null);
 
 		assertThrows(UserNotExistException.class, () -> this.messageServiceMocked.saveMessage(this.message));
 	}

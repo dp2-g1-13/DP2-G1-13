@@ -21,10 +21,6 @@ public class UserService {
 		return this.userRepository.findById(username);
 	}
 
-	public void deleteById(final String username) {
-		this.userRepository.deleteById(username);
-	}
-
 	public void save(final User user) {
 		this.userRepository.save(user);
 	}

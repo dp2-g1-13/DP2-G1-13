@@ -34,7 +34,7 @@ public class PersonService {
 
 	@Transactional(rollbackFor = DuplicatedUsernameException.class)
 	public void saveUser(final PersonForm user) throws DataAccessException, DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : user.getAuthority().equals(AuthoritiesType.HOST) ? new Tenant(user) : null;
+		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : user.getAuthority().equals(AuthoritiesType.TENANT) ? new Tenant(user) : null;
 		SaveType type = user.getSaveType();
 
 		if (SaveType.NEW.equals(type) && this.personRepository.findByUsername(user.getUsername()) != null) {

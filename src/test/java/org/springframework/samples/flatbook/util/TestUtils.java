@@ -51,8 +51,9 @@ public abstract class TestUtils {
 			for (String string : fieldAndErrors) {
 				String field = string.split("(->)")[0].trim();
 				String error = string.split("(->)")[1].trim();
-				Assert.assertTrue("Expecting propertyPath to be equal to " + field + " but was not.", constraintViolations.stream().allMatch(x -> x.getPropertyPath().toString().equals(field)));
-				Assert.assertTrue("Expecting one of the constraint violation messages to be equal to '" + error + "', but was not.", constraintViolations.stream().anyMatch(x -> x.getMessage().contains(error)));
+				Assert.assertTrue("Expecting propertyPath to be equal to " + field + " but was not.", constraintViolations.stream().anyMatch(x -> x.getPropertyPath().toString().equals(field)));
+				Assert.assertTrue("Expecting one of the constraint violation messages to be equal to '" + error + "', but was not.",
+					constraintViolations.stream().filter(x -> x.getPropertyPath().toString().equals(field)).anyMatch(x -> x.getMessage().contains(error)));
 			}
 		}
 
@@ -65,7 +66,7 @@ public abstract class TestUtils {
 	 * @param <T>
 	 *            Type of the object that you want validate
 	 * @param validator
-	 *            Validator that will be use to validate the object
+	 *            Validator that will be used to validate the object
 	 * @param object
 	 *            Object that you want validate
 	 * @param fieldAndErrors
@@ -82,8 +83,9 @@ public abstract class TestUtils {
 			for (String string : fieldAndErrors) {
 				String field = string.split("(->)")[0];
 				String error = string.split("(->)")[1];
-				Assert.assertTrue("Expecting propertyPath to be equal to " + field + " but was not.", errors.getFieldErrors().stream().allMatch(x -> x.getField().toString().equals(field)));
-				Assert.assertTrue("Expecting one of the constraint violation messages to be equal to '" + error + "', but was not.", errors.getFieldErrors().stream().anyMatch(x -> x.getDefaultMessage().contains(error)));
+				Assert.assertTrue("Expecting propertyPath to be equal to " + field + " but was not.", errors.getFieldErrors().stream().anyMatch(x -> x.getField().toString().equals(field)));
+				Assert.assertTrue("Expecting one of the constraint violation messages to be equal to '" + error + "', but was not.",
+					errors.getFieldErrors().stream().filter(x -> x.getField().toString().equals(field)).anyMatch(x -> x.getDefaultMessage().contains(error)));
 			}
 		}
 

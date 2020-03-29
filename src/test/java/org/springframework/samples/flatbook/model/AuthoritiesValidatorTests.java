@@ -6,7 +6,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.util.TestUtils;
@@ -14,46 +14,47 @@ import org.springframework.samples.flatbook.util.TestUtils;
 public class AuthoritiesValidatorTests {
 
 	private static final String	USERNAME	= "asasa";
-	private static Authorities	authorities;
+
+	private Authorities			authorities;
 
 
 	@BeforeEach
 	void instanciateAuthorities() {
 		LocaleContextHolder.setLocale(Locale.ENGLISH);
-		AuthoritiesValidatorTests.authorities = new Authorities();
-		AuthoritiesValidatorTests.authorities.setAuthority(AuthoritiesType.HOST);
-		AuthoritiesValidatorTests.authorities.setUsername(AuthoritiesValidatorTests.USERNAME);
+		this.authorities = new Authorities();
+		this.authorities.setAuthority(AuthoritiesType.HOST);
+		this.authorities.setUsername(AuthoritiesValidatorTests.USERNAME);
 	}
 
 	@Test
 	void shouldNotValidateWhenUsernameEmpty() {
 
-		AuthoritiesValidatorTests.authorities.setUsername(null);
+		this.authorities.setUsername(null);
 
-		TestUtils.multipleAssert(AuthoritiesValidatorTests.authorities, "username->must not be blank");
+		TestUtils.multipleAssert(this.authorities, "username->must not be null");
 	}
 
 	@ParameterizedTest
-	@CsvSource({
+	@ValueSource(strings = {
 		".-+_dani", "dani", "danielramonyjorgeusername1000000"
 	})
 	void shouldNotValidateWhenUsernameNotMatchPattern(final String authoritiesname) {
 
-		AuthoritiesValidatorTests.authorities.setUsername(authoritiesname);
+		this.authorities.setUsername(authoritiesname);
 
-		TestUtils.multipleAssert(AuthoritiesValidatorTests.authorities, "username->must match \"^[a-zA-Z0-9]{5,20}$\"");
+		TestUtils.multipleAssert(this.authorities, "username->must match \"^[a-zA-Z0-9]{5,20}$\"");
 	}
 
 	@Test
 	void shouldNotValidateWhenAuthorityEmpty() {
 
-		AuthoritiesValidatorTests.authorities.setAuthority(null);
+		this.authorities.setAuthority(null);
 
-		TestUtils.multipleAssert(AuthoritiesValidatorTests.authorities, "authority->must not be null");
+		TestUtils.multipleAssert(this.authorities, "authority->must not be null");
 	}
 
 	@Test
 	void shouldValidate() {
-		TestUtils.multipleAssert(AuthoritiesValidatorTests.authorities, (String[]) null);
+		TestUtils.multipleAssert(this.authorities, (String[]) null);
 	}
 }
