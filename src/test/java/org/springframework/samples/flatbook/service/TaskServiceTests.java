@@ -128,6 +128,8 @@ public class TaskServiceTests {
 	
 	@Test
 	void shouldDeleteTask() throws DataAccessException {
-		this.taskService.deleteTaskById(1);
+		this.taskService.deleteTaskById(ID);
+		Task t = this.taskService.findTaskById(ID);
+		Assertions.assertThat(t).isNull();
 	}
 }

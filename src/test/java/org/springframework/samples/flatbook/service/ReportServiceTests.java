@@ -121,6 +121,8 @@ public class ReportServiceTests {
 	
 	@Test
 	void shouldDeleteReport() throws DataAccessException {
-		this.reportService.deleteReportById(1);
+		this.reportService.deleteReportById(ID);
+		Report r = this.reportService.findReportById(ID);
+		Assertions.assertThat(r).isNull();
 	}
 }
