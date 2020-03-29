@@ -24,6 +24,7 @@
                 </c:when>
                 <c:otherwise>
                     <flatbook:selectField name="status" label="Status" names="${taskStatus}" size="4"/>
+                    <flatbook:hidden name="id"/>
                 </c:otherwise>
             </c:choose>
             <flatbook:hidden name="creator"/>

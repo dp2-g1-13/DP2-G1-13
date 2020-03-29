@@ -51,10 +51,4 @@ public class PersonService {
 	public Person findUserById(final String username) {
 		return this.personRepository.findByUsername(username);
 	}
-	
-	@Transactional(readOnly = true)
-	public Collection<Person> findAllPersons() throws DataAccessException {
-		return this.personRepository.findAll();
-	}
-
 }

@@ -26,6 +26,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -45,11 +46,14 @@ public class Report extends BaseEntity {
 	@NotNull
 	@Column(name = "creation_date")
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@PastOrPresent
 	private LocalDate	creationDate;
 
+	@NotNull
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Person		sender;
 
+	@NotNull
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Person		receiver;
 }

@@ -15,3 +15,5 @@ INSERT INTO authorities (username, authority) VALUES('jorrapdia', 'HOST');
 INSERT INTO authorities (username, authority) VALUES('josferde5', 'TENNANT');
 INSERT INTO review (dtype, id, creation_date, description, rate, creator_username, flat_id) VALUES ('FlatReview', 1, '2020-03-29', 'description', 2, 'dansanbal', 1);
 INSERT INTO review (dtype, id, creation_date, description, rate, creator_username, flat_id) VALUES ('TennantReview', 2, '2020-03-29', 'description', 3, 'josferde5', null);
+INSERT INTO reports (id, creation_date, reason, receiver_username, sender_username) VALUES (1, '2020-03-29', 'reason', 'dansanbal', 'josferde5');
+INSERT INTO tasks (id, creation_date, description, status, title, asignee_username, creator_username) VALUES (1, '2020-03-29', 'description', 'TODO', 'title', 'dansanbal', 'josferde5');
