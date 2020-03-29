@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/users/tennants")
-public class TenantController {
+public class TennantController {
 
 }

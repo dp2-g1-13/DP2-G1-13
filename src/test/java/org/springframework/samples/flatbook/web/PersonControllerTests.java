@@ -60,7 +60,7 @@ class PersonControllerTests {
 
 	private static final String	ROLE_ANONYMOUS	= "ROLE_ANONYMOUS";
 	private static final String	ANONIMOUS_USER	= "anonimousUser";
-	private static final String	TENANT_USER		= "TENANT";
+	private static final String	TENNANT_USER		= "TENNANT";
 
 	private Person				person;
 	private PersonForm			personForm;
@@ -80,11 +80,11 @@ class PersonControllerTests {
 		this.person.setPhoneNumber(PersonControllerTests.TELEPHONE);
 
 		this.personForm = new PersonForm(this.person);
-		this.personForm.setAuthority(AuthoritiesType.TENANT);
+		this.personForm.setAuthority(AuthoritiesType.TENNANT);
 		this.personForm.setSaveType(SaveType.NEW);
 		this.personForm.setConfirmPassword(PersonControllerTests.PASSWORD);
 
-		this.authorities = new Authorities(PersonControllerTests.USERNAME, AuthoritiesType.TENANT);
+		this.authorities = new Authorities(PersonControllerTests.USERNAME, AuthoritiesType.TENNANT);
 	}
 
 	@WithMockUser(username = PersonControllerTests.ANONIMOUS_USER, authorities = PersonControllerTests.ROLE_ANONYMOUS)
@@ -108,7 +108,7 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", PersonControllerTests.EMAIL)
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
@@ -127,7 +127,7 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", PersonControllerTests.EMAIL)
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "username")).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
@@ -146,7 +146,7 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", PersonControllerTests.EMAIL)
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "dni")).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
@@ -164,7 +164,7 @@ class PersonControllerTests {
 			.param("confirmPassword", PersonControllerTests.PASSWORD)
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", PersonControllerTests.EMAIL)
-			.param("dni", PersonControllerTests.DNI).param("authority", AuthoritiesType.TENANT.toString().toUpperCase()).param("saveType", SaveType.NEW.toString().toUpperCase()))
+			.param("dni", PersonControllerTests.DNI).param("authority", AuthoritiesType.TENNANT.toString().toUpperCase()).param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "email")).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
@@ -180,13 +180,13 @@ class PersonControllerTests {
 			.param("username", "as").param("password", "as")
 			.param("email", PersonControllerTests.EMAIL)
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "username")).andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "password")).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testInitEditionForm() throws Exception {
@@ -203,12 +203,12 @@ class PersonControllerTests {
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("phoneNumber", Matchers.is(PersonControllerTests.TELEPHONE))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("email", Matchers.is(PersonControllerTests.EMAIL))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("dni", Matchers.is(PersonControllerTests.DNI))))
-			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("authority", Matchers.is(AuthoritiesType.TENANT))))
+			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("authority", Matchers.is(AuthoritiesType.TENNANT))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("saveType", Matchers.is(SaveType.EDIT))));
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testInitEditFormOfAnotherProfile() throws Exception {
@@ -221,7 +221,7 @@ class PersonControllerTests {
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testProcessEditFormSuccess() throws Exception {
@@ -236,13 +236,13 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", "dani@outlook.com")
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testProcessEditFormWithErrors() throws Exception {
@@ -256,14 +256,14 @@ class PersonControllerTests {
 			.param("username", PersonControllerTests.USERNAME)
 			.param("phoneNumber", "655").param("email", "dani@outlook.com")
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "phoneNumber"))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testProcessEditFormOfAnotherProfile() throws Exception {
@@ -277,13 +277,13 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", "dani@outlook.com")
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testInitPasswordEditionForm() throws Exception {
@@ -297,12 +297,12 @@ class PersonControllerTests {
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("phoneNumber", Matchers.is(PersonControllerTests.TELEPHONE))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("email", Matchers.is(PersonControllerTests.EMAIL))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("dni", Matchers.is(PersonControllerTests.DNI))))
-			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("authority", Matchers.is(AuthoritiesType.TENANT))))
+			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("authority", Matchers.is(AuthoritiesType.TENNANT))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("saveType", Matchers.is(SaveType.EDIT))));
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testInitPasswordEditFormOfAnotherProfile() throws Exception {
@@ -315,7 +315,7 @@ class PersonControllerTests {
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testProcessPasswordEditFormSuccess() throws Exception {
@@ -328,13 +328,13 @@ class PersonControllerTests {
 			.param("confirmPassword", PersonControllerTests.NEWPASSWORD)
 			.param("previousPassword", PersonControllerTests.PASSWORD)
 			.param("username", PersonControllerTests.USERNAME)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testProcessPasswordEditFormWithErrors() throws Exception {
@@ -347,14 +347,14 @@ class PersonControllerTests {
 				.param("confirmPassword", "HHoo11")
 				.param("previousPassword", PersonControllerTests.PASSWORD)
 				.param("username", PersonControllerTests.USERNAME)
-				.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+				.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 				.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 				.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "password"))
 				.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testProcessPasswordEditFormWithErrorsInThePreviusPassword() throws Exception {
@@ -367,14 +367,14 @@ class PersonControllerTests {
 			.param("confirmPassword", PersonControllerTests.NEWPASSWORD)
 			.param("previousPassword", "HHoo11")
 			.param("username", PersonControllerTests.USERNAME)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "previousPassword"))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENANT_USER
+		PersonControllerTests.TENNANT_USER
 	})
 	@Test
 	void testProcessPasswordEditFormOfAnotherProfile() throws Exception {
@@ -386,7 +386,7 @@ class PersonControllerTests {
 			.param("confirmPassword", PersonControllerTests.NEWPASSWORD)
 			.param("previousPassword", PersonControllerTests.PASSWORD)
 			.param("username", PersonControllerTests.USERNAME)
-			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}

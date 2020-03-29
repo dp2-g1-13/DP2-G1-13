@@ -55,7 +55,7 @@ public class PersonController {
 
 	@ModelAttribute("types")
 	public List<AuthoritiesType> getTypes(final ModelMap model) {
-		return Arrays.asList(AuthoritiesType.HOST, AuthoritiesType.TENANT);
+		return Arrays.asList(AuthoritiesType.HOST, AuthoritiesType.TENNANT);
 	}
 
 	@InitBinder("personForm")

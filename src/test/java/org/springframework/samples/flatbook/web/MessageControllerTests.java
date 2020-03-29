@@ -62,7 +62,7 @@ class MessageControllerTests {
 	private static final String	TELEPHONE2		= "675789789";
 	private static final String	PASSWORD		= "HOst__Pa77S";
 
-	private static final String	TENANT_USER		= "TENANT";
+	private static final String	TENNANT_USER		= "TENNANT";
 
 	private Person				person1;
 	private Person				person2;
@@ -128,7 +128,7 @@ class MessageControllerTests {
 
 	}
 
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
 	@Test
 	void testInitConversationList() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -143,7 +143,7 @@ class MessageControllerTests {
 			.andExpect(MockMvcResultMatchers.model().attributeExists("messages"));
 	}
 
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
 	@Test
 	void testProcessSendFormSuccess() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -160,7 +160,7 @@ class MessageControllerTests {
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
 	
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
 	@Test
 	void testInitConversation() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -175,7 +175,7 @@ class MessageControllerTests {
 			.andExpect(MockMvcResultMatchers.model().attributeExists("messages"));
 	}
 
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
 	@Test
 	void testProcessSendFormSuccessInConversation() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -193,7 +193,7 @@ class MessageControllerTests {
 		}
 
 
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
 	@Test
 	void testProcessSendFormWithCantReceiveYourOwnMessageError() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -210,7 +210,7 @@ class MessageControllerTests {
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 		}
 	
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
 	@Test
 	void testProcessSendFormWithUserNotExistsException() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -228,7 +228,7 @@ class MessageControllerTests {
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 		}
 	
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
 	@Test
 	void testProcessSendFormWithErrors() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));

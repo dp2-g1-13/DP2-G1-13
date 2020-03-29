@@ -2,7 +2,7 @@
 package org.springframework.samples.flatbook.model.enums;
 
 public enum AuthoritiesType {
-	ADMIN("Admin"), TENANT("Tenant"), HOST("Host");
+	ADMIN("Admin"), TENNANT("Tennant"), HOST("Host");
 
 	private final String type;
 

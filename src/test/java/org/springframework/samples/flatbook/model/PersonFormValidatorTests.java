@@ -21,7 +21,7 @@ public class PersonFormValidatorTests {
 	private static final String				DNI			= "23330000B";
 	private static final String				EMAIL		= "a@a.com";
 	private static final String				USERNAME	= "asasa";
-	private static final AuthoritiesType	AUTHORITY	= AuthoritiesType.TENANT;
+	private static final AuthoritiesType	AUTHORITY	= AuthoritiesType.TENNANT;
 	private static final String				TELEPHONE	= "675789789";
 
 	private PersonForm						personForm;

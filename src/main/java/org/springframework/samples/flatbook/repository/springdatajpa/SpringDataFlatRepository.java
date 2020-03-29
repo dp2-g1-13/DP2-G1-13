@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.samples.flatbook.model.Flat;
-import org.springframework.samples.flatbook.model.Tenant;
+import org.springframework.samples.flatbook.model.Tennant;
 import org.springframework.samples.flatbook.repository.FlatRepository;
 
 import java.util.Collection;
@@ -25,6 +25,6 @@ public interface SpringDataFlatRepository extends FlatRepository, Repository<Fla
     Collection<Flat> findByCityAndPostalCode(@Param("city") String city, @Param("postalCode") Integer postalCode);
     
     @Override
-    @Query("SELECT tenants FROM Flat WHERE id = ?1")
-    Collection<Tenant> findTenantsById(int id) throws DataAccessException;
+    @Query("SELECT tennants FROM Flat WHERE id = ?1")
+    Collection<Tennant> findTennantsById(int id) throws DataAccessException;
 }

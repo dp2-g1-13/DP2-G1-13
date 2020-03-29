@@ -28,7 +28,7 @@ public class PersonAuthorityValidatorTests {
 	void instanciatePersonForm() {
 		LocaleContextHolder.setLocale(Locale.ENGLISH);
 		this.personForm = new PersonForm();
-		this.personForm.setAuthority(AuthoritiesType.TENANT);
+		this.personForm.setAuthority(AuthoritiesType.TENNANT);
 	}
 
 	@Test

@@ -64,6 +64,6 @@ public class Flat extends BaseEntity {
 	private Set<FlatReview>		flatReviews;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "flat")
-	private Set<Tenant>		tenants;
+	private Set<Tennant>		tennants;
 
 }

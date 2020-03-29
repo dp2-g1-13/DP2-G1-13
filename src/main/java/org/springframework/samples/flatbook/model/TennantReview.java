@@ -29,8 +29,8 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "tenant_reviews")
-public class TenantReview extends Review {
+@Table(name = "tennant_reviews")
+public class TennantReview extends Review {
 
 	@NotNull
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

@@ -21,8 +21,8 @@ import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.Formatter;
-import org.springframework.samples.flatbook.model.Tenant;
-import org.springframework.samples.flatbook.service.TenantService;
+import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.service.TennantService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,28 +41,28 @@ import org.springframework.stereotype.Component;
  * @author Michael Isvy
  */
 @Component
-public class RoommateFormatter implements Formatter<Tenant> {
+public class RoommateFormatter implements Formatter<Tennant> {
 
-	private final TenantService tenantService;
+	private final TennantService tennantService;
 
 	@Autowired
-	public RoommateFormatter(TenantService tenantService) {
-		this.tenantService = tenantService;
+	public RoommateFormatter(TennantService tennantService) {
+		this.tennantService = tennantService;
 	}
 
 	@Override
-	public String print(Tenant tenant, Locale locale) {
-		return tenant.getUsername();
+	public String print(Tennant tennant, Locale locale) {
+		return tennant.getUsername();
 	}
 
 	@Override
-	public Tenant parse(String text, Locale locale) throws ParseException {
-		Collection<Tenant> findTenants = this.tenantService.findAllTenants();
-		for (Tenant t : findTenants) {
+	public Tennant parse(String text, Locale locale) throws ParseException {
+		Collection<Tennant> findTennants = this.tennantService.findAllTennants();
+		for (Tennant t : findTennants) {
 			if (t.getUsername().equals(text)) {
 				return t;
 			}
 		}
-		throw new ParseException("tenant not found: " + text, 0);
+		throw new ParseException("tennant not found: " + text, 0);
 	}
 }
