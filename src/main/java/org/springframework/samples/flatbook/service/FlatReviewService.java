@@ -2,7 +2,6 @@ package org.springframework.samples.flatbook.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.repository.FlatReviewRepository;
 import org.springframework.stereotype.Service;
@@ -21,11 +20,6 @@ public class FlatReviewService {
     @Transactional(readOnly = true)
     public FlatReview findFlatReviewById(int flatReviewId) throws DataAccessException {
         return this.flatReviewRepository.findById(flatReviewId);
-    }
-    
-    @Transactional(readOnly = true)
-    public Flat findFlatOfFlatReviewById(int flatReviewId) throws DataAccessException {
-        return this.flatReviewRepository.findFlatOfFlatReviewById(flatReviewId);
     }
     
     @Transactional
