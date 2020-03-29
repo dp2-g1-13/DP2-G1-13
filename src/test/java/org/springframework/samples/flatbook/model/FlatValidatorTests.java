@@ -151,7 +151,7 @@ public class FlatValidatorTests {
 
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Flat> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("squareMeters");
+        assertThat(violation.getPropertyPath().toString()).isEqualTo("squareMeters");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
 
@@ -373,33 +373,6 @@ public class FlatValidatorTests {
         ConstraintViolation<Flat> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("images");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
-    }
-
-    @Test
-    void shouldNotValidateWhenImagesLessThan6() {
-        LocaleContextHolder.setLocale(Locale.ENGLISH);
-        Flat flat = new Flat();
-        flat.setDescription("this is a sample description with more than 29 chars");
-        flat.setSquareMeters(90);
-        flat.setNumberRooms(2);
-        flat.setNumberBaths(2);
-        flat.setAvailableServices("Wifi and cable TV");
-        flat.setAddress(address);
-        Set<DBImage> images = new HashSet<>();
-        images.add(image1);
-        images.add(image2);
-        images.add(image3);
-        images.add(image4);
-        images.add(image5);
-        flat.setImages(images);
-
-        Validator validator = createValidator();
-        Set<ConstraintViolation<Flat>> constraintViolations = validator.validate(flat);
-
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        ConstraintViolation<Flat> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("images");
-        assertThat(violation.getMessage()).isEqualTo("size must be between 6 and 2147483647");
     }
 
     @ParameterizedTest

@@ -27,7 +27,7 @@ public class RequestFormValidator implements Validator {
         RequestForm request = (RequestForm) o;
         if(type.equals(AuthoritiesType.TENNANT)) {
             if(request.getDescription() == null || request.getDescription().isEmpty())
-                errors.rejectValue("description", "", "Description must not be null");
+                errors.rejectValue("description", "", "Description must not be null nor blank");
             if(request.getStartDate() != null && request.getFinishDate() != null) {
                 if(request.getStartDate().isAfter(request.getFinishDate()) || request.getStartDate().isEqual(request.getFinishDate())) {
                     errors.rejectValue("startDate", "", "Start date must be before finish date");

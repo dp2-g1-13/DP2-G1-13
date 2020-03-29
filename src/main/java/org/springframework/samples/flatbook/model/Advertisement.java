@@ -28,8 +28,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Positive;
 
 import lombok.Getter;
@@ -56,17 +58,21 @@ public class Advertisement extends BaseEntity {
 
 	@Column(name = "creation_date")
     @NotNull
+    @PastOrPresent
 	private LocalDate		creationDate;
 
 	@Column(name = "price_per_month")
     @Positive
     @NotNull
     private Double pricePerMonth;
+
+	@Valid
 	@NotNull
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")
 	private Flat			flat;
 
+	@Valid
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "advertisement_id")
 	private Set<Request>	requests;
