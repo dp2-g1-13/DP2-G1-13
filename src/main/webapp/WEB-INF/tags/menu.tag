@@ -29,9 +29,9 @@
 					<span>Find owners</span>
 				</flatbook:menuItem>
 
-				<flatbook:menuItem active="${name eq 'vets'}" url="/vets" title="veterinarians">
+				<flatbook:menuItem active="${name eq 'messages'}" url="/messages/list" title="messages">
 					<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
-					<span>Veterinarians</span>
+					<span>Messages</span>
 				</flatbook:menuItem>
 
 				<flatbook:menuItem active="${name eq 'error'}" url="/oups" title="trigger a RuntimeException to see how it is handled">

@@ -18,7 +18,6 @@ package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -26,6 +25,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,9 +42,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "messages")
-public class Message extends BaseEntity {
+public class Message extends BaseEntity implements Comparable<Message> {
 
 	@Column(name = "creation_moment")
+	@DateTimeFormat(pattern = "dd/MM/yyyy HH:mm")
 	@NotNull
 	private LocalDateTime	creationMoment;
 
@@ -51,10 +53,18 @@ public class Message extends BaseEntity {
 	@NotBlank
 	private String			body;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@NotNull
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Person			sender;
 
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@NotNull
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Person			receiver;
+
+
+	@Override
+	public int compareTo(final Message o) {
+		return this.creationMoment.compareTo(o.creationMoment);
+	}
 
 }

@@ -14,6 +14,8 @@ import org.springframework.samples.flatbook.model.enums.SaveType;
 import org.springframework.samples.flatbook.model.mappers.PersonForm;
 import org.springframework.samples.flatbook.repository.AuthoritiesRepository;
 import org.springframework.samples.flatbook.repository.PersonRepository;
+import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
+import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,16 +23,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PersonService {
 
-	@Autowired
 	private PersonRepository		personRepository;
 
-	@Autowired
 	private AuthoritiesRepository	authoritiesRepository;
 
 
+	@Autowired
+	public PersonService(final PersonRepository personRepository, final AuthoritiesRepository authoritiesRepository) {
+		this.personRepository = personRepository;
+		this.authoritiesRepository = authoritiesRepository;
+	}
+
 	@Transactional(rollbackFor = DuplicatedUsernameException.class)
 	public void saveUser(final PersonForm user) throws DataAccessException, DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : new Tennant(user);
+		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : user.getAuthority().equals(AuthoritiesType.TENNANT) ? new Tennant(user) : null;
 		SaveType type = user.getSaveType();
 
 		if (SaveType.NEW.equals(type) && this.personRepository.findByUsername(user.getUsername()) != null) {
@@ -42,7 +48,7 @@ public class PersonService {
 		} else if (SaveType.NEW.equals(type) && this.personRepository.findByUsername(user.getUsername()) == null) {
 			this.personRepository.save(person);
 			this.authoritiesRepository.save(new Authorities(user.getUsername(), user.getAuthority()));
-		} else {
+		} else if (SaveType.EDIT.equals(type)) {
 			this.personRepository.save(person);
 		}
 

@@ -1,3 +1,4 @@
+
 package org.springframework.samples.flatbook.configuration;
 
 import javax.sql.DataSource;
@@ -29,16 +30,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Autowired
 	DataSource dataSource;
 
+
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 				.antMatchers("/resources/**","/webjars/**","/h2-console/**").permitAll()
 				.antMatchers(HttpMethod.GET, "/","/oups").permitAll()
-				.antMatchers("/users/**").permitAll()
+				.antMatchers("/users/new").permitAll()
+				.antMatchers("/users/**").authenticated()
 				.antMatchers("/admin/**").hasAnyAuthority("admin")
 				.antMatchers("/tasks/**").authenticated()
 				.antMatchers("/tennants/**").authenticated()
 				.antMatchers("/flats/**").authenticated()
+				.antMatchers("/messages/**").authenticated()
 				.antMatchers("/logout").permitAll()
 				.anyRequest().denyAll()
 				.and()
@@ -58,25 +62,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(final AuthenticationManagerBuilder auth) throws Exception {
-		auth.jdbcAuthentication()
-	      .dataSource(this.dataSource)
-	      .usersByUsernameQuery(
-	       "select username,password,enabled "
-	        + "from users "
-	        + "where username = ?")
-	      .authoritiesByUsernameQuery(
-	       "select username, authority "
-	        + "from authorities "
-	        + "where username = ?")
-	      .passwordEncoder(this.passwordEncoder());
+		auth.jdbcAuthentication().dataSource(this.dataSource).usersByUsernameQuery("select username,password,enabled " + "from users " + "where username = ?")
+			.authoritiesByUsernameQuery("select username, authority " + "from authorities " + "where username = ?").passwordEncoder(this.passwordEncoder());
 	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		PasswordEncoder encoder =  NoOpPasswordEncoder.getInstance();
-	    return encoder;
+		PasswordEncoder encoder = NoOpPasswordEncoder.getInstance();
+		return encoder;
 	}
 
 }
-
-

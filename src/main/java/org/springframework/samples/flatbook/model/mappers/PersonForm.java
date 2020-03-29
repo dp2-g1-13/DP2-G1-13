@@ -8,7 +8,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
@@ -50,8 +49,7 @@ public class PersonForm {
 
 	@Id
 	@NotBlank
-	@Size(min = 5, max = 20)
-	@Pattern(regexp = "[a-zA-Z0-9]{5,20}")
+	@Pattern(regexp = "^[a-zA-Z0-9]{5,20}$")
 	String				username;
 
 	String				password;

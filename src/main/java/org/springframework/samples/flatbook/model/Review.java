@@ -32,7 +32,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "review")
+@Table(name = "reviews")
 @Getter
 @Setter
 public class Review extends BaseEntity {
