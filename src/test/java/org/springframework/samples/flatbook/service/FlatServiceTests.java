@@ -9,11 +9,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.repository.DBImageRepository;
 import org.springframework.samples.flatbook.repository.FlatRepository;
 import org.springframework.samples.flatbook.util.EntityUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,8 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@DataJpaTest(includeFilters= @ComponentScan.Filter(Service.class))
 @ExtendWith(MockitoExtension.class)
-public class FlatServiceMockedTests {
+public class FlatServiceTests {
+
+    @Autowired
+    private FlatService flatService;
 
     @Mock
     private static FlatRepository flatRepository;
@@ -32,17 +40,18 @@ public class FlatServiceMockedTests {
     @Mock
     private static DBImageRepository dbImageRepository;
 
-    private static Set<Flat> flats;
-    private static Set<Flat> flatsOfHost1;
-    private static Set<Flat> flatsOfHost2;
-    private static Flat flat1;
-    private static Flat flat2;
-    private static Flat flat3;
+    private Set<Flat> flats;
+    private Set<Flat> flatsOfHost1;
+    private Set<Flat> flatsOfHost2;
+    private Flat flat1;
+    private Flat flat2;
+    private Flat flat3;
 
-    protected FlatService flatService;
+    protected FlatService mockedFlatService;
 
-    @BeforeAll
-    static void setupMock() {
+    @BeforeEach
+    void setup() {
+        mockedFlatService = new FlatService(flatRepository, dbImageRepository);
         flats = new HashSet<>();
         flat1 = new Flat();
         flat2 = new Flat();
@@ -75,16 +84,11 @@ public class FlatServiceMockedTests {
         flatsOfHost2.remove(flat2);
     }
 
-    @BeforeEach
-    void setup() {
-        flatService = new FlatService(flatRepository, dbImageRepository);
-    }
-
     @Test
     void shouldFindAllFlats() {
         when(flatRepository.findAll()).thenReturn(flats);
 
-        Set<Flat> flats = this.flatService.findAllFlats();
+        Set<Flat> flats = this.mockedFlatService.findAllFlats();
         assertThat(flats.size()).isEqualTo(3);
 
         Flat f1 = EntityUtils.getById(flats, Flat.class, 1);
@@ -103,42 +107,31 @@ public class FlatServiceMockedTests {
         lenient().when(flatRepository.findById(2)).thenReturn(flat2);
         lenient().when(flatRepository.findById(3)).thenReturn(flat3);
 
-        Flat flat = this.flatService.findFlatById(id);
+        Flat flat = this.mockedFlatService.findFlatById(id);
         assertThat(flat.getId()).isEqualTo(id);
         assertThat(flat.getImages().iterator().next().getFilename()).isEqualTo("image" + id);
     }
 
     @Test
     void shouldNotFindFlat() {
-        Flat flat = this.flatService.findFlatById(50);
+        Flat flat = this.mockedFlatService.findFlatById(50);
         assertThat(flat).isNull();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"host1", "host2"})
-    void shouldFindFlatsOfHost(String username) {
-        lenient().when(flatRepository.findByHostUsername("host1")).thenReturn(flatsOfHost1);
-        lenient().when(flatRepository.findByHostUsername("host2")).thenReturn(flatsOfHost2);
-
-        Set<Flat> flatsOfHost = this.flatService.findFlatByHostUsername(username);
+    @Test
+    void shouldFindFlatsOfHost() {
+        Set<Flat> flatsOfHost = this.flatService.findFlatByHostUsername("host1");
         assertThat(flatsOfHost).isNotNull();
         assertThat(flatsOfHost).isNotEmpty();
+        assertThat(flatsOfHost.size()).isEqualTo(2);
     }
 
-    @Test
-    void shouldNotFindFlatsOfHost() {
-        Set<Flat> flatsOfHost = this.flatService.findFlatByHostUsername("host3");
+    @ParameterizedTest
+    @ValueSource(strings = {"host3", ""})
+    void shouldNotFindFlatsOfHost(String username) {
+        Set<Flat> flatsOfHost = this.flatService.findFlatByHostUsername(username);
         assertThat(flatsOfHost).isNotNull();
         assertThat(flatsOfHost).isEmpty();
-    }
-
-    @Test
-    @DisplayName("Should throw NullPointerException when trying to find flats of a host with a null username")
-    void shouldThrowNullPointerWhenTryingToFindFlatsOfHostWithNullUsername() {
-        when(flatRepository.findByHostUsername(isNull())).thenThrow(new NullPointerException("Null username"));
-
-        Exception exception = assertThrows(NullPointerException.class, () -> this.flatService.findFlatByHostUsername(null));
-        assertThat(exception.getMessage()).isEqualTo("Null username");
     }
 
     @Test
@@ -146,7 +139,7 @@ public class FlatServiceMockedTests {
         doNothing().when(flatRepository).save(isA(Flat.class));
         doNothing().when(dbImageRepository).save(isA(DBImage.class));
 
-        this.flatService.saveFlat(flat1);
+        this.mockedFlatService.saveFlat(flat1);
 
         verify(flatRepository).save(flat1);
         verify(dbImageRepository).save(flat1.getImages().iterator().next());
@@ -154,21 +147,21 @@ public class FlatServiceMockedTests {
 
     @Test
     @DisplayName("Should throw NullPointerException when trying to add a null flat")
-    void shouldThrowNullPointerWhenTryingToAddNullFlat() {
-        doThrow(new NullPointerException("Null flat")).when(flatRepository).save(isNull());
+    void shouldThrowIllegalArgumentExceptionWhenTryingToAddNullFlat() {
+        doThrow(new IllegalArgumentException("Target object must not be null")).when(flatRepository).save(isNull());
 
-        Exception exception = assertThrows(NullPointerException.class, () -> this.flatService.saveFlat(null));
-        assertThat(exception.getMessage()).isEqualTo("Null flat");
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> this.mockedFlatService.saveFlat(null));
+        assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
     }
 
     @Test
     @DisplayName("Should throw NullPointerException when trying to add a null image")
-    void shouldThrowNullPointerWhenTryingToAddNullImageInFlat() {
+    void shouldThrowIllegalArgumentExceptionWhenTryingToAddNullImageInFlat() {
         flat2.getImages().add(null);
-        doThrow(new NullPointerException("Null image")).when(dbImageRepository).save(isNull());
+        doThrow(new IllegalArgumentException("Target object must not be null")).when(dbImageRepository).save(isNull());
 
-        Exception exception = assertThrows(NullPointerException.class, () -> this.flatService.saveFlat(flat2));
-        assertThat(exception.getMessage()).isEqualTo("Null image");
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> this.mockedFlatService.saveFlat(flat2));
+        assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
     }
 
 

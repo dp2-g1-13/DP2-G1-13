@@ -7,10 +7,10 @@
 
 <flatbook:layout pageName="advertisements">
     <h2>
-    <c:if test="${formAdvertisement['new']}">New </c:if> Advertisement
+    <c:if test="${advertisementForm['new']}">New </c:if> Advertisement
     </h2>
 
-    <form:form modelAttribute="formAdvertisement" class="form-horizontal" id="add-advertisement-form">
+    <form:form modelAttribute="advertisementForm" class="form-horizontal" id="add-advertisement-form">
         <div class="form-group has-feedback">
             <flatbook:inputField name="title" label="Title"/>
             <flatbook:textAreaField name="description" label="Description"/>
@@ -20,7 +20,7 @@
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <c:choose>
-                    <c:when test="${formAdvertisement['new']}">
+                    <c:when test="${advertisementForm['new']}">
                         <button class="btn btn-default" type="submit">Add Advertisement</button>
                     </c:when>
                     <c:otherwise>

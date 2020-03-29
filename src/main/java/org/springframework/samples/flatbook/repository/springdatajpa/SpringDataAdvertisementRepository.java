@@ -32,10 +32,6 @@ public interface SpringDataAdvertisementRepository extends AdvertisementReposito
     Set<Advertisement> findByCityAndPostalCode(@Param("city") String city, @Param("postal_code") String postalCode) throws DataAccessException;
 
     @Override
-    @Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND adv.pricePerMonth < :price_per_month")
-    Set<Advertisement> findByPricePerMonthLessThan(@Param("city") String city, @Param("price_per_month") double pricePerMonth) throws DataAccessException;
-
-    @Override
     @Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND adv.flat.address.country = :country")
     Set<Advertisement> findByCityAndCountry(@Param("city") String city, @Param("country") String country) throws DataAccessException;
 

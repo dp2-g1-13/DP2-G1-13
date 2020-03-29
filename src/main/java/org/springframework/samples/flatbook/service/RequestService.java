@@ -26,11 +26,6 @@ public class RequestService {
     }
 
     @Transactional(readOnly = true)
-    public Set<Request> findRequestsByAdvertisementId(int advId) throws DataAccessException {
-        return this.requestRepository.findManyByAdvertisementId(advId);
-    }
-
-    @Transactional(readOnly = true)
     public Set<Request> findRequestsByTenantUsername(String username) throws DataAccessException {
         return this.requestRepository.findManyByTenantUsername(username);
     }

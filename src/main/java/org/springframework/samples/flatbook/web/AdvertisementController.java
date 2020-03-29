@@ -52,7 +52,7 @@ public class AdvertisementController {
             return "exception";
         }
         AdvertisementForm advertisement = new AdvertisementForm();
-        model.put("formAdvertisement", advertisement);
+        model.put("advertisementForm", advertisement);
         return VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
     }
 
@@ -75,20 +75,20 @@ public class AdvertisementController {
     }
 
     @GetMapping(value = "/advertisements/{advertisementId}/edit")
-    public String initEditForm(@PathVariable("advertisementId") int advertisementId, Map<String, Object> model) {
+    public String initUpdateForm(@PathVariable("advertisementId") int advertisementId, Map<String, Object> model) {
         Advertisement adv = this.advertisementService.findAdvertisementById(advertisementId);
         if(adv == null || !validateHost(adv.getFlat().getId())) {
             RuntimeException ex = new RuntimeException("Illegal access");
             model.put("exception", ex);
             return "exception";
         }
-        AdvertisementForm fa = new AdvertisementForm(adv);
-        model.put("formAdvertisement", fa);
+        AdvertisementForm af = new AdvertisementForm(adv);
+        model.put("advertisementForm", af);
         return VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
     }
 
     @PostMapping(value = "/advertisements/{advertisementId}/edit")
-    public String processEditForm(@Valid AdvertisementForm adv, @PathVariable("advertisementId") int advertisementId, BindingResult result, Map<String, Object> model) {
+    public String processUpdateForm(@Valid AdvertisementForm adv, BindingResult result, @PathVariable("advertisementId") int advertisementId, Map<String, Object> model) {
         if(result.hasErrors()) {
             return VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
         } else {
@@ -129,14 +129,14 @@ public class AdvertisementController {
         mav.addObject("images", images);
         String hostUsername = this.hostService.findHostByFlatId(advertisement.getFlat().getId()).getUsername();
         mav.addObject("host", hostUsername);
-        Person person = this.personService.findUserById(((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername());
-        if(person instanceof Tennant) {
-            mav.addObject("requestMade", this.requestService.isThereRequestOfTenantByAdvertisementId(person.getUsername(), advertisementId));
-            mav.addObject("hasFlat", ((Tennant) person).getFlat() != null);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ROLE_ANONYMOUS"))) {
+            Person person = this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
+            if (person instanceof Tennant) {
+                mav.addObject("requestMade", this.requestService.isThereRequestOfTenantByAdvertisementId(person.getUsername(), advertisementId));
+                mav.addObject("hasFlat", ((Tennant) person).getFlat() != null);
+            }
         }
-
-
-
         return mav;
     }
 

@@ -29,7 +29,7 @@ public class FlatValidator implements Validator {
                     errors.rejectValue("images", "", FILE_TYPE_EMPTY);
                 else if (!i.getFileType().startsWith("image/"))
                     errors.rejectValue("images", "", FILE_TYPE_MUST_BE_IMAGE);
-                else if (i.getData().length < 1)
+                else if (i.getData() == null || i.getData().length < 1)
                     errors.rejectValue("images", "", DATA_EMPTY);
             }
         }

@@ -9,6 +9,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.samples.flatbook.web.validators.FlatValidator;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.validation.ConstraintViolation;
@@ -373,6 +377,166 @@ public class FlatValidatorTests {
         ConstraintViolation<Flat> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("images");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
+    }
+
+    @Test
+    void shouldNotValidateWhenAddingImageWithEmptyFilename() {
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
+        Flat flat = new Flat();
+        flat.setDescription("this is a sample description with more than 29 chars");
+        flat.setSquareMeters(90);
+        flat.setNumberRooms(2);
+        flat.setNumberBaths(2);
+        flat.setAvailableServices("Wifi and cable TV");
+        flat.setAddress(address);
+        Set<DBImage> images = new HashSet<>();
+        images.add(image1);
+        images.add(image2);
+        images.add(image3);
+        images.add(image4);
+        images.add(image5);
+        images.add(image6);
+
+        DBImage badImage = new DBImage();
+        badImage.setFilename("");
+        badImage.setFileType("image/jpg");
+        badImage.setData("image".getBytes());
+
+        images.add(badImage);
+        flat.setImages(images);
+
+        Validator validator = createValidator();
+        Set<ConstraintViolation<Flat>> constraintViolations = validator.validate(flat);
+        assertThat(constraintViolations).isEmpty();
+
+        org.springframework.validation.Validator customValidator = new FlatValidator();
+        Errors errors = new BeanPropertyBindingResult(flat, flat.getClass().toString());
+        customValidator.validate(flat, errors);
+
+        assertThat(errors.getAllErrors().size()).isEqualTo(1);
+        FieldError violation = errors.getFieldErrors().iterator().next();
+        assertThat(violation.getField()).isEqualTo("images");
+        assertThat(violation.getDefaultMessage()).isEqualTo("The filename of the image must not be empty");
+    }
+
+    @Test
+    void shouldNotValidateWhenAddingImageWithEmptyFileType() {
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
+        Flat flat = new Flat();
+        flat.setDescription("this is a sample description with more than 29 chars");
+        flat.setSquareMeters(90);
+        flat.setNumberRooms(2);
+        flat.setNumberBaths(2);
+        flat.setAvailableServices("Wifi and cable TV");
+        flat.setAddress(address);
+        Set<DBImage> images = new HashSet<>();
+        images.add(image1);
+        images.add(image2);
+        images.add(image3);
+        images.add(image4);
+        images.add(image5);
+        images.add(image6);
+
+        DBImage badImage = new DBImage();
+        badImage.setFilename("image.jpg");
+        badImage.setFileType("");
+        badImage.setData("image".getBytes());
+
+        images.add(badImage);
+        flat.setImages(images);
+
+        Validator validator = createValidator();
+        Set<ConstraintViolation<Flat>> constraintViolations = validator.validate(flat);
+        assertThat(constraintViolations).isEmpty();
+
+        org.springframework.validation.Validator customValidator = new FlatValidator();
+        Errors errors = new BeanPropertyBindingResult(flat, flat.getClass().toString());
+        customValidator.validate(flat, errors);
+
+        assertThat(errors.getAllErrors().size()).isEqualTo(1);
+        FieldError violation = errors.getFieldErrors().iterator().next();
+        assertThat(violation.getField()).isEqualTo("images");
+        assertThat(violation.getDefaultMessage()).isEqualTo("The file type of the image must not be empty");
+    }
+
+    @Test
+    void shouldNotValidateWhenAddingImageWhenFileTypeIsNotImage() {
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
+        Flat flat = new Flat();
+        flat.setDescription("this is a sample description with more than 29 chars");
+        flat.setSquareMeters(90);
+        flat.setNumberRooms(2);
+        flat.setNumberBaths(2);
+        flat.setAvailableServices("Wifi and cable TV");
+        flat.setAddress(address);
+        Set<DBImage> images = new HashSet<>();
+        images.add(image1);
+        images.add(image2);
+        images.add(image3);
+        images.add(image4);
+        images.add(image5);
+        images.add(image6);
+
+        DBImage badImage = new DBImage();
+        badImage.setFilename("image.jpg");
+        badImage.setFileType("application/json");
+        badImage.setData("image".getBytes());
+
+        images.add(badImage);
+        flat.setImages(images);
+
+        Validator validator = createValidator();
+        Set<ConstraintViolation<Flat>> constraintViolations = validator.validate(flat);
+        assertThat(constraintViolations).isEmpty();
+
+        org.springframework.validation.Validator customValidator = new FlatValidator();
+        Errors errors = new BeanPropertyBindingResult(flat, flat.getClass().toString());
+        customValidator.validate(flat, errors);
+
+        assertThat(errors.getAllErrors().size()).isEqualTo(1);
+        FieldError violation = errors.getFieldErrors().iterator().next();
+        assertThat(violation.getField()).isEqualTo("images");
+        assertThat(violation.getDefaultMessage()).isEqualTo("The file type must be an image");
+    }
+
+    @Test
+    void shouldNotValidateWhenAddingImageWithEmptyData() {
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
+        Flat flat = new Flat();
+        flat.setDescription("this is a sample description with more than 29 chars");
+        flat.setSquareMeters(90);
+        flat.setNumberRooms(2);
+        flat.setNumberBaths(2);
+        flat.setAvailableServices("Wifi and cable TV");
+        flat.setAddress(address);
+        Set<DBImage> images = new HashSet<>();
+        images.add(image1);
+        images.add(image2);
+        images.add(image3);
+        images.add(image4);
+        images.add(image5);
+        images.add(image6);
+
+        DBImage badImage = new DBImage();
+        badImage.setFilename("image.jpg");
+        badImage.setFileType("image/jpg");
+        badImage.setData(new byte[]{});
+
+        images.add(badImage);
+        flat.setImages(images);
+
+        Validator validator = createValidator();
+        Set<ConstraintViolation<Flat>> constraintViolations = validator.validate(flat);
+        assertThat(constraintViolations).isEmpty();
+
+        org.springframework.validation.Validator customValidator = new FlatValidator();
+        Errors errors = new BeanPropertyBindingResult(flat, flat.getClass().toString());
+        customValidator.validate(flat, errors);
+
+        assertThat(errors.getAllErrors().size()).isEqualTo(1);
+        FieldError violation = errors.getFieldErrors().iterator().next();
+        assertThat(violation.getField()).isEqualTo("images");
+        assertThat(violation.getDefaultMessage()).isEqualTo("The data of the image must not be empty");
     }
 
     @ParameterizedTest

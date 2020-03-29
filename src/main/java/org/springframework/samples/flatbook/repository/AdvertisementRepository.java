@@ -23,8 +23,6 @@ public interface AdvertisementRepository {
 
     Set<Advertisement> findByCityAndCountryAndPostalCode(String city, String country, String postalCode) throws DataAccessException;
 
-    Set<Advertisement> findByPricePerMonthLessThan(String city, double pricePerMonth) throws DataAccessException;
-
     void save(Advertisement advertisement);
 
     void delete(Advertisement advertisement);

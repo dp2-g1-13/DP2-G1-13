@@ -87,10 +87,15 @@ class FlatControllerTests {
         flat.setAddress(address);
         flat.setImages(images);
 
+        Set<Flat> flatsOfHost = new HashSet<>();
+        flatsOfHost.add(flat);
+
         Host host = new Host();
         host.setUsername(TEST_PERSON_USERNAME);
+
         given(this.personService.findUserById(TEST_PERSON_USERNAME)).willReturn(host);
         given(this.flatService.findFlatById(TEST_FLAT_ID)).willReturn(flat);
+        given(this.flatService.findFlatByHostUsername(TEST_PERSON_USERNAME)).willReturn(flatsOfHost);
         given(this.dbImageService.getImageById(TEST_IMAGE_ID)).willReturn(image);
         given(this.dbImageService.getImagesByFlatId(TEST_FLAT_ID)).willReturn(images);
         given(this.hostService.findHostByFlatId(TEST_FLAT_ID)).willReturn(host);
@@ -139,6 +144,7 @@ class FlatControllerTests {
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))
             .andExpect(status().is3xxRedirection());
+        then(this.flatService).should().saveFlat(isA(Flat.class));
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
@@ -195,6 +201,14 @@ class FlatControllerTests {
             .andExpect(view().name("flats/createOrUpdateFlatForm"));
     }
 
+    @WithMockUser(value = "spring-wrong", roles = {"HOST"})
+    @Test
+    void testInitUpdateFormThrowExceptionWithWrongHost() throws Exception {
+        mockMvc.perform(get("/flats/{flatId}/edit", TEST_FLAT_ID))
+            .andExpect(status().isOk())
+            .andExpect(view().name("exception"));
+    }
+
     @WithMockUser(value = "spring", roles = {"HOST"})
     @Test
     void testProcessUpdateFormSuccess() throws Exception {
@@ -214,6 +228,7 @@ class FlatControllerTests {
             .param("address.country", "Spain"))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/flats/{flatId}"));
+        then(this.flatService).should().saveFlat(isA(Flat.class));
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
@@ -239,12 +254,42 @@ class FlatControllerTests {
             .andExpect(view().name("flats/createOrUpdateFlatForm"));
     }
 
+    @WithMockUser(value = "spring-wrong", roles = {"HOST"})
+    @Test
+    void testProcessUpdateFormThrowExceptionWithWrongHost() throws Exception {
+        MockMultipartFile file1 = new MockMultipartFile("images", "image1.png", "image/png", "image1".getBytes());
+
+        mockMvc.perform(multipart("/flats/{flatId}/edit", TEST_FLAT_ID)
+            .file(file1)
+            .with(csrf())
+            .param("description", "this is a sample description with more than 30 chars")
+            .param("squareMeters", "90")
+            .param("numberRooms", "2")
+            .param("numberBaths", "2")
+            .param("availableServices", "Wifi and cable TV")
+            .param("address.address", "Calle Luis Montoto")
+            .param("address.postalCode", "41003")
+            .param("address.city", "Sevilla")
+            .param("address.country", "Spain"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("exception"));
+    }
+
     @WithMockUser(value = "spring", roles = {"HOST"})
     @Test
     void testProcessDeleteImage() throws Exception {
         mockMvc.perform(get("/flats/{flatId}/images/{imageId}/delete", TEST_FLAT_ID, TEST_IMAGE_ID))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/flats/{flatId}/edit"));
+        then(this.dbImageService).should().deleteImage(isA(DBImage.class));
+    }
+
+    @WithMockUser(value = "spring-wrong", roles = {"HOST"})
+    @Test
+    void testProcessDeleteImageThrowExceptionWithWrongHost() throws Exception {
+        mockMvc.perform(get("/flats/{flatId}/images/{imageId}/delete", TEST_FLAT_ID, TEST_IMAGE_ID))
+            .andExpect(status().isOk())
+            .andExpect(view().name("exception"));
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
@@ -254,7 +299,20 @@ class FlatControllerTests {
             .andExpect(status().isOk())
             .andExpect(model().attributeExists("flat"))
             .andExpect(model().attributeExists("images"))
-            .andExpect(model().attributeExists("host"));
+            .andExpect(model().attributeExists("host"))
+            .andExpect(view().name("flats/flatDetails"));
 
     }
+
+    @WithMockUser(value = "spring", roles = {"HOST"})
+    @Test
+    void testShowFlatsOfHost() throws Exception {
+        mockMvc.perform(get("/flats/my-flats"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("flats"))
+            .andExpect(model().attributeExists("advIds"))
+            .andExpect(view().name("flats/flatsOfHost"));
+
+    }
+
 }

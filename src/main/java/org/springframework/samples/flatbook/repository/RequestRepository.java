@@ -9,8 +9,6 @@ public interface RequestRepository {
 
     Request findById(int id) throws DataAccessException;
 
-    Set<Request> findManyByAdvertisementId(int advId) throws DataAccessException;
-
     Set<Request> findManyByTenantUsername(String username) throws DataAccessException;
 
     Boolean isThereRequestOfTenantByAdvertisementId(String tenantUser, int advId) throws DataAccessException;

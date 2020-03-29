@@ -62,11 +62,6 @@ public class AdvertisementService {
         return this.advertisementRepository.findByCityAndCountryAndPostalCode(city, country, postalCode);
     }
 
-    @Transactional(readOnly = true)
-    public Set<Advertisement> findAdvertisementsByCityWithPriceLessThan(String city, Double pricePerMonth) throws DataAccessException {
-        return this.advertisementRepository.findByPricePerMonthLessThan(city, pricePerMonth);
-    }
-
     @Transactional
     public void saveAdvertisement(Advertisement advertisement) throws DataAccessException {
         this.advertisementRepository.save(advertisement);

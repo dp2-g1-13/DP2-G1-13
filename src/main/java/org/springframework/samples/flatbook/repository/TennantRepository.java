@@ -14,5 +14,5 @@ public interface TennantRepository {
 
 	Tennant findByRequestId(int requestId) throws DataAccessException;
 
-	void save(Tennant tennant) throws DataAccessException;
+	void save(Tennant tenant) throws DataAccessException;
 }

@@ -60,7 +60,7 @@ public class RequestController {
         dataBinder.addValidators(new RequestFormValidator(this.authoritiesService.findAuthorityById(username)));
     }
 
-    @GetMapping("advertisements/{advertisementId}/requests/new")
+    @GetMapping("/advertisements/{advertisementId}/requests/new")
     public String initCreationForm(@PathVariable("advertisementId") int advertisementId, Map<String, Object> model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Tennant tenant = (Tennant) this.personService.findUserById(((User)auth.getPrincipal()).getUsername());
@@ -72,7 +72,7 @@ public class RequestController {
         return VIEWS_REQUESTS_CREATE_FORM;
     }
 
-    @PostMapping("advertisements/{advertisementId}/requests/new")
+    @PostMapping("/advertisements/{advertisementId}/requests/new")
     public String processCreationForm(@Valid RequestForm request, BindingResult result, @PathVariable("advertisementId") int advertisementId) {
         if(result.hasErrors()) {
             return VIEWS_REQUESTS_CREATE_FORM;
@@ -117,28 +117,6 @@ public class RequestController {
             this.requestService.saveRequest(request);
         }
         return "redirect:/advertisements/{advertisementId}/requests/list";
-    }
-
-    @GetMapping(value = "/requests/{requestId}")
-    public ModelAndView showRequest(@PathVariable("requestId") int requestId) {
-        ModelAndView mav = new ModelAndView("requests/requestDetails");
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("admin"))) {
-            Person person = this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
-            Person userSupposedToAccess;
-            if (person instanceof Tennant)
-                userSupposedToAccess = this.tenantService.findTenantByRequestId(requestId);
-            else
-                userSupposedToAccess = this.hostService.findHostOfAdvertisementByRequestId(requestId);
-            if(!person.getUsername().equals(userSupposedToAccess.getUsername())) {
-                throw new RuntimeException("Illegal access");
-            }
-        }
-
-        Request request = this.requestService.findRequestById(requestId);
-        mav.addObject("request", request);
-        return mav;
     }
 
     @GetMapping("/requests/list")

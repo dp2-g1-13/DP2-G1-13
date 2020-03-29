@@ -11,8 +11,6 @@ public class RequestFormValidator implements Validator {
 
     private AuthoritiesType type;
 
-    private RequestFormValidator() {}
-
     public RequestFormValidator(AuthoritiesType type) {
         this.type = type;
     }

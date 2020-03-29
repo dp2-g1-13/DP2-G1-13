@@ -18,7 +18,6 @@ import java.util.Set;
 public class DBImageService {
 
     private DBImageRepository dbImageRepository;
-    private FlatRepository flatRepository;
 
     @Autowired
     public DBImageService(DBImageRepository dbImageRepository) {
