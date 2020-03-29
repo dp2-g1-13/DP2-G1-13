@@ -105,6 +105,6 @@ public class TennantServiceTests {
 	@Test
 	void shouldfindAllTennants() throws DataAccessException {
 		Collection<Tennant> tennants = this.tennantService.findAllTennants();
-		Assertions.assertThat(tennants).hasSize(2);
+		Assertions.assertThat(tennants).hasSize(4);
 	}
 }
