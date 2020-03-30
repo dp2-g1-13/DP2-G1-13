@@ -70,12 +70,10 @@
                             <a role="button" href="${fn:escapeXml(rejectRequestUrl)}" class="btn btn-danger" aria-pressed="true">Reject request</a>
                         </div>
                         <div class="col-md-4" align="center">
-<%--                            <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/reject" var="rejectRequestUrl">--%>
-<%--                                <spring:param name="advertisementId" value="${advId}"/>--%>
-<%--                                <spring:param name="requestId" value="${requests.get(i).id}"/>--%>
-<%--                            </spring:url>--%>
-<%--                            <a role="button" href="${fn:escapeXml(rejectRequestUrl)}" class="btn btn-info" aria-pressed="true">Send message</a>--%>
-                            <button type="button" class="btn btn-info">Send message</button>
+                            <spring:url value="/messages/{username}" var="messageUrl">
+                                <spring:param name="username" value="${tenants.get(i).username}"/>
+                            </spring:url>
+                            <a role="button" href="${fn:escapeXml(messageUrl)}" class="btn btn-info" aria-pressed="true">Send message</a>
                         </div>
                         </c:if>
                     </sec:authorize>

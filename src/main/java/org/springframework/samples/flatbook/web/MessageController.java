@@ -3,6 +3,7 @@ package org.springframework.samples.flatbook.web;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,11 +18,7 @@ import org.springframework.samples.flatbook.service.exceptions.UserNotExistExcep
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/messages")
@@ -60,7 +57,11 @@ public class MessageController {
 	public String chargeConversation(final ModelMap model, final Principal principal, @PathVariable("username") final String username) {
 		((Message) model.getAttribute("message")).setReceiver(this.personService.findUserById(username));
 		List<Message> messages = this.messageServiceTests.findMessagesByParticipant(principal.getName()).get(username);
-		messages.sort(Comparator.naturalOrder());
+		if(messages == null) {
+            messages = new ArrayList<>();
+        } else {
+            messages.sort(Comparator.naturalOrder());
+        }
 		model.put("messages", messages);
 		return MessageController.USERS_MESSAGES_CONVERSATION;
 	}
