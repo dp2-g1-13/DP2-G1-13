@@ -10,7 +10,7 @@ import org.springframework.samples.flatbook.repository.FlatRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
+import java.util.Set;
 
 @Service
 public class FlatService {
@@ -36,20 +36,19 @@ public class FlatService {
     }
 
     @Transactional(readOnly = true)
-    public Collection<Flat> findFlatsByCity(String city) throws DataAccessException {
-        return this.flatRepository.findByCity(city);
+    public Set<Flat> findAllFlats() throws DataAccessException {
+        return this.flatRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public Collection<Flat> findFlatsByCityAndPostalCode(String city, int postalCode) throws DataAccessException {
-        return this.flatRepository.findByCityAndPostalCode(city, postalCode);
+    public Set<Flat> findFlatByHostUsername(String username) throws DataAccessException {
+        return this.flatRepository.findByHostUsername(username);
     }
 
     @Transactional
     public void saveFlat(Flat flat) throws DataAccessException {
         this.flatRepository.save(flat);
         for(DBImage image : flat.getImages()) {
-            image.setFlat(flat);
             this.dbImageRepository.save(image);
         }
     }

@@ -16,6 +16,7 @@
 
 package org.springframework.samples.flatbook.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -48,5 +49,12 @@ public class Host extends Person {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "host_id")
 	private Set<Flat> flats;
+
+	public void addFlat(Flat flat) {
+	    if(this.flats == null) {
+	        this.flats = new HashSet<>();
+        }
+        flats.add(flat);
+    }
 
 }

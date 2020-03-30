@@ -18,7 +18,7 @@
         <label class="col-sm-2 control-label">${label}</label>
 
         <div class="col-sm-10">
-            <input type="file" name="${name}" <c:if test="${multiple}">multiple</c:if> class=""/>
+            <input type="file" name="${name}" <c:if test="${multiple}">multiple</c:if> class="" accept="image/*"/>
             <c:if test="${valid}">
                 <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
             </c:if>

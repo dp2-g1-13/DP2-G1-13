@@ -35,4 +35,8 @@ public class TennantService {
         this.tennantRepository.save(tennant);
     }
 	
+    public Tennant findTenantByRequestId(int requestId) throws DataAccessException {
+    @Transactional(readOnly = true)
+        return this.tennantRepository.findByRequestId(requestId);
+    }
 }

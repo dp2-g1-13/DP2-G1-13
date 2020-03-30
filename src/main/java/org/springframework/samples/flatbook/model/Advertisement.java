@@ -17,6 +17,7 @@
 package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -27,11 +28,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Positive;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
 
 @Entity
 @Getter
@@ -47,20 +52,45 @@ public class Advertisement extends BaseEntity {
 	@NotBlank
 	private String			description;
 
-	@Column(name = "requeriments")
+	@Column(name = "requirements")
 	@NotBlank
-	private String			requeriments;
+	private String			requirements;
 
 	@Column(name = "creation_date")
-	@NotNull
+    @NotNull
+    @PastOrPresent
 	private LocalDate		creationDate;
 
+	@Column(name = "price_per_month")
+    @Positive
+    @NotNull
+    private Double pricePerMonth;
+
+	@Valid
 	@NotNull
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")
 	private Flat			flat;
 
+	@Valid
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "advertisement_id")
 	private Set<Request>	requests;
+
+	public Advertisement() {}
+
+	public Advertisement(AdvertisementForm adv) {
+	    this.title = adv.getTitle();
+	    this.description = adv.getDescription();
+	    this.requirements = adv.getRequirements();
+	    this.pricePerMonth =  adv.getPricePerMonth();
+	    this.creationDate = LocalDate.now();
+    }
+
+    public void addRequest(Request request) {
+        if(this.requests == null) {
+            this.requests = new HashSet<>();
+        }
+        requests.add(request);
+    }
 }

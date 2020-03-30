@@ -30,4 +30,12 @@ public class HostService {
 		return this.hostRepository.findAll();
 	}
 
+    public Host findHostByFlatId(int flatId) throws DataAccessException {
+        return this.hostRepository.findByFlatId(flatId);
+    }
+
+    @Transactional(readOnly = true)
+    public Host findHostOfAdvertisementByRequestId(int requestId) throws DataAccessException {
+        return this.hostRepository.findHostOfAdvertisementByRequestId(requestId);
+    }
 }

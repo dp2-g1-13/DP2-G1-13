@@ -3,8 +3,6 @@
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ attribute name="name" required="true" rtexprvalue="true" description="Name of the active menu: home, owners, vets or error"%>
 
 <nav class="navbar navbar-default" role="navigation">
@@ -23,6 +21,12 @@
 					<span class="glyphicon glyphicon-home" aria-hidden="true"></span>
 					<span>Home</span>
 				</flatbook:menuItem>
+                <sec:authorize access="hasAuthority('HOST')">
+				    <flatbook:menuItem active="${name eq 'flats'}" url="/flats/my-flats" title="find my flats">
+					    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+					    <span>Find my flats</span>
+				    </flatbook:menuItem>
+                </sec:authorize>
 
 				<flatbook:menuItem active="${name eq 'owners'}" url="/owners/find" title="find owners">
 					<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -48,12 +52,12 @@
 				<sec:authorize access="!isAuthenticated()">
 					<li><a href="<c:url value="/login" />">Login</a></li>
 					<li class="dropdown"><a href="/users/new" > <span
-							class="glyphicon glyphicon-user"></span>  Register
+							class="glyphicon glyphicon-user"></span> Register
 					</a>
 				</sec:authorize>
 				<sec:authorize access="isAuthenticated()">
 					<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"> <span
-							class="glyphicon glyphicon-user"></span>  <strong><sec:authentication property="name" /></strong> <span
+							class="glyphicon glyphicon-user"></span> <strong><sec:authentication property="name" /></strong> <span
 							class="glyphicon glyphicon-chevron-down"></span>
 					</a>
 						<ul class="dropdown-menu">
