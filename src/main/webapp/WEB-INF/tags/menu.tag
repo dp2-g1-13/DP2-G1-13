@@ -28,11 +28,6 @@
 				    </flatbook:menuItem>
                 </sec:authorize>
 
-				<flatbook:menuItem active="${name eq 'owners'}" url="/owners/find" title="find owners">
-					<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-					<span>Find owners</span>
-				</flatbook:menuItem>
-
 				<flatbook:menuItem active="${name eq 'messages'}" url="/messages/list" title="messages">
 					<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
 					<span>Messages</span>

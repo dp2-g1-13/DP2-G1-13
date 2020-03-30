@@ -8,29 +8,63 @@
 
 <flatbook:layout pageName="persons">
 
-    <h2>
-        
-    </h2>
-    <div class="col-s-8" align="center">
-    <c:forEach items="${messages}" var="mess">
-            <div align="left">
-                	<div class="messagelist" > <c:out value="${mess.sender.username}"/></div>
-                
-                   <div class="messagelist" > <c:out value="${mess.body}"/></div>
-                
-                	<flatbook:localDatetime date="${mess.creationMoment}"/>
-                	</div>
-                
-        </c:forEach>
-    <form:form action="/messages/${message.receiver.username}/new" modelAttribute="message" class="form-horizontal" id="add-person-form">
-            <form:hidden path="receiver.username"/>
-            <flatbook:inputField label="" name="body"/>
-            <form:hidden path="creationMoment"/>
-            <form:hidden path="sender.username"/>
-            <div class="col-sm-offset-2 col-sm-10">
-                 <button class="btn btn-default" type="submit">Send</button>
+    <jsp:attribute name="customScript">
+        <script>
+            document.querySelector("#chat-body").scrollTo(0, document.querySelector("#chat-body").scrollHeight);
+        </script>
+    </jsp:attribute>
+    <jsp:body>
+    <div id="chat-container" class="panel panel-primary">
+        <div id="chat-heading" class="panel-heading"><h2 class="chat-heading">Chat: <c:out value="${message.receiver.username}"/></h2></div>
+        <div id="chat-body" class="panel-body">
+            <div class="panel-group">
+                <c:forEach items="${messages}" var="mess">
+
+                <div class="row">
+                    <c:choose>
+                        <c:when test="${message.receiver.username.equals(mess.sender.username)}">
+                            <div class="col-md-5 col-sm-5 col-xs-5 pull-left">
+                                <div class="panel panel-default panel-msg">
+                                    <div class="panel-body panel-msg">
+                                        <div class="pull-left">
+                                            <div class="msg"><c:out value="${mess.body}"/></div>
+                                            <div class="msg-date"><flatbook:localDatetime date="${mess.creationMoment}"/></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="col-md-5 col-sm-5 col-xs-5 pull-right text-right">
+                                <div class="panel panel-default panel-msg">
+                                    <div class="panel-body your-messages panel-msg">
+                                        <div class="pull-right">
+                                            <div class="msg"><c:out value="${mess.body}"/></div>
+                                            <div class="msg-date"><flatbook:localDatetime date="${mess.creationMoment}"/></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+                <br>
+                </c:forEach>
             </div>
-    </form:form>
+        </div>
+        <div id="chat-footer" class="panel-footer">
+            <div class="row" align="center">
+            <form:form action="/messages/${message.receiver.username}/new" modelAttribute="message" class="form-horizontal" id="add-person-form">
+                <form:hidden path="receiver.username"/>
+                <form:hidden path="creationMoment"/>
+                <form:hidden path="sender.username"/>
+                <flatbook:chatInputField name="body"/>
+
+            </form:form>
+            </div>
+        </div>
     </div>
+    </jsp:body>
+
 
 </flatbook:layout>
