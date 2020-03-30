@@ -65,7 +65,7 @@ public class RequestControllerTests {
     private HostService hostService;
 
     @MockBean
-    private TennantService tenantService;
+    private TenantService tenantService;
 
     @BeforeEach
     void setup() {
@@ -104,11 +104,11 @@ public class RequestControllerTests {
         Host host = new Host();
         host.setUsername(TEST_HOST_USERNAME);
 
-        Tennant tenant1 = new Tennant();
+        Tenant tenant1 = new Tenant();
         tenant1.setUsername(TEST_TENANT_USERNAME);
         tenant1.setRequests(requests);
 
-        Tennant tenant2 = new Tennant();
+        Tenant tenant2 = new Tenant();
         tenant2.setUsername(TEST_TENANT_WRONG_USERNAME);
         tenant2.setRequests(requests);
 
@@ -117,8 +117,8 @@ public class RequestControllerTests {
         given(this.advertisementService.findAdvertisementById(TEST_ADVERTISEMENT_ID)).willReturn(advertisement);
         given(this.requestService.isThereRequestOfTenantByAdvertisementId(TEST_TENANT_USERNAME, TEST_ADVERTISEMENT_ID)).willReturn(false);
         given(this.requestService.isThereRequestOfTenantByAdvertisementId(TEST_TENANT_WRONG_USERNAME, TEST_ADVERTISEMENT_ID)).willReturn(true);
-        given(this.authoritiesService.findAuthorityById(TEST_TENANT_USERNAME)).willReturn(AuthoritiesType.TENNANT);
-        given(this.authoritiesService.findAuthorityById(TEST_TENANT_WRONG_USERNAME)).willReturn(AuthoritiesType.TENNANT);
+        given(this.authoritiesService.findAuthorityById(TEST_TENANT_USERNAME)).willReturn(AuthoritiesType.TENANT);
+        given(this.authoritiesService.findAuthorityById(TEST_TENANT_WRONG_USERNAME)).willReturn(AuthoritiesType.TENANT);
         given(this.authoritiesService.findAuthorityById(TEST_HOST_USERNAME)).willReturn(AuthoritiesType.HOST);
         given(this.authoritiesService.findAuthorityById(TEST_HOST_WRONG_USERNAME)).willReturn(AuthoritiesType.HOST);
         given(this.requestService.findRequestById(TEST_REQUEST_ID)).willReturn(request);
@@ -129,7 +129,7 @@ public class RequestControllerTests {
         given(this.hostService.findHostByFlatId(TEST_FLAT_ID)).willReturn(host);
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENNANT"})
+    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
     @Test
     void testInitCreationForm() throws Exception {
         mockMvc.perform(get("/advertisements/{advertisementId}/requests/new", TEST_ADVERTISEMENT_ID))
@@ -139,7 +139,7 @@ public class RequestControllerTests {
 
     }
 
-    @WithMockUser(value = "spring-tenant-wrong", roles = {"TENNANT"})
+    @WithMockUser(value = "spring-tenant-wrong", roles = {"TENANT"})
     @Test
     void testInitCreationFormThrowExceptionWithTenantWithExistingPendingRequest() throws Exception {
         mockMvc.perform(get("/advertisements/{advertisementId}/requests/new", TEST_ADVERTISEMENT_ID))
@@ -148,7 +148,7 @@ public class RequestControllerTests {
 
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENNANT"})
+    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
     @Test
     void testProcessCreationFormSuccess() throws Exception {
         mockMvc.perform(post("/advertisements/{advertisementId}/requests/new", TEST_ADVERTISEMENT_ID)
@@ -161,7 +161,7 @@ public class RequestControllerTests {
         then(requestService).should().saveRequest(isA(Request.class));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENNANT"})
+    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
     @Test
     void testProcessCreationFormWithErrors() throws Exception {
         mockMvc.perform(post("/advertisements/{advertisementId}/requests/new", TEST_ADVERTISEMENT_ID)
@@ -176,7 +176,7 @@ public class RequestControllerTests {
             .andExpect(view().name("requests/createRequestForm"));
     }
 
-    @WithMockUser(value = "spring-tenant-wrong", roles = {"TENNANT"})
+    @WithMockUser(value = "spring-tenant-wrong", roles = {"TENANT"})
     @Test
     void testProcessCreationFormThrowExceptionWithTenantWithExistingPendingRequest() throws Exception {
         mockMvc.perform(post("/advertisements/{advertisementId}/requests/new", TEST_ADVERTISEMENT_ID)
@@ -195,7 +195,7 @@ public class RequestControllerTests {
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/advertisements/{advertisementId}/requests/list"));
         then(requestService).should().saveRequest(isA(Request.class));
-        then(tenantService).should().saveTenant(isA(Tennant.class));
+        then(tenantService).should().saveTenant(isA(Tenant.class));
     }
 
     @WithMockUser(value = "spring-wrong", roles = {"HOST"})
@@ -223,7 +223,7 @@ public class RequestControllerTests {
             .andExpect(view().name("exception"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENNANT"})
+    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
     @Test
     void testShowRequestsOfTenant() throws Exception {
         mockMvc.perform(get("/requests/list"))

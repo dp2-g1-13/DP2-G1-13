@@ -14,7 +14,7 @@
         <sec:authorize access="isAuthenticated()">
             <sec:authentication property="principal" var="user"/>
             <div class="row" align="center">
-                <sec:authorize access="hasAnyAuthority('TENNANT')">
+                <sec:authorize access="hasAnyAuthority('TENANT')">
                     <c:if test="${!hasFlat}">
                         <div class="col-md-1">
                             <spring:url value="/advertisements/{advId}/requests/new" var="requestUrl">

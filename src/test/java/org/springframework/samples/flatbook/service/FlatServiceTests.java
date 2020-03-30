@@ -1,6 +1,5 @@
 package org.springframework.samples.flatbook.service;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,8 +40,6 @@ public class FlatServiceTests {
     private static DBImageRepository dbImageRepository;
 
     private Set<Flat> flats;
-    private Set<Flat> flatsOfHost1;
-    private Set<Flat> flatsOfHost2;
     private Flat flat1;
     private Flat flat2;
     private Flat flat3;
@@ -77,11 +74,6 @@ public class FlatServiceTests {
         flats.add(flat1);
         flats.add(flat2);
         flats.add(flat3);
-        flatsOfHost1 = new HashSet<>(flats);
-        flatsOfHost1.remove(flat3);
-        flatsOfHost2 = new HashSet<>(flats);
-        flatsOfHost2.remove(flat1);
-        flatsOfHost2.remove(flat2);
     }
 
     @Test
@@ -158,7 +150,7 @@ public class FlatServiceTests {
     @DisplayName("Should throw NullPointerException when trying to add a null image")
     void shouldThrowIllegalArgumentExceptionWhenTryingToAddNullImageInFlat() {
         flat2.getImages().add(null);
-        doThrow(new IllegalArgumentException("Target object must not be null")).when(dbImageRepository).save(isNull());
+        lenient().doThrow(new IllegalArgumentException("Target object must not be null")).when(dbImageRepository).save(isNull());
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> this.mockedFlatService.saveFlat(flat2));
         assertThat(exception.getMessage()).isEqualTo("Target object must not be null");

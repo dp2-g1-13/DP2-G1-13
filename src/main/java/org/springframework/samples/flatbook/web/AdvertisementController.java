@@ -132,9 +132,9 @@ public class AdvertisementController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ROLE_ANONYMOUS"))) {
             Person person = this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
-            if (person instanceof Tennant) {
+            if (person instanceof Tenant) {
                 mav.addObject("requestMade", this.requestService.isThereRequestOfTenantByAdvertisementId(person.getUsername(), advertisementId));
-                mav.addObject("hasFlat", ((Tennant) person).getFlat() != null);
+                mav.addObject("hasFlat", ((Tenant) person).getFlat() != null);
             }
         }
         return mav;

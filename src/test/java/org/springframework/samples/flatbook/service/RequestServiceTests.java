@@ -78,7 +78,7 @@ public class RequestServiceTests {
     @ParameterizedTest
     @CsvSource({
         "tenant1, 1",
-        "tenant3, 2"
+        "tenant2, 1"
     })
     void shouldAssertThatThereIsRequestOfTenantByAdvertisementId(String username, int advertisementId) {
         Boolean b = this.requestService.isThereRequestOfTenantByAdvertisementId(username, advertisementId);

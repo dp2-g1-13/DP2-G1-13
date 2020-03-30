@@ -1,27 +1,16 @@
 -- One admin user, named admin1 with passwor 4dm1n and authority admin
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant1', 1, 'Is-Dp2-G1-13', '20015860A', 'tenant1@alum.us.es', 'Daniel', 'Sanchez', '654321987', NULL);
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'host1', 1, 'Is-Dp2-G1-13', '28983254B', 'host1@us.es', 'Ramon', 'Fernandez de la Rosa', '661707683', NULL);
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'host2', 1, 'Is-Dp2-G1-13', '96325874W', 'host2@alum.us.es', 'Jorge', 'Raposo', '698741203', NULL);
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant2', 1, 'Is-Dp2-G1-13', '11111111A', 'tenant2@alum.us.es', 'Jose Ramon', 'Fernandez', '632014577', NULL);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant1', 1, 'Is-Dp2-G1-13', '98765432A', 'tenant1@alum.us.es', 'Daniel', 'Sanchez', '654321987', NULL);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'host1', 1, 'Is-Dp2-G1-13', '12345678B', 'host1@us.es', 'Ramon', 'Fernandez de la Rosa', '661707683', NULL);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'host2', 1, 'Is-Dp2-G1-13', '11122233W', 'host2@alum.us.es', 'Jorge', 'Raposo', '698741203', NULL);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant2', 1, 'Is-Dp2-G1-13', '66655544A', 'tenant2@alum.us.es', 'Jose Ramon', 'Fernandez', '632014577', NULL);
 INSERT INTO users(DTYPE,username,password,enabled) VALUES ('Admin','admin1','4dm1n',TRUE);
 
 INSERT INTO authorities VALUES ('admin1','admin');
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'jfdelarosa', 1, 'Is-Dp2-G1-13', '28983254B', 'jfdelarosa@us.es', 'Ramon', 'Fernandez de la Rosa', '661707683', NULL);
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'jorrapdia', 1, 'Is-Dp2-G1-13', '96325874W', 'jorrapdia@alum.us.es', 'Jorge', 'Raposo', '698741203', NULL);
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'dansanbal', 1, 'Is-Dp2-G1-13', '20015860A', 'dansanbal@alum.us.es', 'Daniel', 'Sanchez', '654321987', 1);
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'josferde5', 1, 'Is-Dp2-G1-13', '11111111A', 'josferde5@alum.us.es', 'Jose Ramon', 'Fernandez', '632014577', 1);
-INSERT INTO authorities (username, authority) VALUES('dansanbal', 'TENNANT');
-INSERT INTO authorities (username, authority) VALUES('jfdelarosa', 'HOST');
-INSERT INTO authorities (username, authority) VALUES('jorrapdia', 'HOST');
-INSERT INTO authorities (username, authority) VALUES('josferde5', 'TENNANT');
-INSERT INTO reviews (dtype, id, creation_date, description, rate, creator_username, flat_id) VALUES ('FlatReview', 1, '2020-03-29', 'description', 2, 'dansanbal', 1);
-INSERT INTO reviews (dtype, id, creation_date, description, rate, creator_username, flat_id) VALUES ('TennantReview', 2, '2020-03-29', 'description', 3, 'josferde5', null);
-INSERT INTO reports (id, creation_date, reason, receiver_username, sender_username) VALUES (1, '2020-03-29', 'reason', 'dansanbal', 'josferde5');
-INSERT INTO tasks (id, creation_date, description, status, title, asignee_username, creator_username) VALUES (1, '2020-03-29', 'description', 'TODO', 'title', 'dansanbal', 'josferde5');
-INSERT INTO authorities (username, authority) VALUES('tenant1', 'TENNANT');
+
+INSERT INTO authorities (username, authority) VALUES('tenant1', 'TENANT');
 INSERT INTO authorities (username, authority) VALUES('host1', 'HOST');
 INSERT INTO authorities (username, authority) VALUES('host2', 'HOST');
-INSERT INTO authorities (username, authority) VALUES('tenant2', 'TENNANT');
+INSERT INTO authorities (username, authority) VALUES('tenant2', 'TENANT');
 
 INSERT INTO addresses (id, address, city, country, postal_code) VALUES(1, 'Calle Enramadilla', 'Sevilla', 'Spain', '41018');
 INSERT INTO addresses (id, address, city, country, postal_code) VALUES(2, 'Paseo de la Castellana', 'Madrid', 'Spain', '28046');
@@ -101,15 +90,38 @@ INSERT INTO requests (id, creation_date, description, finish_date, start_date, s
 INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, advertisement_id) VALUES(4, '2020-03-27 19:00:34.521884', 'Sample description of request.', '2020-08-29', '2020-03-28', 'ACCEPTED', 2);
 INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, advertisement_id) VALUES(5, '2020-03-27 19:01:07.185945', 'Sample description of tenant4', '2020-11-28', '2020-03-28', 'ACCEPTED', 2);
 
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant3', 1, 'Is-Dp2-G1-13', '36954820X', 'tenant3@us.es', 'Tenant', 'Three', '820314698', 2);
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant4', 1, 'Is-Dp2-G1-13', '45688700Q', 'tenant4@us.es', 'Tenant', 'Four', '999888777', 2);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant3', 1, 'Is-Dp2-G1-13', '36954820X', 'tenant3@us.es', 'Tenant', 'Three', '820314698', 2);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant4', 1, 'Is-Dp2-G1-13', '45688700Q', 'tenant4@us.es', 'Tenant', 'Four', '999888777', 2);
 
-INSERT INTO authorities (username, authority) VALUES('tenant3', 'TENNANT');
-INSERT INTO authorities (username, authority) VALUES('tenant4', 'TENNANT');
+INSERT INTO authorities (username, authority) VALUES('tenant3', 'TENANT');
+INSERT INTO authorities (username, authority) VALUES('tenant4', 'TENANT');
 
-INSERT INTO users_requests (tennant_username, requests_id) VALUES('tenant1', 1);
-INSERT INTO users_requests (tennant_username, requests_id) VALUES('tenant1', 2);
-INSERT INTO users_requests (tennant_username, requests_id) VALUES('tenant2', 3);
-INSERT INTO users_requests (tennant_username, requests_id) VALUES('tenant3', 4);
-INSERT INTO users_requests (tennant_username, requests_id) VALUES('tenant4', 5);
+INSERT INTO users_requests (tenant_username, requests_id) VALUES('tenant1', 1);
+INSERT INTO users_requests (tenant_username, requests_id) VALUES('tenant1', 2);
+INSERT INTO users_requests (tenant_username, requests_id) VALUES('tenant2', 3);
+INSERT INTO users_requests (tenant_username, requests_id) VALUES('tenant3', 4);
+INSERT INTO users_requests (tenant_username, requests_id) VALUES('tenant4', 5);
 
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'jfdelarosa', 1, 'Is-Dp2-G1-13', '28983254B', 'jfdelarosa@us.es', 'Ramon', 'Fernandez de la Rosa', '661707683', NULL);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'jorrapdia', 1, 'Is-Dp2-G1-13', '96325874W', 'jorrapdia@alum.us.es', 'Jorge', 'Raposo', '698741203', NULL);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'dansanbal', 1, 'Is-Dp2-G1-13', '20015860A', 'dansanbal@alum.us.es', 'Daniel', 'Sanchez', '654321987', 1);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'josferde5', 1, 'Is-Dp2-G1-13', '11111111A', 'josferde5@alum.us.es', 'Jose Ramon', 'Fernandez', '632014577', 1);
+INSERT INTO authorities (username, authority) VALUES('dansanbal', 'TENANT');
+INSERT INTO authorities (username, authority) VALUES('jfdelarosa', 'HOST');
+INSERT INTO authorities (username, authority) VALUES('jorrapdia', 'HOST');
+INSERT INTO authorities (username, authority) VALUES('josferde5', 'TENANT');
+INSERT INTO reviews (dtype, id, creation_date, description, rate, creator_username, flat_id) VALUES ('FlatReview', 1, '2020-03-29', 'description', 2, 'dansanbal', 1);
+INSERT INTO reviews (dtype, id, creation_date, description, rate, creator_username, flat_id) VALUES ('TenantReview', 2, '2020-03-29', 'description', 3, 'josferde5', null);
+INSERT INTO reports (id, creation_date, reason, receiver_username, sender_username) VALUES (1, '2020-03-29', 'reason', 'dansanbal', 'josferde5');
+INSERT INTO tasks (id, creation_date, description, status, title, asignee_username, creator_username) VALUES (1, '2020-03-29', 'description', 'TODO', 'title', 'dansanbal', 'josferde5');
+
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'ababa', 1, 'AnonimO__1099', '20133699A', 'danielsanchezbaledasyron@hotmail.com', 'Daniel', 'Sanchez', '657346638', NULL);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'asasa', 1, 'AnonimO__1099', '20133699G', 'danielsanchezbaleyron@hotmail.com', 'Daniel', 'Sanchez', '657346638', NULL);
+INSERT INTO authorities (username, authority) VALUES('ababa', 'TENANT');
+INSERT INTO authorities (username, authority) VALUES('asasa', 'HOST');
+
+INSERT INTO messages (id, body, creation_moment, receiver_username, sender_username) VALUES(1, 'Hola', '2020-03-28 15:48:45.126', 'ababa', 'asasa');
+INSERT INTO messages (id, body, creation_moment, receiver_username, sender_username) VALUES(2, 'Hola, ¿que tal?', '2020-03-28 15:49:05.332', 'asasa', 'ababa');
+INSERT INTO messages (id, body, creation_moment, receiver_username, sender_username) VALUES(3, 'Bien, ¿Y tu?', '2020-03-28 15:49:11.521', 'asasa', 'ababa');
+INSERT INTO messages (id, body, creation_moment, receiver_username, sender_username) VALUES(4, 'Bien', '2020-03-28 15:49:16.484', 'asasa', 'ababa');
+INSERT INTO messages (id, body, creation_moment, receiver_username, sender_username) VALUES(5, 'Adios', '2020-03-28 15:49:20.617', 'asasa', 'ababa');

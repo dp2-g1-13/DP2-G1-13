@@ -31,7 +31,7 @@ public class RequestFormValidatorTests {
         requestForm.setFinishDate(LocalDate.of(10000, 12, 1));
 
 
-        Validator validator = new RequestFormValidator(AuthoritiesType.TENNANT);
+        Validator validator = new RequestFormValidator(AuthoritiesType.TENANT);
         Errors errors = new BeanPropertyBindingResult(requestForm, requestForm.getClass().toString());
         validator.validate(requestForm, errors);
 
@@ -50,7 +50,7 @@ public class RequestFormValidatorTests {
         requestForm.setFinishDate(LocalDate.of(10000, 12, 1));
 
 
-        Validator validator = new RequestFormValidator(AuthoritiesType.TENNANT);
+        Validator validator = new RequestFormValidator(AuthoritiesType.TENANT);
         Errors errors = new BeanPropertyBindingResult(requestForm, requestForm.getClass().toString());
         validator.validate(requestForm, errors);
 
@@ -69,7 +69,7 @@ public class RequestFormValidatorTests {
         requestForm.setFinishDate(LocalDate.of(10000, 12, 1));
 
 
-        Validator validator = new RequestFormValidator(AuthoritiesType.TENNANT);
+        Validator validator = new RequestFormValidator(AuthoritiesType.TENANT);
         Errors errors = new BeanPropertyBindingResult(requestForm, requestForm.getClass().toString());
         validator.validate(requestForm, errors);
 
@@ -88,7 +88,7 @@ public class RequestFormValidatorTests {
         requestForm.setFinishDate(null);
 
 
-        Validator validator = new RequestFormValidator(AuthoritiesType.TENNANT);
+        Validator validator = new RequestFormValidator(AuthoritiesType.TENANT);
         Errors errors = new BeanPropertyBindingResult(requestForm, requestForm.getClass().toString());
         validator.validate(requestForm, errors);
 
@@ -107,7 +107,7 @@ public class RequestFormValidatorTests {
         requestForm.setFinishDate(LocalDate.of(10000, 12, 1));
 
 
-        Validator validator = new RequestFormValidator(AuthoritiesType.TENNANT);
+        Validator validator = new RequestFormValidator(AuthoritiesType.TENANT);
         Errors errors = new BeanPropertyBindingResult(requestForm, requestForm.getClass().toString());
         validator.validate(requestForm, errors);
 
@@ -126,7 +126,7 @@ public class RequestFormValidatorTests {
         requestForm.setFinishDate(LocalDate.of(-10000, 12, 1));
 
 
-        Validator validator = new RequestFormValidator(AuthoritiesType.TENNANT);
+        Validator validator = new RequestFormValidator(AuthoritiesType.TENANT);
         Errors errors = new BeanPropertyBindingResult(requestForm, requestForm.getClass().toString());
         validator.validate(requestForm, errors);
 
@@ -145,7 +145,7 @@ public class RequestFormValidatorTests {
         requestForm.setFinishDate(LocalDate.of(10000, 1, 1));
 
 
-        Validator validator = new RequestFormValidator(AuthoritiesType.TENNANT);
+        Validator validator = new RequestFormValidator(AuthoritiesType.TENANT);
         Errors errors = new BeanPropertyBindingResult(requestForm, requestForm.getClass().toString());
         validator.validate(requestForm, errors);
 
@@ -171,7 +171,7 @@ public class RequestFormValidatorTests {
         requestForm.setFinishDate(LocalDate.of(10000, 12, 1));
 
 
-        Validator validator = new RequestFormValidator(AuthoritiesType.TENNANT);
+        Validator validator = new RequestFormValidator(AuthoritiesType.TENANT);
         Errors errors = new BeanPropertyBindingResult(requestForm, requestForm.getClass().toString());
         validator.validate(requestForm, errors);
 

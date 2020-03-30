@@ -17,7 +17,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Report;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.repository.ReportRepository;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class ReportServiceTests {
 	private static final String	REASON		= "reason";
 	private static final Integer ID		= 1;
 	private static final Integer ID2		= 2;
-	
+
 	@Mock
 	private ReportRepository	reportRepositoryMocked;
 
@@ -51,8 +51,8 @@ public class ReportServiceTests {
 
 	private Report				report;
 	private Report				report2;
-	private Tennant				sender;
-	private Tennant				receiver;
+	private Tenant				sender;
+	private Tenant				receiver;
 
 	private ReportService		reportService;
 	private ReportService		reportServiceMocked;
@@ -60,7 +60,7 @@ public class ReportServiceTests {
 
 	@BeforeEach
 	void setupMock() {
-		this.sender = new Tennant();
+		this.sender = new Tenant();
 		this.sender.setPassword(PASSWORD);
 		this.sender.setUsername(USERNAME_1);
 		this.sender.setDni(DNI_1);
@@ -70,7 +70,7 @@ public class ReportServiceTests {
 		this.sender.setLastName(LASTNAME_1);
 		this.sender.setPhoneNumber(TELEPHONE_1);
 
-		this.receiver = new Tennant();
+		this.receiver = new Tenant();
 		this.receiver.setPassword(PASSWORD);
 		this.receiver.setUsername(USERNAME_2);
 		this.receiver.setDni(DNI_2);
@@ -86,14 +86,14 @@ public class ReportServiceTests {
 		this.report.setId(ID);
 		this.report.setReason(REASON);
 		this.report.setReceiver(this.receiver);
-		
+
 		this.report2 = new Report();
 		this.report2.setSender(this.sender);
 		this.report2.setCreationDate(LocalDate.now());
 		this.report2.setId(ID2);
 		this.report2.setReason(REASON);
 		this.report2.setReceiver(this.receiver);
-		
+
 		this.reportServiceMocked = new ReportService(this.reportRepositoryMocked);
 		this.reportService = new ReportService(this.reportRepository);
 	}
@@ -118,7 +118,7 @@ public class ReportServiceTests {
 		this.reportServiceMocked.saveReport(this.report2);
 		Mockito.verify(this.reportRepositoryMocked).save(this.report2);
 	}
-	
+
 	@Test
 	void shouldDeleteReport() throws DataAccessException {
 		this.reportService.deleteReportById(ID);

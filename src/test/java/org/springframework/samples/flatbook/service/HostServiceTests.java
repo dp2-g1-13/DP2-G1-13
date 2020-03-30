@@ -47,9 +47,9 @@ public class HostServiceTests {
 
 	@BeforeEach
 	void setupMock() {
-		
+
 		Set<Flat> flats = new HashSet<>();
-		
+
 		this.host = new Host();
 		this.host.setPassword(PASSWORD);
 		this.host.setUsername(USERNAME_1);
@@ -80,8 +80,8 @@ public class HostServiceTests {
 	}
 
 	@Test
-	void shouldfindAllHosts() throws DataAccessException {
+	void shouldFindAllHosts() throws DataAccessException {
 		Collection<Host> hosts = this.hostService.findAllHosts();
-		Assertions.assertThat(hosts).hasSize(2);
+		Assertions.assertThat(hosts).hasSize(5);
 	}
 }

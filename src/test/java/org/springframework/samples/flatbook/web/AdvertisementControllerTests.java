@@ -117,7 +117,7 @@ public class AdvertisementControllerTests {
         Host host = new Host();
         host.setUsername(TEST_HOST_USERNAME);
 
-        Tennant tenant = new Tennant();
+        Tenant tenant = new Tenant();
         tenant.setUsername(TEST_TENANT_USERNAME);
 
         given(this.flatService.findFlatById(TEST_FLAT_ID)).willReturn(flat);
@@ -279,7 +279,7 @@ public class AdvertisementControllerTests {
             .andExpect(view().name("advertisements/advertisementDetails"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENNANT"})
+    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
     @Test
     void testShowAdvertisementAsTenant() throws Exception {
         mockMvc.perform(get("/advertisements/{advertisementId}", TEST_ADVERTISEMENT_ID))
@@ -292,7 +292,7 @@ public class AdvertisementControllerTests {
             .andExpect(view().name("advertisements/advertisementDetails"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENNANT"})
+    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
     @Test
     void testProcessFindFormSuccess() throws Exception {
         mockMvc.perform(get("/advertisements")
@@ -303,7 +303,7 @@ public class AdvertisementControllerTests {
             .andExpect(view().name("advertisements/advertisementsList"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENNANT"})
+    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
     @Test
     void testProcessFindFormWithErrors() throws Exception {
         mockMvc.perform(get("/advertisements"))

@@ -23,7 +23,7 @@ public class RequestFormValidator implements Validator {
     @Override
     public void validate(Object o, Errors errors) {
         RequestForm request = (RequestForm) o;
-        if(type.equals(AuthoritiesType.TENNANT)) {
+        if(type.equals(AuthoritiesType.TENANT)) {
             if(request.getDescription() == null || request.getDescription().isEmpty())
                 errors.rejectValue("description", "", "Description must not be null nor blank");
             if(request.getStartDate() != null && request.getFinishDate() != null) {

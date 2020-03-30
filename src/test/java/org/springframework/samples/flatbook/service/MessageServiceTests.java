@@ -97,7 +97,7 @@ public class MessageServiceTests {
 	}
 
 	@Test
-	void shouldFindMessagesByParticipan() {
+	void shouldFindMessagesByParticipant() {
 		Map<String, List<Message>> messagesByConversation = this.messageService.findMessagesByParticipant(MessageServiceTests.USERNAME1);
 		Assertions.assertThat(messagesByConversation.entrySet().size()).isEqualTo(1);
 		Assertions.assertThat(messagesByConversation.entrySet().iterator().next().getValue().size()).isEqualTo(5);
@@ -118,7 +118,7 @@ public class MessageServiceTests {
 
 		Mockito.verify(this.messageRepositoryMocked).save(this.message);
 	}
-	
+
 	@Test
 	void shouldThrowUserNotExistsExceptionWhenTryToSendToAnNotExistingUser() throws DataAccessException, UserNotExistException {
 		Mockito.lenient().doNothing().when(this.messageRepositoryMocked).save(ArgumentMatchers.isA(Message.class));
@@ -126,7 +126,7 @@ public class MessageServiceTests {
 
 		assertThrows(UserNotExistException.class, () -> this.messageServiceMocked.saveMessage(this.message));
 	}
-	
+
 	@Test
 	void shouldThrowNullPointerExceptionWhenTryToSaveNull() throws DataAccessException, UserNotExistException {
 		assertThrows(NullPointerException.class, () -> this.messageService.saveMessage(null));

@@ -11,7 +11,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
 
@@ -36,9 +36,9 @@ public class PersonForm {
 		this.phoneNumber = person.getPhoneNumber();
 	}
 
-	public PersonForm(final Tennant person) {
+	public PersonForm(final Tenant person) {
 		this((Person) person);
-		this.authority = AuthoritiesType.TENNANT;
+		this.authority = AuthoritiesType.TENANT;
 	}
 
 	public PersonForm(final Host person) {

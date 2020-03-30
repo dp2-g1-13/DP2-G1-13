@@ -41,11 +41,11 @@ public class RequestController {
 
     private HostService hostService;
 
-    private TennantService tenantService;
+    private TenantService tenantService;
 
     @Autowired
     public RequestController(RequestService requestService, PersonService personService, AdvertisementService advertisementService,
-                             AuthoritiesService authoritiesService, HostService hostService, TennantService tenantService) {
+                             AuthoritiesService authoritiesService, HostService hostService, TenantService tenantService) {
         this.requestService = requestService;
         this.personService = personService;
         this.advertisementService = advertisementService;
@@ -63,7 +63,7 @@ public class RequestController {
     @GetMapping("/advertisements/{advertisementId}/requests/new")
     public String initCreationForm(@PathVariable("advertisementId") int advertisementId, Map<String, Object> model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Tennant tenant = (Tennant) this.personService.findUserById(((User)auth.getPrincipal()).getUsername());
+        Tenant tenant = (Tenant) this.personService.findUserById(((User)auth.getPrincipal()).getUsername());
         Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
         if(tenant.getFlat() != null || !validateTenantDoesNotHaveRequestsToFlat(auth, advertisementId) || advertisement == null)
             throw new RuntimeException("Illegal access");
@@ -78,7 +78,7 @@ public class RequestController {
             return VIEWS_REQUESTS_CREATE_FORM;
         } else {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Tennant tenant = (Tennant) this.personService.findUserById(((User)auth.getPrincipal()).getUsername());
+            Tenant tenant = (Tenant) this.personService.findUserById(((User)auth.getPrincipal()).getUsername());
             Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
             if(tenant.getFlat() != null || !validateTenantDoesNotHaveRequestsToFlat(auth, advertisementId) || advertisement == null)
                 throw new RuntimeException("Illegal access");
@@ -101,7 +101,7 @@ public class RequestController {
             Request request = this.requestService.findRequestById(requestId);
             request.setStatus(RequestStatus.ACCEPTED);
             Flat flat = this.advertisementService.findAdvertisementById(advertisementId).getFlat();
-            Tennant tenant = this.tenantService.findTenantByRequestId(requestId);
+            Tenant tenant = this.tenantService.findTenantByRequestId(requestId);
             tenant.setFlat(flat);
             this.requestService.saveRequest(request);
             this.tenantService.saveTenant(tenant);
@@ -147,7 +147,7 @@ public class RequestController {
         }
         List<Request> requests = new ArrayList<>(adv.getRequests());
         requests.sort(Comparator.comparing(Request::getCreationDate));
-        List<Tennant> tenants = requests.stream().map(x -> this.tenantService.findTenantByRequestId(x.getId()))
+        List<Tenant> tenants = requests.stream().map(x -> this.tenantService.findTenantByRequestId(x.getId()))
             .collect(Collectors.toList());
         mav.addObject("requests", requests);
         mav.addObject("tenants", tenants);

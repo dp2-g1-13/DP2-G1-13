@@ -32,15 +32,15 @@ class AuthoritiesFormatterTests {
 	@Test
 	void testPrint() {
 		Authorities authority = new Authorities();
-		authority.setAuthority(AuthoritiesType.TENNANT);
+		authority.setAuthority(AuthoritiesType.TENANT);
 		String authorityName = this.authoritiesFormatter.print(authority.getAuthority(), Locale.ENGLISH);
-		Assertions.assertEquals("Tennant", authorityName);
+		Assertions.assertEquals("Tenant", authorityName);
 	}
 
 	@Test
 	void shouldParse() throws ParseException {
-		AuthoritiesType authority = this.authoritiesFormatter.parse("TENNANT", Locale.ENGLISH);
-		Assertions.assertEquals(AuthoritiesType.TENNANT, authority);
+		AuthoritiesType authority = this.authoritiesFormatter.parse("TENANT", Locale.ENGLISH);
+		Assertions.assertEquals(AuthoritiesType.TENANT, authority);
 	}
 
 	@Test

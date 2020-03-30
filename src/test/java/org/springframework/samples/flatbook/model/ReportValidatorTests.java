@@ -29,7 +29,7 @@ public class ReportValidatorTests {
     }
 
     @BeforeAll
-    static void instantiateStatusDateAndTennants() {
+    static void instantiateStatusDateAndTenants() {
         creationDate = LocalDate.now();
 
         sender = new Person();
@@ -40,7 +40,7 @@ public class ReportValidatorTests {
         sender.setPassword("/4A]m^ub~4e$KFAY");
         sender.setPhoneNumber("123456789");
         sender.setUsername("anton");
-        
+
         receiver = new Person();
         receiver.setDni("12345678B");
         receiver.setEmail("email@email.com");
@@ -62,7 +62,7 @@ public class ReportValidatorTests {
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Report>> constraintViolations = validator.validate(report);
-        
+
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Report> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("reason");
@@ -86,7 +86,7 @@ public class ReportValidatorTests {
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("creationDate");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
-    
+
     @Test
     void shouldNotValidateWhenCreationDateIsInFuture() {
     	LocaleContextHolder.setLocale(Locale.ENGLISH);
@@ -122,7 +122,7 @@ public class ReportValidatorTests {
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("sender");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
-    
+
     @Test
     void shouldNotValidateWhenReceiverNull() {
     	LocaleContextHolder.setLocale(Locale.ENGLISH);
@@ -158,5 +158,5 @@ public class ReportValidatorTests {
 
         assertThat(constraintViolations.size()).isEqualTo(0);
     }
-	
+
 }

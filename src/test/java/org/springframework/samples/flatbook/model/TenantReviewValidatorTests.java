@@ -16,10 +16,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-public class FlatReviewValidatorTests {
+public class TenantReviewValidatorTests {
 
     public static LocalDate creationDate;
-    public static Tenant creator;
+    public static Person creator;
 
     private Validator createValidator() {
         LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
@@ -31,7 +31,7 @@ public class FlatReviewValidatorTests {
     static void instantiateStatusDateAndTenants() {
         creationDate = LocalDate.now();
 
-        creator = new Tenant();
+        creator = new Person();
         creator.setDni("12345678A");
         creator.setEmail("email@mail.com");
         creator.setFirstName("Antonio");
@@ -44,17 +44,17 @@ public class FlatReviewValidatorTests {
     @Test
     void shouldNotValidateWhenRateNull() {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        FlatReview review = new FlatReview();
+        TenantReview review = new TenantReview();
         review.setCreationDate(creationDate);
         review.setCreator(creator);
         review.setDescription("test");
         review.setRate(null);
 
         Validator validator = createValidator();
-        Set<ConstraintViolation<FlatReview>> constraintViolations = validator.validate(review);
+        Set<ConstraintViolation<TenantReview>> constraintViolations = validator.validate(review);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
-        ConstraintViolation<FlatReview> violation = constraintViolations.iterator().next();
+        ConstraintViolation<TenantReview> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("rate");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
@@ -62,17 +62,17 @@ public class FlatReviewValidatorTests {
     @Test
     void shouldNotValidateWhenRateNegative() {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        FlatReview review = new FlatReview();
+        TenantReview review = new TenantReview();
         review.setCreationDate(creationDate);
         review.setCreator(creator);
         review.setDescription("test");
         review.setRate(-1);
 
         Validator validator = createValidator();
-        Set<ConstraintViolation<FlatReview>> constraintViolations = validator.validate(review);
+        Set<ConstraintViolation<TenantReview>> constraintViolations = validator.validate(review);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
-        ConstraintViolation<FlatReview> violation = constraintViolations.iterator().next();
+        ConstraintViolation<TenantReview> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("rate");
         assertThat(violation.getMessage()).isEqualTo("must be greater than or equal to 0");
     }
@@ -80,17 +80,17 @@ public class FlatReviewValidatorTests {
     @Test
     void shouldNotValidateWhenRateHigherThan5() {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        FlatReview review = new FlatReview();
+        TenantReview review = new TenantReview();
         review.setCreationDate(creationDate);
         review.setCreator(creator);
         review.setDescription("test");
         review.setRate(6);
 
         Validator validator = createValidator();
-        Set<ConstraintViolation<FlatReview>> constraintViolations = validator.validate(review);
+        Set<ConstraintViolation<TenantReview>> constraintViolations = validator.validate(review);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
-        ConstraintViolation<FlatReview> violation = constraintViolations.iterator().next();
+        ConstraintViolation<TenantReview> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("rate");
         assertThat(violation.getMessage()).isEqualTo("must be less than or equal to 5");
     }
@@ -98,17 +98,17 @@ public class FlatReviewValidatorTests {
     @Test
     void shouldNotValidateWhenCreationDateNull() {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        FlatReview review = new FlatReview();
+        TenantReview review = new TenantReview();
         review.setCreationDate(null);
         review.setCreator(creator);
         review.setDescription("test");
         review.setRate(0);
 
         Validator validator = createValidator();
-        Set<ConstraintViolation<FlatReview>> constraintViolations = validator.validate(review);
+        Set<ConstraintViolation<TenantReview>> constraintViolations = validator.validate(review);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
-        ConstraintViolation<FlatReview> violation = constraintViolations.iterator().next();
+        ConstraintViolation<TenantReview> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("creationDate");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
@@ -116,17 +116,17 @@ public class FlatReviewValidatorTests {
     @Test
     void shouldNotValidateWhenCreationDateIsFuture() {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        FlatReview review = new FlatReview();
+        TenantReview review = new TenantReview();
         review.setCreationDate(LocalDate.of(2050, 1, 1));
         review.setCreator(creator);
         review.setDescription("test");
         review.setRate(0);
 
         Validator validator = createValidator();
-        Set<ConstraintViolation<FlatReview>> constraintViolations = validator.validate(review);
+        Set<ConstraintViolation<TenantReview>> constraintViolations = validator.validate(review);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
-        ConstraintViolation<FlatReview> violation = constraintViolations.iterator().next();
+        ConstraintViolation<TenantReview> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("creationDate");
         assertThat(violation.getMessage()).isEqualTo("must be a date in the past or in the present");
     }
@@ -134,17 +134,17 @@ public class FlatReviewValidatorTests {
     @Test
     void shouldNotValidateWhenCreatorNull() {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        FlatReview review = new FlatReview();
+        TenantReview review = new TenantReview();
         review.setCreationDate(creationDate);
         review.setCreator(null);
         review.setDescription("test");
         review.setRate(0);
 
         Validator validator = createValidator();
-        Set<ConstraintViolation<FlatReview>> constraintViolations = validator.validate(review);
+        Set<ConstraintViolation<TenantReview>> constraintViolations = validator.validate(review);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
-        ConstraintViolation<FlatReview> violation = constraintViolations.iterator().next();
+        ConstraintViolation<TenantReview> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("creator");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
@@ -153,14 +153,14 @@ public class FlatReviewValidatorTests {
     @ValueSource(ints = {0, 5})
     void shouldValidate(int rate) {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        FlatReview review = new FlatReview();
+        TenantReview review = new TenantReview();
         review.setCreationDate(creationDate);
         review.setCreator(creator);
         review.setDescription("test");
         review.setRate(rate);
 
         Validator validator = createValidator();
-        Set<ConstraintViolation<FlatReview>> constraintViolations = validator.validate(review);
+        Set<ConstraintViolation<TenantReview>> constraintViolations = validator.validate(review);
 
         assertThat(constraintViolations.size()).isEqualTo(0);
     }

@@ -9,7 +9,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.flatbook.configuration.SecurityConfiguration;
 import org.springframework.samples.flatbook.model.*;
+import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.web.formatters.PersonFormatter;
 import org.springframework.samples.flatbook.web.formatters.TenantFormatter;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -24,14 +26,15 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = FlatReviewController.class,
-includeFilters = {@ComponentScan.Filter(value = TenantFormatter.class, type = FilterType.ASSIGNABLE_TYPE)},
+@WebMvcTest(controllers = TenantReviewController.class,
+includeFilters = {@ComponentScan.Filter(value = TenantFormatter.class, type = FilterType.ASSIGNABLE_TYPE), @ComponentScan.Filter(value = PersonFormatter.class, type = FilterType.ASSIGNABLE_TYPE)},
 excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration= SecurityConfiguration.class)
-public class FlatReviewControllerTests {
+public class TenantReviewControllerTests {
 
-	private static final Integer TEST_FLATREVIEW_ID = 1;
+	private static final Integer TEST_TENANTREVIEW_ID = 1;
 	private static final Integer TEST_FLAT_ID = 1;
+    private static final String TEST_REVIEWED_USERNAME = "reviewed";
     private static final String TEST_CREATOR_USERNAME = "creator";
     private static final String TEST_NOTALLOWED_USERNAME = "notallowed";
 
@@ -39,13 +42,19 @@ public class FlatReviewControllerTests {
     private MockMvc mockMvc;
 
     @MockBean
+    private PersonService personService;
+
+    @MockBean
     private TenantService tenantService;
 
     @MockBean
-    private FlatReviewService flatReviewService;
+    private HostService hostService;
 
     @MockBean
-    private FlatService flatService;
+    private TenantReviewService tenantReviewService;
+
+    @MockBean
+    private AuthoritiesService authoritiesService;
 
     @BeforeEach
     void setup() {
@@ -53,46 +62,57 @@ public class FlatReviewControllerTests {
     	Flat flat = new Flat();
     	flat.setId(TEST_FLAT_ID);
 
-    	Tenant creator = new Tenant();
-    	creator.setUsername(TEST_CREATOR_USERNAME);
+    	Tenant reviewed = new Tenant();
+        reviewed.setUsername(TEST_REVIEWED_USERNAME);
         Set<Tenant> tenants = new HashSet<>();
-        creator.setFlat(flat);
-        tenants.add(creator);
+        reviewed.setFlat(flat);
+        tenants.add(reviewed);
         flat.setTenants(tenants);
-        Set<FlatReview> rews = new HashSet<>();
-        flat.setFlatReviews(rews);
+        Set<TenantReview> rews = new HashSet<>();
+        reviewed.setReviews(rews);
+
+        Host creator = new Host();
+        creator.setUsername(TEST_CREATOR_USERNAME);
+        Set<Flat> hostFlats = new HashSet<>();
+        hostFlats.add(flat);
+        creator.setFlats(hostFlats);
 
         LocalDate creationDate = LocalDate.now();
 
-        FlatReview review = new FlatReview();
+        TenantReview review = new TenantReview();
     	review.setCreationDate(creationDate);
     	review.setCreator(creator);
     	review.setDescription("description");
     	review.setRate(4);
-    	review.setId(TEST_FLATREVIEW_ID);
+    	review.setId(TEST_TENANTREVIEW_ID);
 
         Tenant notAllowed = new Tenant();
         notAllowed.setUsername(TEST_NOTALLOWED_USERNAME);
 
-        given(this.tenantService.findTenantById(TEST_CREATOR_USERNAME)).willReturn(creator);
+        given(this.tenantService.findTenantById(TEST_REVIEWED_USERNAME)).willReturn(reviewed);
         given(this.tenantService.findTenantById(TEST_NOTALLOWED_USERNAME)).willReturn(notAllowed);
-        given(this.flatService.findFlatById(TEST_FLAT_ID)).willReturn(flat);
-        given(this.flatReviewService.findFlatReviewById(TEST_FLATREVIEW_ID)).willReturn(review);
+        given(this.hostService.findHostById(TEST_CREATOR_USERNAME)).willReturn(creator);
+        given(this.authoritiesService.findAuthorityById(TEST_CREATOR_USERNAME)).willReturn(AuthoritiesType.HOST);
+        given(this.authoritiesService.findAuthorityById(TEST_NOTALLOWED_USERNAME)).willReturn(AuthoritiesType.TENANT);
+        given(this.personService.findUserById(TEST_CREATOR_USERNAME)).willReturn(creator);
+        given(this.personService.findUserById(TEST_REVIEWED_USERNAME)).willReturn(reviewed);
+        given(this.personService.findUserById(TEST_NOTALLOWED_USERNAME)).willReturn(notAllowed);
+        given(this.tenantReviewService.findTenantReviewById(TEST_TENANTREVIEW_ID)).willReturn(review);
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"HOST"})
     @Test
     void testInitCreationForm() throws Exception {
-        mockMvc.perform(get("/flats/{flatId}/reviews/new", TEST_FLAT_ID))
+        mockMvc.perform(get("/tenants/{tenantId}/reviews/new", TEST_REVIEWED_USERNAME))
             .andExpect(status().isOk())
-            .andExpect(view().name("flats/reviews/createOrUpdateFlatReviewForm"))
-            .andExpect(model().attributeExists("flatReview"));
+            .andExpect(view().name("users/reviews/createOrUpdateTenantReviewForm"))
+            .andExpect(model().attributeExists("tenantReview"));
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"HOST"})
     @Test
     void testProcessCreationFormSuccess() throws Exception {
-        mockMvc.perform(post("/flats/{flatId}/reviews/new", TEST_FLAT_ID)
+        mockMvc.perform(post("/tenants/{tenantId}/reviews/new", TEST_REVIEWED_USERNAME)
             .with(csrf())
         	.param("creationDate", "01/01/2005")
         	.param("creator", TEST_CREATOR_USERNAME)
@@ -101,27 +121,27 @@ public class FlatReviewControllerTests {
             .andExpect(status().is3xxRedirection());
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"HOST"})
     @Test
     void testProcessCreationFormHasErrors() throws Exception {
 
-        mockMvc.perform(post("/flats/{flatId}/reviews/new", TEST_FLAT_ID)
+        mockMvc.perform(post("/tenants/{tenantId}/reviews/new", TEST_REVIEWED_USERNAME)
             .with(csrf())
             .param("creationDate", "01/01/2005")
         	.param("description", "description")
         	.param("rate", "6"))
             .andExpect(status().isOk())
-            .andExpect(model().attributeHasErrors("flatReview"))
-            .andExpect(model().attributeHasFieldErrors("flatReview", "rate"))
-            .andExpect(model().attributeHasFieldErrors("flatReview", "creator"))
-            .andExpect(view().name("flats/reviews/createOrUpdateFlatReviewForm"));
+            .andExpect(model().attributeHasErrors("tenantReview"))
+            .andExpect(model().attributeHasFieldErrors("tenantReview", "rate"))
+            .andExpect(model().attributeHasFieldErrors("tenantReview", "creator"))
+            .andExpect(view().name("users/reviews/createOrUpdateTenantReviewForm"));
     }
 
     @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessCreationFormNotAllowedUser() throws Exception {
 
-        mockMvc.perform(post("/flats/{flatId}/reviews/new", TEST_FLAT_ID)
+        mockMvc.perform(post("/tenants/{tenantId}/reviews/new", TEST_REVIEWED_USERNAME)
             .with(csrf())
             .param("creationDate", "01/01/2005")
         	.param("creator", TEST_NOTALLOWED_USERNAME)
@@ -131,17 +151,17 @@ public class FlatReviewControllerTests {
             .andExpect(view().name("exception"));
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"HOST"})
     @Test
     void testProcessTenantReviewRemovalSucess() throws Exception {
-        mockMvc.perform(get("/flats/{flatId}/reviews/{flatReviewId}/remove", TEST_FLAT_ID, TEST_FLATREVIEW_ID))
+        mockMvc.perform(get("/tenants/{tenantId}/reviews/{tenantReviewId}/remove", TEST_REVIEWED_USERNAME, TEST_TENANTREVIEW_ID))
             .andExpect(status().is3xxRedirection());
     }
 
     @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessTenantReviewRemovalNotAllowed() throws Exception {
-        mockMvc.perform(get("/flats/{flatId}/reviews/{flatReviewId}/remove", TEST_FLAT_ID, TEST_FLATREVIEW_ID))
+        mockMvc.perform(get("/tenants/{tenantId}/reviews/{tenantReviewId}/remove", TEST_REVIEWED_USERNAME, TEST_TENANTREVIEW_ID))
             .andExpect(status().is2xxSuccessful())
             .andExpect(view().name("exception"));
     }

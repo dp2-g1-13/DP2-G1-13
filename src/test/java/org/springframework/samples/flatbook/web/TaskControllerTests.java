@@ -11,7 +11,7 @@ import org.springframework.samples.flatbook.configuration.SecurityConfiguration;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.TaskStatus;
 import org.springframework.samples.flatbook.service.*;
-import org.springframework.samples.flatbook.web.formatters.TennantFormatter;
+import org.springframework.samples.flatbook.web.formatters.TenantFormatter;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = TaskController.class,
-includeFilters = {@ComponentScan.Filter(value = TennantFormatter.class, type = FilterType.ASSIGNABLE_TYPE)},
+includeFilters = {@ComponentScan.Filter(value = TenantFormatter.class, type = FilterType.ASSIGNABLE_TYPE)},
 excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration= SecurityConfiguration.class)
 public class TaskControllerTests {
@@ -45,30 +45,30 @@ public class TaskControllerTests {
     private TaskService taskService;
 
     @MockBean
-    private TennantService tennantService;
-    
+    private TenantService tenantService;
+
     @MockBean
     private FlatService flatService;
 
     @BeforeEach
     void setup() {
-    	
+
     	Flat flat = new Flat();
         flat.setId(TEST_FLAT_ID);
-    	
-        Tennant creator = new Tennant();
+
+        Tenant creator = new Tenant();
         creator.setUsername(TEST_CREATOR_USERNAME);
         creator.setFlat(flat);
-        
-        Tennant asignee = new Tennant();
+
+        Tenant asignee = new Tenant();
         asignee.setUsername(TEST_ASIGNEE_USERNAME);
         asignee.setFlat(flat);
-        
-        Set<Tennant> tennants = new HashSet<>();
-        tennants.add(creator);
-        tennants.add(asignee);
-        flat.setTennants(tennants);
-        
+
+        Set<Tenant> tenants = new HashSet<>();
+        tenants.add(creator);
+        tenants.add(asignee);
+        flat.setTenants(tenants);
+
         TaskStatus status = TaskStatus.TODO;
         LocalDate creationDate = LocalDate.now();
 
@@ -81,18 +81,18 @@ public class TaskControllerTests {
         task.setTitle("title");
         task.setDescription("description");
         task.setStatus(status);
-        
-        Tennant notAllowed = new Tennant();
+
+        Tenant notAllowed = new Tenant();
         notAllowed.setUsername(TEST_NOTALLOWED_USERNAME);
 
-        given(this.flatService.findTennantsById(TEST_FLAT_ID)).willReturn(flat.getTennants());
-        given(this.tennantService.findTennantById(TEST_CREATOR_USERNAME)).willReturn(creator);
-        given(this.tennantService.findTennantById(TEST_ASIGNEE_USERNAME)).willReturn(asignee);
-        given(this.tennantService.findTennantById(TEST_NOTALLOWED_USERNAME)).willReturn(notAllowed);
+        given(this.flatService.findTenantsById(TEST_FLAT_ID)).willReturn(flat.getTenants());
+        given(this.tenantService.findTenantById(TEST_CREATOR_USERNAME)).willReturn(creator);
+        given(this.tenantService.findTenantById(TEST_ASIGNEE_USERNAME)).willReturn(asignee);
+        given(this.tenantService.findTenantById(TEST_NOTALLOWED_USERNAME)).willReturn(notAllowed);
         given(this.taskService.findTaskById(TEST_TASK_ID)).willReturn(task);
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
     @Test
     void testInitCreationForm() throws Exception {
         mockMvc.perform(get("/tasks/new"))
@@ -101,7 +101,7 @@ public class TaskControllerTests {
             .andExpect(model().attributeExists("task"));
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessCreationFormSuccess() throws Exception {
         mockMvc.perform(post("/tasks/new")
@@ -115,7 +115,7 @@ public class TaskControllerTests {
             .andExpect(status().is3xxRedirection());
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessCreationFormHasErrors() throws Exception {
 
@@ -131,8 +131,8 @@ public class TaskControllerTests {
             .andExpect(model().attributeHasFieldErrors("task", "creationDate"))
             .andExpect(view().name("tasks/createOrUpdateTaskForm"));
     }
-    
-    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENNANT"})
+
+    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessCreationFormNotAllowedUser() throws Exception {
 
@@ -148,21 +148,21 @@ public class TaskControllerTests {
             .andExpect(view().name("exception"));
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
     @Test
     void testInitUpdateForm() throws Exception {
-    	
+
     	Flat flat = new Flat();
         flat.setId(TEST_FLAT_ID);
-        
-        Tennant asignee = new Tennant();
+
+        Tenant asignee = new Tenant();
         asignee.setUsername(TEST_ASIGNEE_USERNAME);
         asignee.setFlat(flat);
-    	
-        Tennant creator = new Tennant();
+
+        Tenant creator = new Tenant();
         creator.setUsername(TEST_CREATOR_USERNAME);
         creator.setFlat(flat);
-    	
+
         mockMvc.perform(get("/tasks/{taskId}/edit", TEST_TASK_ID))
             .andExpect(status().isOk())
             .andExpect(model().attributeExists("task"))
@@ -175,7 +175,7 @@ public class TaskControllerTests {
             .andExpect(view().name("tasks/createOrUpdateTaskForm"));
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessUpdateFormSuccess() throws Exception {
         mockMvc.perform(post("/tasks/{taskId}/edit", TEST_TASK_ID)
@@ -189,14 +189,14 @@ public class TaskControllerTests {
             .andExpect(status().is3xxRedirection());
     }
 
-    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENNANT"})
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessTaskRemovalSucess() throws Exception {
         mockMvc.perform(get("/tasks/{taskId}/remove", TEST_TASK_ID))
             .andExpect(status().is3xxRedirection());
     }
-    
-    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENNANT"})
+
+    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessTaskRemovalNotAllowed() throws Exception {
         mockMvc.perform(get("/tasks/{taskId}/remove", TEST_TASK_ID))

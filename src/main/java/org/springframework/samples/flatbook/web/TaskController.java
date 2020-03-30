@@ -2,11 +2,11 @@ package org.springframework.samples.flatbook.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Task;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.TaskStatus;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.TaskService;
-import org.springframework.samples.flatbook.service.TennantService;
+import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -26,43 +26,43 @@ public class TaskController {
     private static final String VIEWS_TASKS_CREATE_OR_UPDATE_FORM = "tasks/createOrUpdateTaskForm";
 
     private final TaskService taskService;
-    private final TennantService tennantService;
+    private final TenantService tenantService;
     private final FlatService flatService;
 
     @Autowired
-    public TaskController(TaskService taskService, TennantService tennantService, FlatService flatService) {
+    public TaskController(TaskService taskService, TenantService tenantService, FlatService flatService) {
         this.taskService = taskService;
-        this.tennantService = tennantService;
+        this.tenantService = tenantService;
         this.flatService = flatService;
     }
-    
+
     private Integer getCreatorFlatId(String creatorUsername) {
 		Integer res = null;
 		try {
-			res = this.tennantService.findTennantById(creatorUsername).getFlat().getId();
+			res = this.tenantService.findTenantById(creatorUsername).getFlat().getId();
 			return res;
 		} catch (NullPointerException e) {
 			return res;
 		}
 	}
-    
-    private Collection<Tennant> getCreatorRoommates(Integer creatorFlatId) {
-    	Collection<Tennant> res = null;
+
+    private Collection<Tenant> getCreatorRoommates(Integer creatorFlatId) {
+    	Collection<Tenant> res = null;
 		try {
-			res = this.flatService.findTennantsById(creatorFlatId);
+			res = this.flatService.findTenantsById(creatorFlatId);
 			return res;
 		} catch (NullPointerException e) {
 			return res;
 		}
 	}
-    
+
     @GetMapping(value = "/tasks/new")
     public String initCreationForm(Map<String, Object> model, Principal principal) {
     	Integer creatorFlatId = getCreatorFlatId(principal.getName());
     	if(creatorFlatId != null) {
-    		Collection<Tennant> roommates = this.flatService.findTennantsById(creatorFlatId);
+    		Collection<Tenant> roommates = this.flatService.findTenantsById(creatorFlatId);
     		Task task = new Task();
-        	task.setCreator(tennantService.findTennantById(principal.getName()));
+        	task.setCreator(tenantService.findTenantById(principal.getName()));
         	task.setCreationDate(LocalDate.now());
         	task.setStatus(TaskStatus.TODO);
             model.put("task", task);
@@ -76,7 +76,7 @@ public class TaskController {
     @PostMapping(value = "/tasks/new")
     public String processCreationForm(Map<String, Object> model, @Valid Task task, BindingResult result, Principal principal) {
     	Integer creatorFlatId = getCreatorFlatId(principal.getName());
-    	Collection<Tennant> roommates = getCreatorRoommates(creatorFlatId);
+    	Collection<Tenant> roommates = getCreatorRoommates(creatorFlatId);
     	if(creatorFlatId != null && roommates!=null && roommates.contains(task.getAsignee())) {
     		if(result.hasErrors()) {
     			model.put("roommates", roommates);
@@ -91,11 +91,11 @@ public class TaskController {
     		throw new RuntimeException("Oops!");
     	}
     }
-    
+
     @GetMapping(value = "/tasks/{taskId}/remove")
 	public String processTaskRemoval(@PathVariable("taskId") final int taskId, Principal principal) {
     	Task task = this.taskService.findTaskById(taskId);
-    	Tennant creator = this.tennantService.findTennantById(principal.getName());
+    	Tenant creator = this.tenantService.findTenantById(principal.getName());
 		if (task != null && creator.equals(task.getCreator())) {
 			this.taskService.deleteTaskById(taskId);
 			return "redirect:/";
@@ -103,12 +103,12 @@ public class TaskController {
 			throw new IllegalArgumentException("Bad task id or you are not the creator of the task.");
 		}
 	}
-    
+
     @GetMapping(value = "/tasks/{taskId}/edit")
 	public String initUpdateForm(@PathVariable("taskId") final int taskId, final ModelMap model, Principal principal) {
 		Task task = this.taskService.findTaskById(taskId);
 		Integer creatorFlatId = getCreatorFlatId(principal.getName());
-		Collection<Tennant> roommates = getCreatorRoommates(creatorFlatId);
+		Collection<Tenant> roommates = getCreatorRoommates(creatorFlatId);
     	if (creatorFlatId != null && task != null && roommates!=null && roommates.contains(task.getCreator())) {
 			model.put("taskStatus", Arrays.asList(TaskStatus.values()));
 			model.put("task", task);
@@ -122,7 +122,7 @@ public class TaskController {
 	@PostMapping(value = "/tasks/{taskId}/edit")
 	public String processUpdateForm(@Valid final Task task, final BindingResult result, @PathVariable("taskId") final int taskId,  final ModelMap model, Principal principal) {
 		Integer creatorFlatId = getCreatorFlatId(principal.getName());
-		Collection<Tennant> roommates = getCreatorRoommates(creatorFlatId);
+		Collection<Tenant> roommates = getCreatorRoommates(creatorFlatId);
 		if (creatorFlatId != null && roommates!=null && roommates.contains(task.getCreator())) {
 			if (result.hasErrors()) {
 				model.put("roommates", roommates);

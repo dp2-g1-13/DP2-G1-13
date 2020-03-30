@@ -17,7 +17,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.FlatReview;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.repository.FlatReviewRepository;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +37,7 @@ public class FlatReviewServiceTests {
 	private static final Integer RATE = 5;
 	private static final Integer ID		= 1;
 	private static final Integer ID2		= 2;
-	
+
 	@Mock
 	private FlatReviewRepository	flatReviewRepositoryMocked;
 
@@ -46,7 +46,7 @@ public class FlatReviewServiceTests {
 
 	private FlatReview				flatReview;
 	private FlatReview				flatReview2;
-	private Tennant				creator;
+	private Tenant				creator;
 
 	private FlatReviewService		flatReviewService;
 	private FlatReviewService		flatReviewServiceMocked;
@@ -54,8 +54,8 @@ public class FlatReviewServiceTests {
 
 	@BeforeEach
 	void setupMock() {
-		
-		this.creator = new Tennant();
+
+		this.creator = new Tenant();
 		this.creator.setPassword(PASSWORD);
 		this.creator.setUsername(USERNAME_1);
 		this.creator.setDni(DNI_1);
@@ -71,7 +71,7 @@ public class FlatReviewServiceTests {
 		this.flatReview.setDescription(DESCRIPTION);
 		this.flatReview.setId(ID);
 		this.flatReview.setRate(RATE);
-		
+
 		this.flatReview2 = new FlatReview();
 		this.flatReview2.setCreationDate(LocalDate.now());
 		this.flatReview2.setCreator(creator);
@@ -103,7 +103,7 @@ public class FlatReviewServiceTests {
 		this.flatReviewServiceMocked.saveFlatReview(this.flatReview2);
 		Mockito.verify(this.flatReviewRepositoryMocked).save(this.flatReview2);
 	}
-	
+
 	@Test
 	void shouldDeleteFlatReview() throws DataAccessException {
 		this.flatReviewService.deleteFlatReviewById(ID);

@@ -63,9 +63,9 @@ public class Task extends BaseEntity {
 
 	@NotNull
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Tennant		creator;
+	private Tenant		creator;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	private Tennant		asignee;
+	private Tenant		asignee;
 
 }

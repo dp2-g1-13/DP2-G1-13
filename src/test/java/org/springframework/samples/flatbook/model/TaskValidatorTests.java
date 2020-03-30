@@ -21,8 +21,8 @@ public class TaskValidatorTests {
 
 	public static TaskStatus status;
     public static LocalDate creationDate;
-    public static Tennant creator;
-    public static Tennant asignee;
+    public static Tenant creator;
+    public static Tenant asignee;
 
     private Validator createValidator() {
         LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
@@ -31,12 +31,12 @@ public class TaskValidatorTests {
     }
 
     @BeforeAll
-    static void instantiateStatusDateAndTennants() {
+    static void instantiateStatusDateAndTenants() {
         status = TaskStatus.TODO;
 
         creationDate = LocalDate.now();
 
-        creator = new Tennant();
+        creator = new Tenant();
         creator.setDni("12345678A");
         creator.setEmail("email@mail.com");
         creator.setFirstName("Antonio");
@@ -44,8 +44,8 @@ public class TaskValidatorTests {
         creator.setPassword("/4A]m^ub~4e$KFAY");
         creator.setPhoneNumber("123456789");
         creator.setUsername("anton");
-        
-        asignee = new Tennant();
+
+        asignee = new Tenant();
         asignee.setDni("12345678B");
         asignee.setEmail("email@email.com");
         asignee.setFirstName("Juan");
@@ -68,7 +68,7 @@ public class TaskValidatorTests {
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);
-        
+
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Task> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("title");
@@ -88,7 +88,7 @@ public class TaskValidatorTests {
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);
-        
+
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Task> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("description");
@@ -134,7 +134,7 @@ public class TaskValidatorTests {
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("creationDate");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
-    
+
     @Test
     void shouldNotValidateWhenCreationDateIsInFuture() {
     	LocaleContextHolder.setLocale(Locale.ENGLISH);
@@ -194,5 +194,5 @@ public class TaskValidatorTests {
 
         assertThat(constraintViolations.size()).isEqualTo(0);
     }
-	
+
 }

@@ -16,7 +16,7 @@
                     <div class="col-md-6">
                         <p><c:out value="${advertisement.description}"/></p>
 
-                        <p><strong><fmt:formatNumber type="number" maxFractionDigits="2" value="${advertisement.pricePerMonth}" /> &euro;</strong></p>
+                        <p><strong><fmt:formatNumber type="number" minFractionDigits="2" value="${advertisement.pricePerMonth}" /> &euro;</strong></p>
                     </div>
                     <div class="col-md-6">
                         <spring:url value="/advertisements/{advertisementId}" var="advertisementUrl">

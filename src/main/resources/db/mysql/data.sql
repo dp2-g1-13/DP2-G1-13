@@ -1,13 +1,13 @@
-INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'ababa', 1, 'AnonimO__1099', '20133699A', 'danielsanchezbaledasyron@hotmail.com', 'Daniel', 'Sanchez', '657346638', NULL);
+INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'ababa', 1, 'AnonimO__1099', '20133699A', 'danielsanchezbaledasyron@hotmail.com', 'Daniel', 'Sanchez', '657346638', NULL);
 INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'asasa', 1, 'AnonimO__1099', '20133699G', 'danielsanchezbaleyron@hotmail.com', 'Daniel', 'Sanchez', '657346638', NULL);
-INSERT INTO authorities (username, authority) VALUES('ababa', 'TENNANT');
+INSERT INTO authorities (username, authority) VALUES('ababa', 'TENANT');
 INSERT INTO authorities (username, authority) VALUES('asasa', 'HOST');
-INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant1', 1, 'Is-Dp2-G1-13', '20015860A', 'tenant1@alum.us.es', 'Daniel', 'Sanchez', '654321987', NULL);
+INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant1', 1, 'Is-Dp2-G1-13', '20015860A', 'tenant1@alum.us.es', 'Daniel', 'Sanchez', '654321987', NULL);
 INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'host1', 1, 'Is-Dp2-G1-13', '28983254B', 'host1@us.es', 'Ramon', 'Fernandez de la Rosa', '661707683', NULL);
 INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'host2', 1, 'Is-Dp2-G1-13', '96325874W', 'host2@alum.us.es', 'Jorge', 'Raposo', '698741203', NULL);
-INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant2', 1, 'Is-Dp2-G1-13', '11111111A', 'tenant2@alum.us.es', 'Jose Ramon', 'Fernandez', '632014577', NULL);
-INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant3', 1, 'Is-Dp2-G1-13', '36954820X', 'tenant3@us.es', 'Tenant', 'Three', '820314698', 2);
-INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant4', 1, 'Is-Dp2-G1-13', '45688700Q', 'tenant4@us.es', 'Tenant', 'Four', '999888777', 2);
+INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant2', 1, 'Is-Dp2-G1-13', '11111111A', 'tenant2@alum.us.es', 'Jose Ramon', 'Fernandez', '632014577', NULL);
+INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant3', 1, 'Is-Dp2-G1-13', '36954820X', 'tenant3@us.es', 'Tenant', 'Three', '820314698', 2);
+INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant4', 1, 'Is-Dp2-G1-13', '45688700Q', 'tenant4@us.es', 'Tenant', 'Four', '999888777', 2);
 INSERT INTO flatbook.users(DTYPE,username,password,enabled) VALUES ('Admin','admin1','4dm1n',TRUE);
 
 INSERT INTO messages (id, body, creation_moment, receiver_username, sender_username) VALUES(1, 'Hola', '2020-03-28 15:48:45.126', 'ababa', 'asasa');
@@ -16,10 +16,10 @@ INSERT INTO messages (id, body, creation_moment, receiver_username, sender_usern
 INSERT INTO messages (id, body, creation_moment, receiver_username, sender_username) VALUES(4, 'Bien', '2020-03-28 15:49:16.484', 'asasa', 'ababa');
 INSERT INTO messages (id, body, creation_moment, receiver_username, sender_username) VALUES(5, 'Adios', '2020-03-28 15:49:20.617', 'asasa', 'ababa');
 INSERT INTO flatbook.authorities VALUES ('admin1','admin');
-INSERT INTO flatbook.authorities (username, authority) VALUES('tenant1', 'TENNANT');
+INSERT INTO flatbook.authorities (username, authority) VALUES('tenant1', 'TENANT');
 INSERT INTO flatbook.authorities (username, authority) VALUES('host1', 'HOST');
 INSERT INTO flatbook.authorities (username, authority) VALUES('host2', 'HOST');
-INSERT INTO flatbook.authorities (username, authority) VALUES('tenant2', 'TENNANT');
+INSERT INTO flatbook.authorities (username, authority) VALUES('tenant2', 'TENANT');
 
 INSERT INTO flatbook.addresses (id, address, city, country, postal_code) VALUES(1, 'Calle Enramadilla', 'Sevilla', 'Spain', '41018');
 INSERT INTO flatbook.addresses (id, address, city, country, postal_code) VALUES(2, 'Paseo de la Castellana', 'Madrid', 'Spain', '28046');
@@ -98,14 +98,14 @@ INSERT INTO flatbook.requests (id, creation_date, description, finish_date, star
 INSERT INTO flatbook.requests (id, creation_date, description, finish_date, start_date, status, advertisement_id) VALUES(4, '2020-03-27 19:00:34.521884', 'Sample description of request.', '2020-08-29', '2020-03-28', 'ACCEPTED', 2);
 INSERT INTO flatbook.requests (id, creation_date, description, finish_date, start_date, status, advertisement_id) VALUES(5, '2020-03-27 19:01:07.185945', 'Sample description of tenant4', '2020-11-28', '2020-03-28', 'ACCEPTED', 2);
 
-INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant3', 1, 'Is-Dp2-G1-13', '36954820X', 'tenant3@us.es', 'Tenant', 'Three', '820314698', 2);
-INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tennant', 'tenant4', 1, 'Is-Dp2-G1-13', '45688700Q', 'tenant4@us.es', 'Tenant', 'Four', '999888777', 2);
+INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant3', 1, 'Is-Dp2-G1-13', '36954820X', 'tenant3@us.es', 'Tenant', 'Three', '820314698', 2);
+INSERT INTO flatbook.users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant4', 1, 'Is-Dp2-G1-13', '45688700Q', 'tenant4@us.es', 'Tenant', 'Four', '999888777', 2);
 
-INSERT INTO flatbook.authorities (username, authority) VALUES('tenant3', 'TENNANT');
-INSERT INTO flatbook.authorities (username, authority) VALUES('tenant4', 'TENNANT');
+INSERT INTO flatbook.authorities (username, authority) VALUES('tenant3', 'TENANT');
+INSERT INTO flatbook.authorities (username, authority) VALUES('tenant4', 'TENANT');
 
-INSERT INTO flatbook.users_requests (tennant_username, requests_id) VALUES('tenant1', 1);
-INSERT INTO flatbook.users_requests (tennant_username, requests_id) VALUES('tenant1', 2);
-INSERT INTO flatbook.users_requests (tennant_username, requests_id) VALUES('tenant2', 3);
-INSERT INTO flatbook.users_requests (tennant_username, requests_id) VALUES('tenant3', 4);
-INSERT INTO flatbook.users_requests (tennant_username, requests_id) VALUES('tenant4', 5);
+INSERT INTO flatbook.users_requests (tenant_username, requests_id) VALUES('tenant1', 1);
+INSERT INTO flatbook.users_requests (tenant_username, requests_id) VALUES('tenant1', 2);
+INSERT INTO flatbook.users_requests (tenant_username, requests_id) VALUES('tenant2', 3);
+INSERT INTO flatbook.users_requests (tenant_username, requests_id) VALUES('tenant3', 4);
+INSERT INTO flatbook.users_requests (tenant_username, requests_id) VALUES('tenant4', 5);

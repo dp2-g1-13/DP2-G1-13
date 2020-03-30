@@ -68,7 +68,7 @@ public class Flat extends BaseEntity {
 
 	@Valid
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "flat")
-	private Set<Tennant>		tenants;
+	private Set<Tenant>		tenants;
 
 	public void deleteImage(DBImage image) {
 	    if(image != null) {

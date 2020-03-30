@@ -60,7 +60,7 @@ class PersonControllerTests {
 
 	private static final String	ROLE_ANONYMOUS	= "ROLE_ANONYMOUS";
 	private static final String	ANONIMOUS_USER	= "anonimousUser";
-	private static final String	TENNANT_USER		= "TENNANT";
+	private static final String	TENANT_USER		= "TENANT";
 
 	private Person				person;
 	private PersonForm			personForm;
@@ -80,11 +80,11 @@ class PersonControllerTests {
 		this.person.setPhoneNumber(PersonControllerTests.TELEPHONE);
 
 		this.personForm = new PersonForm(this.person);
-		this.personForm.setAuthority(AuthoritiesType.TENNANT);
+		this.personForm.setAuthority(AuthoritiesType.TENANT);
 		this.personForm.setSaveType(SaveType.NEW);
 		this.personForm.setConfirmPassword(PersonControllerTests.PASSWORD);
 
-		this.authorities = new Authorities(PersonControllerTests.USERNAME, AuthoritiesType.TENNANT);
+		this.authorities = new Authorities(PersonControllerTests.USERNAME, AuthoritiesType.TENANT);
 	}
 
 	@WithMockUser(username = PersonControllerTests.ANONIMOUS_USER, authorities = PersonControllerTests.ROLE_ANONYMOUS)
@@ -108,7 +108,7 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", PersonControllerTests.EMAIL)
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
@@ -127,7 +127,7 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", PersonControllerTests.EMAIL)
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "username")).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
@@ -146,7 +146,7 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", PersonControllerTests.EMAIL)
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "dni")).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
@@ -164,7 +164,7 @@ class PersonControllerTests {
 			.param("confirmPassword", PersonControllerTests.PASSWORD)
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", PersonControllerTests.EMAIL)
-			.param("dni", PersonControllerTests.DNI).param("authority", AuthoritiesType.TENNANT.toString().toUpperCase()).param("saveType", SaveType.NEW.toString().toUpperCase()))
+			.param("dni", PersonControllerTests.DNI).param("authority", AuthoritiesType.TENANT.toString().toUpperCase()).param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "email")).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
@@ -180,13 +180,13 @@ class PersonControllerTests {
 			.param("username", "as").param("password", "as")
 			.param("email", PersonControllerTests.EMAIL)
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.NEW.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "username")).andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "password")).andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testInitEditionForm() throws Exception {
@@ -203,17 +203,17 @@ class PersonControllerTests {
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("phoneNumber", Matchers.is(PersonControllerTests.TELEPHONE))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("email", Matchers.is(PersonControllerTests.EMAIL))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("dni", Matchers.is(PersonControllerTests.DNI))))
-			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("authority", Matchers.is(AuthoritiesType.TENNANT))))
+			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("authority", Matchers.is(AuthoritiesType.TENANT))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("saveType", Matchers.is(SaveType.EDIT))));
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testInitEditFormOfAnotherProfile() throws Exception {
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/{username}/edit", PersonControllerTests.NEWUSERNAME))
 			.andExpect(MockMvcResultMatchers.view().name("exception"))
 			.andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("personForm"))
@@ -221,13 +221,13 @@ class PersonControllerTests {
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testProcessEditFormSuccess() throws Exception {
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
 		BDDMockito.given(this.personService.findUserById(PersonControllerTests.USERNAME)).willReturn(this.person);
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/{username}/edit", PersonControllerTests.USERNAME)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
 			.param("firstName", PersonControllerTests.FIRSTNAME)
@@ -236,19 +236,19 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", "dani@outlook.com")
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testProcessEditFormWithErrors() throws Exception {
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
 		BDDMockito.given(this.personService.findUserById(PersonControllerTests.USERNAME)).willReturn(this.person);
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/{username}/edit", PersonControllerTests.USERNAME)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
 			.param("firstName", PersonControllerTests.FIRSTNAME)
@@ -256,19 +256,19 @@ class PersonControllerTests {
 			.param("username", PersonControllerTests.USERNAME)
 			.param("phoneNumber", "655").param("email", "dani@outlook.com")
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "phoneNumber"))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testProcessEditFormOfAnotherProfile() throws Exception {
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/{username}/edit", PersonControllerTests.NEWUSERNAME)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
 			.param("firstName", PersonControllerTests.FIRSTNAME)
@@ -277,19 +277,19 @@ class PersonControllerTests {
 			.param("phoneNumber", PersonControllerTests.TELEPHONE)
 			.param("email", "dani@outlook.com")
 			.param("dni", PersonControllerTests.DNI)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testInitPasswordEditionForm() throws Exception {
 		BDDMockito.given(this.personService.findUserById(PersonControllerTests.USERNAME)).willReturn(this.person);
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/{username}/editPassword", PersonControllerTests.USERNAME)).andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.view().name("users/updatePassword"))
 			.andExpect(MockMvcResultMatchers.model().attributeExists("personForm")).andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("firstName", Matchers.is(PersonControllerTests.FIRSTNAME))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("lastName", Matchers.is(PersonControllerTests.LASTNAME))))
@@ -297,17 +297,17 @@ class PersonControllerTests {
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("phoneNumber", Matchers.is(PersonControllerTests.TELEPHONE))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("email", Matchers.is(PersonControllerTests.EMAIL))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("dni", Matchers.is(PersonControllerTests.DNI))))
-			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("authority", Matchers.is(AuthoritiesType.TENNANT))))
+			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("authority", Matchers.is(AuthoritiesType.TENANT))))
 			.andExpect(MockMvcResultMatchers.model().attribute("personForm", Matchers.hasProperty("saveType", Matchers.is(SaveType.EDIT))));
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testInitPasswordEditFormOfAnotherProfile() throws Exception {
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/{username}/editPassword", PersonControllerTests.NEWUSERNAME))
 			.andExpect(MockMvcResultMatchers.view().name("exception"))
 			.andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("personForm"))
@@ -315,78 +315,78 @@ class PersonControllerTests {
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testProcessPasswordEditFormSuccess() throws Exception {
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
 		BDDMockito.given(this.personService.findUserById(PersonControllerTests.USERNAME)).willReturn(this.person);
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/{username}/editPassword", PersonControllerTests.USERNAME)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
 			.param("password", PersonControllerTests.NEWPASSWORD)
 			.param("confirmPassword", PersonControllerTests.NEWPASSWORD)
 			.param("previousPassword", PersonControllerTests.PASSWORD)
 			.param("username", PersonControllerTests.USERNAME)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testProcessPasswordEditFormWithErrors() throws Exception {
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
 		BDDMockito.given(this.personService.findUserById(PersonControllerTests.USERNAME)).willReturn(this.person);
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/{username}/editPassword", PersonControllerTests.USERNAME)
 				.with(SecurityMockMvcRequestPostProcessors.csrf())
 				.param("password", "HHoo1")
 				.param("confirmPassword", "HHoo11")
 				.param("previousPassword", PersonControllerTests.PASSWORD)
 				.param("username", PersonControllerTests.USERNAME)
-				.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+				.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 				.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 				.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "password"))
 				.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testProcessPasswordEditFormWithErrorsInThePreviusPassword() throws Exception {
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
 		BDDMockito.given(this.personService.findUserById(PersonControllerTests.USERNAME)).willReturn(this.person);
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/{username}/editPassword", PersonControllerTests.USERNAME)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
 			.param("password", PersonControllerTests.NEWPASSWORD)
 			.param("confirmPassword", PersonControllerTests.NEWPASSWORD)
 			.param("previousPassword", "HHoo11")
 			.param("username", PersonControllerTests.USERNAME)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("personForm", "previousPassword"))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
 	@WithMockUser(username = PersonControllerTests.USERNAME, authorities = {
-		PersonControllerTests.TENNANT_USER
+		PersonControllerTests.TENANT_USER
 	})
 	@Test
 	void testProcessPasswordEditFormOfAnotherProfile() throws Exception {
 		BDDMockito.given(this.authoritiesService.findAuthorityById(PersonControllerTests.USERNAME)).willReturn(this.authorities.getAuthority());
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/users/{username}/editPassword", PersonControllerTests.NEWUSERNAME)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
 			.param("password", PersonControllerTests.NEWPASSWORD)
 			.param("confirmPassword", PersonControllerTests.NEWPASSWORD)
 			.param("previousPassword", PersonControllerTests.PASSWORD)
 			.param("username", PersonControllerTests.USERNAME)
-			.param("authority", AuthoritiesType.TENNANT.toString().toUpperCase())
+			.param("authority", AuthoritiesType.TENANT.toString().toUpperCase())
 			.param("saveType", SaveType.EDIT.toString().toUpperCase()))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}

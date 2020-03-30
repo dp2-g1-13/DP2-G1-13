@@ -16,11 +16,18 @@
 
 package org.springframework.samples.flatbook.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+
+import org.springframework.samples.flatbook.model.mappers.PersonForm;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,10 +35,32 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "tennant_reviews")
-public class TennantReview extends Review {
+@Table(name = "tenants")
+public class Tenant extends Person {
 
-	@NotNull
+	public Tenant() {
+
+	}
+
+	public Tenant(final PersonForm person) {
+		super(person);
+	}
+
+
 	@ManyToOne(fetch = FetchType.EAGER)
-	private Person creator;
+	@JoinColumn(name = "flat_id")
+	private Flat				flat;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<Request>		requests;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<TenantReview>	reviews;
+
+	public void addRequest(Request request) {
+        if(this.requests == null) {
+            this.requests = new HashSet<>();
+        }
+        requests.add(request);
+    }
 }

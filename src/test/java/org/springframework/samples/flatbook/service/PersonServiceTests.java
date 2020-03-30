@@ -60,10 +60,10 @@ public class PersonServiceTests {
 		this.person.setPhoneNumber(PersonServiceTests.TELEPHONE);
 
 		this.personForm = new PersonForm(this.person);
-		this.personForm.setAuthority(AuthoritiesType.TENNANT);
+		this.personForm.setAuthority(AuthoritiesType.TENANT);
 		this.personForm.setSaveType(SaveType.NEW);
 
-		this.authorities = new Authorities(USERNAME, AuthoritiesType.TENNANT);
+		this.authorities = new Authorities(USERNAME, AuthoritiesType.TENANT);
 
 		this.personService = new PersonService(this.personRepository, this.authoritiesRepository);
 	}

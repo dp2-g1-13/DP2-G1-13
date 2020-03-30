@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Address;
 import org.springframework.samples.flatbook.model.Person;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +28,7 @@ public class WelcomeController {
           Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	      if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ROLE_ANONYMOUS"))) {
 	          Person person = this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
-	          Boolean hasFlat = person instanceof Tennant && ((Tennant) person).getFlat() != null;
+	          Boolean hasFlat = person instanceof Tenant && ((Tenant) person).getFlat() != null;
 	          model.put("hasFlat", hasFlat);
           }
 

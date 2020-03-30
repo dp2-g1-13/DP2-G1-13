@@ -17,7 +17,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Task;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.TaskStatus;
 import org.springframework.samples.flatbook.repository.TaskRepository;
 import org.springframework.samples.flatbook.service.TaskService;
@@ -45,7 +45,7 @@ public class TaskServiceTests {
 	private static final String	TITLE		= "title";
 	private static final Integer ID		= 1;
 	private static final Integer ID2		= 2;
-	
+
 	@Mock
 	private TaskRepository	taskRepositoryMocked;
 
@@ -54,8 +54,8 @@ public class TaskServiceTests {
 
 	private Task				task;
 	private Task				task2;
-	private Tennant				asignee;
-	private Tennant				creator;
+	private Tenant				asignee;
+	private Tenant				creator;
 
 	private TaskService		taskService;
 	private TaskService		taskServiceMocked;
@@ -63,7 +63,7 @@ public class TaskServiceTests {
 
 	@BeforeEach
 	void setupMock() {
-		this.creator = new Tennant();
+		this.creator = new Tenant();
 		this.creator.setPassword(PASSWORD);
 		this.creator.setUsername(USERNAME_1);
 		this.creator.setDni(DNI_1);
@@ -73,7 +73,7 @@ public class TaskServiceTests {
 		this.creator.setLastName(LASTNAME_1);
 		this.creator.setPhoneNumber(TELEPHONE_1);
 
-		this.asignee = new Tennant();
+		this.asignee = new Tenant();
 		this.asignee.setPassword(PASSWORD);
 		this.asignee.setUsername(USERNAME_2);
 		this.asignee.setDni(DNI_2);
@@ -91,7 +91,7 @@ public class TaskServiceTests {
 		this.task.setStatus(TaskStatus.TODO);
 		this.task.setTitle(TITLE);
 		this.task.setId(ID);
-		
+
 		this.task2 = new Task();
 		this.task2.setAsignee(this.asignee);
 		this.task2.setCreationDate(LocalDate.now());
@@ -125,7 +125,7 @@ public class TaskServiceTests {
 		this.taskServiceMocked.saveTask(this.task2);
 		Mockito.verify(this.taskRepositoryMocked).save(this.task2);
 	}
-	
+
 	@Test
 	void shouldDeleteTask() throws DataAccessException {
 		this.taskService.deleteTaskById(ID);

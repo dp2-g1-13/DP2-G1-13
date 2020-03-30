@@ -2,8 +2,9 @@ package org.springframework.samples.flatbook.repository;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Flat;
-import org.springframework.samples.flatbook.model.Tennant;
+import org.springframework.samples.flatbook.model.Tenant;
 
+import java.util.Collection;
 import java.util.Set;
 
 public interface FlatRepository {
@@ -14,7 +15,7 @@ public interface FlatRepository {
 
     Set<Flat> findByHostUsername(String username) throws DataAccessException;
 
-    Collection<Tennant> findTennantsById(int id) throws DataAccessException;
-    
+    Collection<Tenant> findTenantsById(int id) throws DataAccessException;
+
     void save(Flat flat) throws DataAccessException;
 }

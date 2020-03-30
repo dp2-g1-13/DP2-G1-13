@@ -45,7 +45,7 @@
                     </table>
                 </div>
                 <div class="row">
-                    <sec:authorize access="hasAuthority('TENNANT')">
+                    <sec:authorize access="hasAuthority('TENANT')">
                     <div class="col-md-6">
                         <spring:url value="/advertisements/{advertisementId}" var="advertisementUrl">
                             <spring:param name="advertisementId" value="${advIds.get(i)}"/>

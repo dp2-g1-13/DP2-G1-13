@@ -38,7 +38,7 @@ class MessageControllerTests {
 
 	@MockBean
 	private PersonService		personService;
-	
+
 	@MockBean
 	private MessageService		messageService;
 
@@ -62,7 +62,7 @@ class MessageControllerTests {
 	private static final String	TELEPHONE2		= "675789789";
 	private static final String	PASSWORD		= "HOst__Pa77S";
 
-	private static final String	TENNANT_USER		= "TENNANT";
+	private static final String	TENANT_USER		= "TENANT";
 
 	private Person				person1;
 	private Person				person2;
@@ -85,7 +85,7 @@ class MessageControllerTests {
 		this.person1.setFirstName(MessageControllerTests.FIRSTNAME1);
 		this.person1.setLastName(MessageControllerTests.LASTNAME1);
 		this.person1.setPhoneNumber(MessageControllerTests.TELEPHONE1);
-		
+
 		this.person2 = new Person();
 		this.person2.setPassword(MessageControllerTests.PASSWORD);
 		this.person2.setUsername(MessageControllerTests.USERNAME2);
@@ -95,31 +95,31 @@ class MessageControllerTests {
 		this.person2.setFirstName(MessageControllerTests.FIRSTNAME2);
 		this.person2.setLastName(MessageControllerTests.LASTNAME2);
 		this.person2.setPhoneNumber(MessageControllerTests.TELEPHONE2);
-		
+
 		this.message1 = new Message();
 		this.message1.setBody(MessageControllerTests.BODY1);
 		this.message1.setCreationMoment(LocalDateTime.now());
 		this.message1.setReceiver(this.person1);
 		this.message1.setSender(this.person2);
-		
+
 		this.message2 = new Message();
 		this.message2.setBody(MessageControllerTests.BODY2);
 		this.message2.setCreationMoment(LocalDateTime.now());
 		this.message2.setReceiver(this.person2);
 		this.message2.setSender(this.person1);
-		
+
 		this.message3 = new Message();
 		this.message3.setBody(MessageControllerTests.BODY3);
 		this.message3.setCreationMoment(LocalDateTime.now());
 		this.message3.setReceiver(this.person1);
 		this.message3.setSender(this.person2);
-		
+
 		this.message4 = new Message();
 		this.message4.setBody(MessageControllerTests.BODY4);
 		this.message4.setCreationMoment(LocalDateTime.now());
 		this.message4.setReceiver(this.person2);
 		this.message4.setSender(this.person1);
-		
+
 		this.message5 = new Message();
 		this.message5.setBody(MessageControllerTests.BODY5);
 		this.message5.setCreationMoment(LocalDateTime.now());
@@ -128,7 +128,7 @@ class MessageControllerTests {
 
 	}
 
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
 	void testInitConversationList() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -143,14 +143,14 @@ class MessageControllerTests {
 			.andExpect(MockMvcResultMatchers.model().attributeExists("messages"));
 	}
 
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
 	void testProcessSendFormSuccess() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
 		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(map);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME1)).willReturn(this.person1);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME2)).willReturn(this.person2);
-		
+
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/new")
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
 			.param("body", this.message1.getBody())
@@ -159,8 +159,8 @@ class MessageControllerTests {
 			.param("sender.username", this.message1.getSender().getUsername()))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
-	
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
+
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
 	void testInitConversation() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -175,7 +175,7 @@ class MessageControllerTests {
 			.andExpect(MockMvcResultMatchers.model().attributeExists("messages"));
 	}
 
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
 	void testProcessSendFormSuccessInConversation() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -193,7 +193,7 @@ class MessageControllerTests {
 		}
 
 
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
 	void testProcessSendFormWithCantReceiveYourOwnMessageError() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -209,8 +209,8 @@ class MessageControllerTests {
 			.param("sender.username", this.message1.getSender().getUsername()))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 		}
-	
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
+
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
 	void testProcessSendFormWithUserNotExistsException() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
@@ -227,8 +227,8 @@ class MessageControllerTests {
 			.param("sender.username", this.message2.getSender().getUsername()))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 		}
-	
-	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENNANT_USER)
+
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
 	void testProcessSendFormWithErrors() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
