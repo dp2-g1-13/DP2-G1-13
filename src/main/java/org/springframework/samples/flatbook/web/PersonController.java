@@ -47,10 +47,10 @@ public class PersonController {
 	@Autowired
 	AuthoritiesService			authoritiesService;
 
-	public static String		USERNAME_DUPLICATED					= "username in use";
-	public static String		DNI_DUPLICATED						= "dni in use";
-	public static String		EMAIL_DUPLICATED					= "email in use";
-	public static String		WRONG_PASSWORD						= "wrong password";
+	public static final String		USERNAME_DUPLICATED					= "username in use";
+	public static final String		DNI_DUPLICATED						= "dni in use";
+	public static final String		EMAIL_DUPLICATED					= "email in use";
+	public static final String		WRONG_PASSWORD						= "wrong password";
 
 
 	@ModelAttribute("types")

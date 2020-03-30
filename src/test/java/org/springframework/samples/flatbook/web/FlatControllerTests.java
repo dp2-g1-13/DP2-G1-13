@@ -1,6 +1,7 @@
 package org.springframework.samples.flatbook.web;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -144,7 +145,7 @@ class FlatControllerTests {
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))
             .andExpect(status().is3xxRedirection());
-        then(this.flatService).should().saveFlat(isA(Flat.class));
+        then(this.flatService).should().saveFlat(Mockito.isA(Flat.class));
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
@@ -228,7 +229,7 @@ class FlatControllerTests {
             .param("address.country", "Spain"))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/flats/{flatId}"));
-        then(this.flatService).should().saveFlat(isA(Flat.class));
+        then(this.flatService).should().saveFlat(Mockito.isA(Flat.class));
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
@@ -281,7 +282,7 @@ class FlatControllerTests {
         mockMvc.perform(get("/flats/{flatId}/images/{imageId}/delete", TEST_FLAT_ID, TEST_IMAGE_ID))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/flats/{flatId}/edit"));
-        then(this.dbImageService).should().deleteImage(isA(DBImage.class));
+        then(this.dbImageService).should().deleteImage(Mockito.isA(DBImage.class));
     }
 
     @WithMockUser(value = "spring-wrong", roles = {"HOST"})

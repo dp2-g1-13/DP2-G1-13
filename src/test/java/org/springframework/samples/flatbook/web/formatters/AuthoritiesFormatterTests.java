@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.web;
+package org.springframework.samples.flatbook.web.formatters;
 
 import java.text.ParseException;
 import java.util.Locale;

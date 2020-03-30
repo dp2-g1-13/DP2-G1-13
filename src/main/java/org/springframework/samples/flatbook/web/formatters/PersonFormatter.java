@@ -50,8 +50,8 @@ public class PersonFormatter implements Formatter<Person> {
 	}
 
 	@Override
-	public String print(Person Person, Locale locale) {
-		return Person.getUsername();
+	public String print(Person person, Locale locale) {
+		return person.getUsername();
 	}
 
 	@Override
