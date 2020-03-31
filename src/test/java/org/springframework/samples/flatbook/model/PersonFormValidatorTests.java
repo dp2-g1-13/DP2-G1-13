@@ -69,7 +69,7 @@ public class PersonFormValidatorTests {
 	void shouldNotValidateWhenDniPatternNotMatch(final String dni) {
 		this.personForm.setDni(dni);
 
-		TestUtils.multipleAssert(this.personForm, "dni->must match \"^[0-9]{8}[A-Z]$\"");
+		TestUtils.multipleAssert(this.personForm, "dni->You must insert 8 numbers and a letter.");
 	}
 
 	@Test
@@ -106,7 +106,7 @@ public class PersonFormValidatorTests {
 
 		this.personForm.setUsername(username);
 
-		TestUtils.multipleAssert(this.personForm, "username->must match \"^[a-zA-Z0-9]{5,20}$\"");
+		TestUtils.multipleAssert(this.personForm, "username->The username must have between 5 and 20 characters, and these characters must be letters or numbers.");
 	}
 
 	@Test
@@ -125,7 +125,7 @@ public class PersonFormValidatorTests {
 
 		this.personForm.setPhoneNumber(phoneNumber);
 
-		TestUtils.multipleAssert(this.personForm, "phoneNumber->must match \"^[0-9]{9}$\"");
+		TestUtils.multipleAssert(this.personForm, "phoneNumber->You must insert 9 numbers.");
 	}
 
 	@Test

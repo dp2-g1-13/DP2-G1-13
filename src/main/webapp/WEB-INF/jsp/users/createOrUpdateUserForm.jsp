@@ -25,9 +25,9 @@
             </c:if>
             <flatbook:inputField label="First Name" name="firstName"/>
             <flatbook:inputField label="Last Name" name="lastName"/>
-            <flatbook:inputField label="Dni" name="dni"/>
-            <flatbook:inputField label="Email" name="email"/>
-            <flatbook:inputField label="Phone Number" name="phoneNumber"/>
+            <flatbook:inputField label="Dni" name="dni" placeholder="11111111A"/>
+            <flatbook:inputField label="Email" name="email" placeholder="email@organization.com"/>
+            <flatbook:inputField label="Phone Number" name="phoneNumber" placeholder="123456789"/>
             
             <form:hidden path="saveType"/>
         </div>

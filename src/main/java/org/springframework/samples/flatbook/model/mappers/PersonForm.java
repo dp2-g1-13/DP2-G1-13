@@ -49,7 +49,7 @@ public class PersonForm {
 
 	@Id
 	@NotBlank
-	@Pattern(regexp = "^[a-zA-Z0-9]{5,20}$")
+	@Pattern(regexp = "^[a-zA-Z0-9]{5,20}$", message = "The username must have between 5 and 20 characters, and these characters must be letters or numbers.")
 	String				username;
 
 	String				password;
@@ -64,7 +64,7 @@ public class PersonForm {
 	@NotBlank
 	protected String	lastName;
 
-	@Pattern(regexp = "^[0-9]{8}[A-Z]$")
+	@Pattern(regexp = "^[0-9]{8}[A-Z]$", message = "You must insert 8 numbers and a letter.")
 	@NotBlank
 	protected String	dni;
 
@@ -73,7 +73,7 @@ public class PersonForm {
 	protected String	email;
 
 	@NotBlank
-	@Pattern(regexp = "^[0-9]{9}$")
+	@Pattern(regexp = "^[0-9]{9}$", message = "You must insert 9 numbers.")
 	protected String	phoneNumber;
 
 	@NotNull
