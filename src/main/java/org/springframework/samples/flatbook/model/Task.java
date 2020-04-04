@@ -18,7 +18,6 @@ package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDate;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -62,7 +61,7 @@ public class Task extends BaseEntity {
 	private LocalDate	creationDate;
 
 	@NotNull
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Tenant		creator;
 
 	@ManyToOne(fetch = FetchType.EAGER)

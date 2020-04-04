@@ -16,7 +16,6 @@
 
 package org.springframework.samples.flatbook.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -33,6 +32,6 @@ import lombok.Setter;
 public class FlatReview extends Review {
 
 	@NotNull
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Tenant creator;
 }

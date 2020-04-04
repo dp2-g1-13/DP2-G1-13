@@ -7,17 +7,22 @@ import org.springframework.samples.flatbook.model.enums.TaskStatus;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.TaskService;
 import org.springframework.samples.flatbook.service.TenantService;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -85,11 +90,29 @@ public class TaskController {
             	task.setCreationDate(LocalDate.now());
             	task.setStatus(TaskStatus.TODO);
                 this.taskService.saveTask(task);
-                return "redirect:/";
+                return "redirect:/tasks/list";
             }
     	}else {
     		throw new RuntimeException("Oops!");
     	}
+    }
+    
+    @GetMapping("/tasks/list")
+    public ModelAndView showTaskList() {
+        ModelAndView mav = new ModelAndView("tasks/tasksList");
+        String username = ((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        Collection<Tenant> creators = getCreatorRoommates(getCreatorFlatId(username));
+        if(creators != null) {
+        	 List<Task> tasks = new ArrayList<>();
+        	 for(Tenant t:creators) {
+        		 tasks.addAll(this.taskService.findManyByTenantUsername(t.getUsername()));
+        	 }
+             mav.addObject("tasks", tasks);
+             return mav;
+        }else {
+        	throw new RuntimeException("You don't live in a flat.");
+        }
+       
     }
 
     @GetMapping(value = "/tasks/{taskId}/remove")
@@ -98,7 +121,7 @@ public class TaskController {
     	Tenant creator = this.tenantService.findTenantById(principal.getName());
 		if (task != null && creator.equals(task.getCreator())) {
 			this.taskService.deleteTaskById(taskId);
-			return "redirect:/";
+			return "redirect:/tasks/list";
 		} else {
 			throw new IllegalArgumentException("Bad task id or you are not the creator of the task.");
 		}
@@ -131,7 +154,7 @@ public class TaskController {
 			} else {
 				task.setId(taskId);
 				this.taskService.saveTask(task);
-				return "redirect:/";
+				return "redirect:/tasks/list";
 			}
 		}else {
     		throw new RuntimeException("Oops!");

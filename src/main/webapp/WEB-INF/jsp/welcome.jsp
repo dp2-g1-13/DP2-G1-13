@@ -47,7 +47,7 @@
         </c:if>
         <c:if test="${hasFlat}">
             <div class="row">
-                <a role="button" class="btn btn-default btn-lg" href="${pageContext.request.contextPath}/tasks/new" aria-pressed="true">Create new task</a>
+                <a role="button" class="btn btn-default btn-lg" href="${pageContext.request.contextPath}/tasks/list" aria-pressed="true">Your tasks</a>
             </div>
         </c:if>
     </sec:authorize>
