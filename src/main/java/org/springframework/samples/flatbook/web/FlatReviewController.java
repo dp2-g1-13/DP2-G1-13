@@ -11,18 +11,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 @Controller
 public class FlatReviewController {
 
     private static final String VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM = "flats/reviews/createOrUpdateFlatReviewForm";
-
+    private static final String VIEWS_FLAT_REVIEW_LIST= "flats/reviews/flatReviewsList";
     private final TenantService tenantService;
     private final FlatReviewService flatReviewService;
     private final FlatService flatService;
@@ -66,11 +70,28 @@ public class FlatReviewController {
         		flat.getFlatReviews().add(fr);
         		this.flatReviewService.saveFlatReview(fr);
         		this.flatService.saveFlat(flat);
-        		return "redirect:/";
+        		return "redirect:/flats/"+flatId+"/reviews/list";
     		}
     	}else {
     		throw new IllegalArgumentException("Bad flat id or you can not write a review of the flat.");
     	}
+    }
+    
+    @GetMapping("/flats/{flatId}/reviews/list")
+    public ModelAndView showFlatReviewList(Principal principal, @PathVariable("flatId") final Integer flatId) {
+        ModelAndView mav = new ModelAndView(VIEWS_FLAT_REVIEW_LIST);
+        Tenant user = tenantService.findTenantById(principal.getName());
+    	Flat flat = this.flatService.findFlatById(flatId);
+    	if(flat != null) {
+        	 List<FlatReview> frs = new ArrayList<>(flat.getFlatReviews());
+        	 frs.sort(Comparator.comparing(FlatReview::getCreationDate).reversed());
+        	 mav.addObject("thisFlat", flatId);
+             mav.addObject("flatReviews", frs);
+             mav.addObject("canCreate", user != null && flat.getTenants().contains(user));
+             return mav;
+        }else {
+        	throw new IllegalArgumentException("Bad flat id.");
+        }
     }
 
     @GetMapping(value = "/flats/{flatId}/reviews/{flatReviewId}/remove")
@@ -82,7 +103,7 @@ public class FlatReviewController {
 			reviewedFlat.getFlatReviews().remove(flatReview);
 			this.flatReviewService.deleteFlatReviewById(flatReviewId);
 			this.flatService.saveFlat(reviewedFlat);
-			return "redirect:/";
+			return "redirect:/flats/"+flatId+"/reviews/list";
 		} else {
 			throw new IllegalArgumentException("Bad flat review id or you are not the creator of the review.");
 		}

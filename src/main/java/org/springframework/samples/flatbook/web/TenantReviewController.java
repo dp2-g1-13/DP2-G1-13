@@ -15,18 +15,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 @Controller
 public class TenantReviewController {
 
     private static final String VIEWS_TENANTREVIEWS_CREATE_OR_UPDATE_FORM = "users/reviews/createOrUpdateTenantReviewForm";
-
+    private static final String VIEWS_TENANT_REVIEW_LIST= "users/reviews/tenantReviewsList";
+    
     private final PersonService personService;
     private final TenantService tenantService;
     private final HostService hostService;
@@ -73,11 +78,27 @@ public class TenantReviewController {
     			tToBeReviewed.getReviews().add(tr);
     			this.tenantReviewService.saveTenantReview(tr);
     			this.tenantService.saveTenant(tToBeReviewed);
-    			return "redirect:/";
+    			return "redirect:/tenants/"+tenantId+"/reviews/list";
     		}
     	}else {
     		throw new IllegalArgumentException("Bad tenant id or you can not make a review about this tenant.");
     	}
+    }
+    
+    @GetMapping("/tenants/{tenantId}/reviews/list")
+    public ModelAndView showFlatReviewList(Principal principal, @PathVariable("tenantId") final String tenantId) {
+        ModelAndView mav = new ModelAndView(VIEWS_TENANT_REVIEW_LIST);
+    	Tenant tenant = this.tenantService.findTenantById(tenantId);
+    	if(tenant != null) {
+        	 List<TenantReview> trs = new ArrayList<>(tenant.getReviews());
+        	 trs.sort(Comparator.comparing(TenantReview::getCreationDate).reversed());
+        	 mav.addObject("thisTenant", tenantId);
+             mav.addObject("tenantReviews", trs);
+             mav.addObject("canCreate", isAllowed(principal.getName(), tenant));
+             return mav;
+        }else {
+        	throw new IllegalArgumentException("Bad tenant id.");
+        }
     }
 
     @GetMapping(value = "/tenants/{tenantId}/reviews/{tenantReviewId}/remove")
@@ -89,7 +110,7 @@ public class TenantReviewController {
 			reviewedTenant.getReviews().remove(tenantReview);
 			this.tenantReviewService.deleteTenantReviewById(tenantReviewId);
 			this.tenantService.saveTenant(reviewedTenant);
-			return "redirect:/";
+			return "redirect:/tenants/"+tenantId+"/reviews/list";
 		} else {
 			throw new IllegalArgumentException("Bad tenant review id or you are not the creator of the review.");
 		}
