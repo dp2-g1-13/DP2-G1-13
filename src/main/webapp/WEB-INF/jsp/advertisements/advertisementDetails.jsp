@@ -11,7 +11,19 @@
             <h2>Flat in <c:out value="${advertisement.flat.address.city}"/>: <c:out value="${advertisement.title}"/></h2>
         </div>
 
-        <sec:authorize access="isAuthenticated()">
+		<div class="row">
+			<div class="col-md-6">
+				<spring:url value="/flats/{flatId}/reviews/list"
+					var="flatReviewListUrl">
+					<spring:param name="flatId" value="${advertisement.flat.id}" />
+				</spring:url>
+				<a role="button" class="btn btn-default btn-lg"
+					href="${fn:escapeXml(flatReviewListUrl)}" aria-pressed="true">Reviews
+					of the flat</a>
+			</div>
+		</div>
+
+		<sec:authorize access="isAuthenticated()">
             <sec:authentication property="principal" var="user"/>
             <div class="row" align="center">
                 <sec:authorize access="hasAnyAuthority('TENANT')">
