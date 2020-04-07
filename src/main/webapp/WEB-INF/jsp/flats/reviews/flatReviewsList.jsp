@@ -18,6 +18,7 @@
 				Review</a>
 		</div>
 	</div>
+	<br>
 </c:if>	
 	<h2>These are the reviews of the flat:</h2>
 	<c:if test="${flatReviews.size() > 0}">

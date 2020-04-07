@@ -18,6 +18,7 @@
 				Review</a>
 		</div>
 	</div>
+	<br>
 </c:if>	
 	<h2>These are the reviews of the user:</h2>
 	<c:if test="${tenantReviews.size() > 0}">
