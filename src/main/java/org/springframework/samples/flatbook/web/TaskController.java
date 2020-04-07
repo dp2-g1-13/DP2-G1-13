@@ -117,8 +117,9 @@ public class TaskController {
     @GetMapping(value = "/tasks/{taskId}/remove")
 	public String processTaskRemoval(@PathVariable("taskId") final int taskId, Principal principal) {
     	Task task = this.taskService.findTaskById(taskId);
-    	Tenant creator = this.tenantService.findTenantById(principal.getName());
-		if (task != null && creator.equals(task.getCreator())) {
+    	Integer creatorFlatId = getCreatorFlatId(principal.getName());
+		Collection<Tenant> roommates = getCreatorRoommates(creatorFlatId);
+		if (creatorFlatId != null && task != null && roommates!=null && roommates.contains(task.getCreator())) {
 			this.taskService.deleteTaskById(taskId);
 			return "redirect:/tasks/list";
 		} else {

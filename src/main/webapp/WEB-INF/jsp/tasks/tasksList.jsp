@@ -4,9 +4,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags"%>
-<%@ taglib prefix="sec"
-	uri="http://www.springframework.org/security/tags"%>
-<sec:authentication var="principal" property="principal.username" />
 <flatbook:layout pageName="tasks">
 	<div class="row">
 		<div class="col-md-6">
@@ -15,6 +12,7 @@
 				aria-pressed="true">New Task</a>
 		</div>
 	</div>
+	<br>
 	<h2>These are your tasks:</h2>
 	<c:if test="${tasks.size() > 0}">
 		<c:forEach var="i" begin="0" end="${tasks.size()-1}">
@@ -58,13 +56,11 @@
 						</spring:url>
 						<a role="button" href="${fn:escapeXml(taskEditUrl)}"
 							class="btn btn-default" aria-pressed="true">Edit</a>
-						<c:if test="${tasks.get(i).creator.username == principal}">
-							<spring:url value="/tasks/{taskId}/remove" var="taskRemoveUrl">
-								<spring:param name="taskId" value="${tasks.get(i).id}" />
-							</spring:url>
-							<a role="button" href="${fn:escapeXml(taskRemoveUrl)}"
-								class="btn btn-default" aria-pressed="true">Remove</a>
-						</c:if>
+						<spring:url value="/tasks/{taskId}/remove" var="taskRemoveUrl">
+							<spring:param name="taskId" value="${tasks.get(i).id}" />
+						</spring:url>
+						<a role="button" href="${fn:escapeXml(taskRemoveUrl)}"
+							class="btn btn-default" aria-pressed="true">Remove</a>
 					</div>
 				</div>
 			</div>
