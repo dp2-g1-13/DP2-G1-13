@@ -1,5 +1,7 @@
 package org.springframework.samples.flatbook.service;
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Task;
@@ -20,6 +22,11 @@ public class TaskService {
     @Transactional(readOnly = true)
     public Task findTaskById(int taskId) throws DataAccessException {
         return this.taskRepository.findById(taskId);
+    }
+    
+    @Transactional(readOnly = true)
+    public Set<Task> findManyByTenantUsername(String username) throws DataAccessException {
+        return this.taskRepository.findManyByTenantUsername(username);
     }
     
     @Transactional

@@ -18,7 +18,6 @@ package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDate;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -50,10 +49,10 @@ public class Report extends BaseEntity {
 	private LocalDate	creationDate;
 
 	@NotNull
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Person		sender;
 
 	@NotNull
-	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Person		receiver;
 }

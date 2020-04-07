@@ -14,19 +14,21 @@
 
     <form:form modelAttribute="task" class="form-horizontal" id="add-task-form">
         <div class="form-group has-feedback">
-        	<flatbook:inputField name="title" label="Title"/>
-        	<flatbook:textAreaField name="description" label="Description"/>
-        	<flatbook:selectField name="asignee" label="Asignee" names="${roommates}" size="4"/>
-        	<flatbook:hidden name="creationDate"/>
         	<c:choose>
             	<c:when test="${task['new']}">
+            		<flatbook:inputField name="title" label="Title"/>
+        			<flatbook:textAreaField name="description" label="Description"/>
                 	<flatbook:hidden name="status"/>
                 </c:when>
                 <c:otherwise>
-                    <flatbook:selectField name="status" label="Status" names="${taskStatus}" size="4"/>
+                    <flatbook:selectField name="status" label="Status" names="${taskStatus}" size="3"/>
                     <flatbook:hidden name="id"/>
+                    <flatbook:hidden name="title"/>
+                    <flatbook:hidden name="description"/>
                 </c:otherwise>
             </c:choose>
+            <flatbook:selectField name="asignee" label="Asignee" names="${roommates}" size="3"/>
+            <flatbook:hidden name="creationDate"/>
             <flatbook:hidden name="creator"/>
         </div>
         <div class="form-group">
