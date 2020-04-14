@@ -25,7 +25,7 @@
                     <c:otherwise>
                         <button class="btn btn-default" type="submit">Update Flat Review</button>
                     </c:otherwise>
-                </c:choose>
+            	</c:choose>
             </div>
         </div>
     </form:form>

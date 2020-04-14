@@ -28,6 +28,7 @@ public class FlatReviewController {
 
     private static final String VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM = "flats/reviews/createOrUpdateFlatReviewForm";
     private static final String VIEWS_FLAT_REVIEW_LIST= "flats/reviews/flatReviewsList";
+    
     private final TenantService tenantService;
     private final FlatReviewService flatReviewService;
     private final FlatService flatService;
@@ -49,7 +50,7 @@ public class FlatReviewController {
     	Tenant user = tenantService.findTenantById(principal.getName());
     	Flat flat = this.flatService.findFlatById(flatId);
     	if(user != null && flat != null && flat.getTenants().contains(user) && 
-    			!flat.getFlatReviews().stream().anyMatch(f->f.getCreator().equals(user))) {
+    			flat.getFlatReviews().stream().noneMatch(f->f.getCreator().equals(user))) {
     		FlatReview fr = new FlatReview();
             fr.setCreator(user);
             fr.setCreationDate(LocalDate.now());
@@ -83,12 +84,16 @@ public class FlatReviewController {
     @GetMapping("/flats/{flatId}/reviews/list")
     public ModelAndView showFlatReviewList(Principal principal, @PathVariable("flatId") final Integer flatId) {
         ModelAndView mav = new ModelAndView(VIEWS_FLAT_REVIEW_LIST);
-        Tenant user = tenantService.findTenantById(principal.getName());
+        Tenant user;
+        if(principal != null) {
+        	user = tenantService.findTenantById(principal.getName());
+        }else {
+        	user = null;
+        }
     	Flat flat = this.flatService.findFlatById(flatId);
     	if(flat != null) {
         	 List<FlatReview> frs = new ArrayList<>(flat.getFlatReviews());
         	 frs.sort(Comparator.comparing(FlatReview::getCreationDate).reversed());
-        	 mav.addObject("thisFlat", flatId);
              mav.addObject("flatReviews", frs);
              mav.addObject("canCreate", user != null && flat.getTenants().contains(user) && 
          			flat.getFlatReviews().stream().noneMatch(f->f.getCreator().equals(user)));

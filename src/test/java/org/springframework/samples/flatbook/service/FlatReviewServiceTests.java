@@ -87,7 +87,7 @@ public class FlatReviewServiceTests {
 	void shouldFindFlatReviewById() {
 		when(this.flatReviewRepositoryMocked.findById(ID)).thenReturn(this.flatReview);
 		FlatReview flatReviewById = this.flatReviewServiceMocked.findFlatReviewById(ID);
-		Assertions.assertThat(flatReviewById).hasNoNullFieldsOrProperties();
+		Assertions.assertThat(flatReviewById).hasNoNullFieldsOrPropertiesExcept("modifiedDate");
 		Assertions.assertThat(flatReviewById).hasFieldOrPropertyWithValue("id", 1);
 	}
 

@@ -87,7 +87,7 @@ public class TenantReviewServiceTests {
 	void shouldFindTenantReviewById() {
 		when(this.tenantReviewRepositoryMocked.findById(ID)).thenReturn(this.tenantReview);
 		TenantReview tenantReviewById = this.tenantReviewServiceMocked.findTenantReviewById(ID);
-		Assertions.assertThat(tenantReviewById).hasNoNullFieldsOrProperties();
+		Assertions.assertThat(tenantReviewById).hasNoNullFieldsOrPropertiesExcept("modifiedDate");
 		Assertions.assertThat(tenantReviewById).hasFieldOrPropertyWithValue("id", 1);
 	}
 
