@@ -8,6 +8,7 @@ import org.springframework.samples.flatbook.service.FlatReviewService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,8 @@ public class FlatReviewController {
     public String initCreationForm(Map<String, Object> model, Principal principal, @PathVariable("flatId") final Integer flatId) {
     	Tenant user = tenantService.findTenantById(principal.getName());
     	Flat flat = this.flatService.findFlatById(flatId);
-    	if(user != null && flat != null && flat.getTenants().contains(user)) {
+    	if(user != null && flat != null && flat.getTenants().contains(user) && 
+    			!flat.getFlatReviews().stream().anyMatch(f->f.getCreator().equals(user))) {
     		FlatReview fr = new FlatReview();
             fr.setCreator(user);
             fr.setCreationDate(LocalDate.now());
@@ -62,7 +64,8 @@ public class FlatReviewController {
     public String processCreationForm(@Valid FlatReview fr, BindingResult result, Principal principal, @PathVariable("flatId") final Integer flatId) {
     	Tenant user = tenantService.findTenantById(principal.getName());
     	Flat flat = this.flatService.findFlatById(flatId);
-    	if(user != null && flat != null && flat.getTenants().contains(user)) {
+    	if(user != null && flat != null && flat.getTenants().contains(user) && 
+    			flat.getFlatReviews().stream().noneMatch(f->f.getCreator().equals(user))) {
     		if(result.hasErrors()) {
     			return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
     		} else {
@@ -87,12 +90,44 @@ public class FlatReviewController {
         	 frs.sort(Comparator.comparing(FlatReview::getCreationDate).reversed());
         	 mav.addObject("thisFlat", flatId);
              mav.addObject("flatReviews", frs);
-             mav.addObject("canCreate", user != null && flat.getTenants().contains(user));
+             mav.addObject("canCreate", user != null && flat.getTenants().contains(user) && 
+         			flat.getFlatReviews().stream().noneMatch(f->f.getCreator().equals(user)));
              return mav;
         }else {
         	throw new IllegalArgumentException("Bad flat id.");
         }
     }
+    
+    @GetMapping(value = "/flats/{flatId}/reviews/{flatReviewId}/edit")
+	public String initUpdateForm(@PathVariable("flatReviewId") final int flatReviewId, @PathVariable("flatId") final int flatId, final ModelMap model, Principal principal) {
+    	FlatReview flatReview = this.flatReviewService.findFlatReviewById(flatReviewId);
+    	Tenant creator = this.tenantService.findTenantById(principal.getName());
+		if (creator != null && flatReview != null && creator.equals(flatReview.getCreator())) {
+			model.put("flatReview", flatReview);
+			return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
+		} else {
+			throw new IllegalArgumentException("Bad flat review id or you can not edit it.");
+		}
+	}
+
+	@PostMapping(value = "/flats/{flatId}/reviews/{flatReviewId}/edit")
+	public String processUpdateForm(@Valid final FlatReview flatReview, final BindingResult result, @PathVariable("flatReviewId") final int flatReviewId, @PathVariable("flatId") final int flatId,  final ModelMap model, Principal principal) {
+    	Tenant creator = this.tenantService.findTenantById(principal.getName());
+    	Flat reviewedFlat = this.flatService.findFlatById(flatId);
+		if (creator != null && reviewedFlat != null && creator.equals(flatReview.getCreator())) {
+			if (result.hasErrors()) {
+				return VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
+			} else {
+				flatReview.setId(flatReviewId);
+				flatReview.setModifiedDate(LocalDate.now());
+				this.flatReviewService.saveFlatReview(flatReview);
+				this.flatService.saveFlat(reviewedFlat);
+				return "redirect:/flats/"+flatId+"/reviews/list";
+			}
+		}else {
+    		throw new RuntimeException("Oops!");
+    	}
+	}
 
     @GetMapping(value = "/flats/{flatId}/reviews/{flatReviewId}/remove")
 	public String processFlatReviewRemoval(@PathVariable("flatReviewId") final int flatReviewId, @PathVariable("flatId") final int flatId, Principal principal) {

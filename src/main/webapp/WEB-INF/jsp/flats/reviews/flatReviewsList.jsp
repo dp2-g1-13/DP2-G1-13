@@ -39,12 +39,27 @@
 								<th>Creation date:</th>
 								<td><flatbook:localDate
 										date="${flatReviews.get(i).creationDate}" pattern="dd/MM/yyyy" /></td>
+								<c:if test="${flatReviews.get(i).modifiedDate != null}">
+									<th>Modified date:</th>
+									<td><flatbook:localDate
+										date="${flatReviews.get(i).modifiedDate}" pattern="dd/MM/yyyy" /></td>
+								</c:if>
+								
 							</tr>
 						</table>
 					</div>
 					<c:if test="${flatReviews.get(i).creator.username == principal}">
 						<div class="row">
 							<div class="col-md-6">
+								<spring:url
+									value="/flats/{flatId}/reviews/{flatReviewId}/edit"
+									var="flatReviewEditUrl">
+									<spring:param name="flatId" value="${thisFlat}" />
+									<spring:param name="flatReviewId"
+										value="${flatReviews.get(i).id}" />
+								</spring:url>
+								<a role="button" href="${fn:escapeXml(flatReviewEditUrl)}"
+									class="btn btn-default" aria-pressed="true">Edit</a>
 								<spring:url
 									value="/flats/{flatId}/reviews/{flatReviewId}/remove"
 									var="flatReviewRemoveUrl">

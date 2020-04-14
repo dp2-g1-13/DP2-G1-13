@@ -116,27 +116,29 @@ public class TenantReviewController {
 		}
 	}
 
-    private Boolean isAllowed(String username, Tenant tToBeReviewed) {
+	private boolean isAllowed(String username, Tenant tToBeReviewed) {
 		Boolean allowed = false;
-    	switch(authoritiesService.findAuthorityById(username)) {
-    		case TENANT:
-    			Tenant tenant = tenantService.findTenantById(username);
-    			if(tToBeReviewed!=null && tenant.getFlat()!=null && tenant.getFlat().getTenants().contains(tToBeReviewed) && tenant != tToBeReviewed) {
-    				allowed = true;
-    			}
-    			break;
-    		case HOST:
-    			Host host = hostService.findHostById(username);
-    			if(tToBeReviewed!=null) {
-    				for(Flat f: host.getFlats()) {
-    	        		if(f.getTenants().contains(tToBeReviewed)) {
-    	        			allowed = true;
-    	        			break;
-    	        		}
-    	        	}
-    			}
-    		default:
-    	}
+		if (tToBeReviewed != null && 
+				tToBeReviewed.getReviews().stream().noneMatch(r -> r.getCreator().getUsername().equals(username))) {
+			switch (authoritiesService.findAuthorityById(username)) {
+			case TENANT:
+				Tenant tenant = tenantService.findTenantById(username);
+				if (tenant.getFlat() != null && tenant.getFlat().getTenants().contains(tToBeReviewed)
+						&& tenant != tToBeReviewed) {
+					allowed = true;
+					break;
+				}
+			case HOST:
+				Host host = hostService.findHostById(username);
+				for (Flat f : host.getFlats()) {
+					if (f.getTenants().contains(tToBeReviewed)) {
+						allowed = true;
+						break;
+					}
+				}
+			default:
+			}
+		}
 		return allowed;
 	}
 }

@@ -82,7 +82,7 @@ public class TaskController {
     public String processCreationForm(Map<String, Object> model, @Valid Task task, BindingResult result, Principal principal) {
     	Integer creatorFlatId = getCreatorFlatId(principal.getName());
     	Collection<Tenant> roommates = getCreatorRoommates(creatorFlatId);
-    	if(creatorFlatId != null && roommates!=null && roommates.contains(task.getAsignee())) {
+    	if(creatorFlatId != null && roommates!=null && task.getAsignee() == null || roommates.contains(task.getAsignee())) {
     		if(result.hasErrors()) {
     			model.put("roommates", roommates);
             	return VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
