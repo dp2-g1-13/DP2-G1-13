@@ -5,7 +5,9 @@
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags"%>
 <%@ taglib prefix="sec"
 	uri="http://www.springframework.org/security/tags"%>
-<sec:authentication var="principal" property="principal.username" />
+<c:if test="${principal != null}">
+	<sec:authentication var="principal" property="principal.username" />
+</c:if>	
 <flatbook:layout pageName="tenantReviews">
 <c:if test="${canCreate}">
 	<div class="row">
@@ -39,12 +41,26 @@
 								<th>Creation date:</th>
 								<td><flatbook:localDate
 										date="${tenantReviews.get(i).creationDate}" pattern="dd/MM/yyyy" /></td>
+								<c:if test="${tenantReviews.get(i).modifiedDate != null}">
+									<th>Modification date:</th>
+									<td><flatbook:localDate
+										date="${tenantReviews.get(i).modifiedDate}" pattern="dd/MM/yyyy" /></td>
+								</c:if>
 							</tr>
 						</table>
 					</div>
 					<c:if test="${tenantReviews.get(i).creator.username == principal}">
 						<div class="row">
 							<div class="col-md-6">
+								<spring:url
+									value="/tenants/{tenantId}/reviews/{tenantReviewId}/edit"
+									var="tenantReviewEditUrl">
+									<spring:param name="tenantId" value="${tenantId}" />
+									<spring:param name="tenantReviewId"
+										value="${tenantReviews.get(i).id}" />
+								</spring:url>
+								<a role="button" href="${fn:escapeXml(tenantReviewEditUrl)}"
+									class="btn btn-default" aria-pressed="true">Edit</a>
 								<spring:url
 									value="/tenants/{tenantId}/reviews/{tenantReviewId}/remove"
 									var="tenantReviewRemoveUrl">

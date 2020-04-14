@@ -51,5 +51,9 @@ public class Review extends BaseEntity {
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	@PastOrPresent
 	private LocalDate	creationDate;
-
+	
+	@Column(name = "modified_date")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@PastOrPresent
+	private LocalDate	modifiedDate;
 }

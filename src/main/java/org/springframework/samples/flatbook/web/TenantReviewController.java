@@ -12,6 +12,7 @@ import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.TenantReviewService;
 import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -85,16 +86,50 @@ public class TenantReviewController {
     	}
     }
     
+    @GetMapping(value = "/tenants/{tenantId}/reviews/{tenantReviewId}/edit")
+	public String initUpdateForm(@PathVariable("tenantReviewId") final int tenantReviewId, @PathVariable("tenantId") final String tenantId, final ModelMap model, Principal principal) {
+    	TenantReview tenantReview = this.tenantReviewService.findTenantReviewById(tenantReviewId);
+    	Person creator = this.personService.findUserById(principal.getName());
+		if (creator != null && tenantReview != null && creator.equals(tenantReview.getCreator())) {
+			model.put("tenantReview", tenantReview);
+			return VIEWS_TENANTREVIEWS_CREATE_OR_UPDATE_FORM;
+		} else {
+			throw new IllegalArgumentException("Bad tenant review id or you can not edit it.");
+		}
+	}
+
+	@PostMapping(value = "/tenants/{tenantId}/reviews/{tenantReviewId}/edit")
+	public String processUpdateForm(@Valid final TenantReview tenantReview, final BindingResult result, @PathVariable("tenantReviewId") final int tenantReviewId, @PathVariable("tenantId") final String tenantId,  final ModelMap model, Principal principal) {
+    	Person creator = this.personService.findUserById(principal.getName());
+    	Tenant reviewedTenant = this.tenantService.findTenantById(tenantId);
+		if (creator != null && reviewedTenant != null && creator.equals(tenantReview.getCreator())) {
+			if (result.hasErrors()) {
+				return VIEWS_TENANTREVIEWS_CREATE_OR_UPDATE_FORM;
+			} else {
+				tenantReview.setId(tenantReviewId);
+				tenantReview.setModifiedDate(LocalDate.now());
+				this.tenantReviewService.saveTenantReview(tenantReview);
+				this.tenantService.saveTenant(reviewedTenant);
+				return "redirect:/tenants/"+tenantId+"/reviews/list";
+			}
+		}else {
+    		throw new RuntimeException("Oops!");
+    	}
+	}
+    
     @GetMapping("/tenants/{tenantId}/reviews/list")
     public ModelAndView showFlatReviewList(Principal principal, @PathVariable("tenantId") final String tenantId) {
         ModelAndView mav = new ModelAndView(VIEWS_TENANT_REVIEW_LIST);
     	Tenant tenant = this.tenantService.findTenantById(tenantId);
+    	boolean allowed = false;
+    	if(principal != null) {
+    		allowed = isAllowed(principal.getName(), tenant);
+    	}
     	if(tenant != null) {
         	 List<TenantReview> trs = new ArrayList<>(tenant.getReviews());
         	 trs.sort(Comparator.comparing(TenantReview::getCreationDate).reversed());
-        	 mav.addObject("thisTenant", tenantId);
              mav.addObject("tenantReviews", trs);
-             mav.addObject("canCreate", isAllowed(principal.getName(), tenant));
+             mav.addObject("canCreate", allowed);
              return mav;
         }else {
         	throw new IllegalArgumentException("Bad tenant id.");
@@ -116,27 +151,29 @@ public class TenantReviewController {
 		}
 	}
 
-    private Boolean isAllowed(String username, Tenant tToBeReviewed) {
+	private boolean isAllowed(String username, Tenant tToBeReviewed) {
 		Boolean allowed = false;
-    	switch(authoritiesService.findAuthorityById(username)) {
-    		case TENANT:
-    			Tenant tenant = tenantService.findTenantById(username);
-    			if(tToBeReviewed!=null && tenant.getFlat()!=null && tenant.getFlat().getTenants().contains(tToBeReviewed) && tenant != tToBeReviewed) {
-    				allowed = true;
-    			}
-    			break;
-    		case HOST:
-    			Host host = hostService.findHostById(username);
-    			if(tToBeReviewed!=null) {
-    				for(Flat f: host.getFlats()) {
-    	        		if(f.getTenants().contains(tToBeReviewed)) {
-    	        			allowed = true;
-    	        			break;
-    	        		}
-    	        	}
-    			}
-    		default:
-    	}
+		if (tToBeReviewed != null && 
+				tToBeReviewed.getReviews().stream().noneMatch(r -> r.getCreator().getUsername().equals(username))) {
+			switch (authoritiesService.findAuthorityById(username)) {
+			case TENANT:
+				Tenant tenant = tenantService.findTenantById(username);
+				if (tenant.getFlat() != null && tenant.getFlat().getTenants().contains(tToBeReviewed)
+						&& tenant != tToBeReviewed) {
+					allowed = true;
+				}
+				break;
+			case HOST:
+				Host host = hostService.findHostById(username);
+				for (Flat f : host.getFlats()) {
+					if (f.getTenants().contains(tToBeReviewed)) {
+						allowed = true;
+						break;
+					}
+				}
+			default:
+			}
+		}
 		return allowed;
 	}
 }

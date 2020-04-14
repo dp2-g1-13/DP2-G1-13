@@ -8,7 +8,7 @@
 
 <flatbook:layout pageName="tenantReview">
 <jsp:body>
-    <h2>New Tenant Review</h2>
+    <h2><c:if test="${tenantReview['new']}">New </c:if>Tenant Review</h2>
     <form:form modelAttribute="tenantReview" class="form-horizontal" id="add-tenantReview-form">
         <div class="form-group has-feedback">
         	<flatbook:textAreaField name="description" label="Description"/>
@@ -18,7 +18,14 @@
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-            	<button class="btn btn-default" type="submit">Create Tenant Review</button>
+            	<c:choose>
+                    <c:when test="${tenantReview['new']}">
+                        <button class="btn btn-default" type="submit">Create Tenant Review</button>
+                    </c:when>
+                    <c:otherwise>
+                        <button class="btn btn-default" type="submit">Update Tenant Review</button>
+                    </c:otherwise>
+            	</c:choose>
             </div>
         </div>
     </form:form>
