@@ -124,6 +124,11 @@
         </div>
     </div>
     </div>
+    <br>
     </c:if>
+
+    <%@include file="/WEB-INF/jsp/reviews/listReviews.jsp"%>
     </div>
+
+
 </flatbook:layout>

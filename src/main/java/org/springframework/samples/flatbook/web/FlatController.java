@@ -144,6 +144,7 @@ public class FlatController {
         mav.addObject("images", flat.getImages());
         Boolean existAd = this.advertisementService.isAdvertisementWithFlatId(flat.getId());
         mav.addObject("existAd", existAd);
+        mav.addObject("reviews", new ArrayList<>(flat.getFlatReviews()));
         return mav;
     }
 

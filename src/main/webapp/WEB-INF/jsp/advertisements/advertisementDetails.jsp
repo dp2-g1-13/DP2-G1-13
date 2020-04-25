@@ -117,6 +117,10 @@
                         <th>Country</th>
                         <td><c:out value="${advertisement.flat.address.country}"/></td>
                     </tr>
+                    <tr>
+                        <th>Host</th>
+                        <td><c:out value="${host}"/></td>
+                    </tr>
                 </table>
             </div>
         </div>
@@ -165,6 +169,8 @@
             </div>
         </div>
         <br>
+
+    <%@include file="/WEB-INF/jsp/reviews/listReviews.jsp"%>
 
         <div class="row">
             <div class="panel panel-success"><p>It was created on <flatbook:localDate date="${advertisement.creationDate}" pattern="dd/MM/yyyy"/> and has <c:out value="${advertisement.requests.size()}"/> requests.</p></div>

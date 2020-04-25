@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -129,6 +130,7 @@ public class AdvertisementController {
         mav.addObject("images", images);
         String hostUsername = this.hostService.findHostByFlatId(advertisement.getFlat().getId()).getUsername();
         mav.addObject("host", hostUsername);
+        mav.addObject("reviews", new ArrayList<>(advertisement.getFlat().getFlatReviews()));
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ROLE_ANONYMOUS"))) {
             Person person = this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
