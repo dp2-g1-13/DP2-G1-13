@@ -13,7 +13,6 @@ import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.TenantReview;
-import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.ReviewType;
 import org.springframework.samples.flatbook.model.mappers.ReviewForm;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
@@ -162,18 +161,14 @@ public class ReviewController {
 		if (creator != null && reviewFormDb != null && creator.equals(reviewFormDb.getCreator())) {
 			if (reviewFormDb.getType().equals(ReviewType.FLAT_REVIEW)) {
 				Flat flat = this.flatService.findFlatByReviewId(reviewId);
-				FlatReview flatReview = new FlatReview(reviewFormDb);
-				flatReview.setId(reviewId);
-				flat.getFlatReviews().remove(flatReview);
-				this.flatReviewService.saveFlatReview(flatReview);
+				flat.getFlatReviews().remove(flat.getFlatReviews().stream().filter(x -> x.getId().equals(reviewId)).findFirst().get());
+				this.flatReviewService.deleteFlatReviewById(reviewId);
 				this.flatService.saveFlat(flat);
 				return "redirect:/flats/" + flat.getId();
 			} else {
 				Tenant tenant = this.tenantService.findTenantByReviewId(reviewId);
-				TenantReview tenantReview = new TenantReview(reviewFormDb);
-				tenantReview.setId(reviewId);
-				tenant.getReviews().remove(tenantReview);
-				this.tenantReviewService.saveTenantReview(tenantReview);
+				tenant.getReviews().remove(tenant.getReviews().stream().filter(x -> x.getId().equals(reviewId)).findFirst().get());
+				this.tenantReviewService.deleteTenantReviewById(reviewId);
 				this.tenantService.saveTenant(tenant);
 				return "redirect:/users/" + tenant.getUsername();
 			}
@@ -207,6 +202,5 @@ public class ReviewController {
 		}
 		return reviewForm;
 	}
-
 
 }

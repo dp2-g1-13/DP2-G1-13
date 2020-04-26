@@ -155,7 +155,7 @@
                         </c:choose>
                         <flatbook:image data="${image.data}" fileType="${image.fileType}" cssClass="img-responsive center-block" width="350" height="350"/>
                     </div>
-                    </c:forEach>
+                </c:forEach>
                 </div>
                 <a class="left carousel-control" href="#carouselImages" data-slide="prev">
                     <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>

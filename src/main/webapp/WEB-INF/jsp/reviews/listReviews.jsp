@@ -64,7 +64,7 @@
                                                                   value="${reviews.get(i).id}" />
                                                 </spring:url>
                                                 <spring:url
-                                                        value="/reviews/{flatReviewId}/remove"
+                                                        value="/reviews/{flatReviewId}/delete"
                                                         var="reviewRemoveUrl">
                                                     <spring:param name="flatReviewId"
                                                                   value="${reviews.get(i).id}" />
@@ -78,7 +78,7 @@
                                                                   value="${reviews.get(i).id}" />
                                                 </spring:url>
                                                 <spring:url
-                                                        value="/reviews/{tenantReviewId}/remove"
+                                                        value="/reviews/{tenantReviewId}/delete"
                                                         var="reviewRemoveUrl">
                                                     <spring:param name="tenantReviewId"
                                                                   value="${reviews.get(i).id}" />
