@@ -11,18 +11,6 @@
             <h2>Flat in <c:out value="${advertisement.flat.address.city}"/>: <c:out value="${advertisement.title}"/></h2>
         </div>
 
-		<div class="row">
-			<div class="col-md-6">
-				<spring:url value="/flats/{flatId}/reviews/list"
-					var="flatReviewListUrl">
-					<spring:param name="flatId" value="${advertisement.flat.id}" />
-				</spring:url>
-				<a role="button" class="btn btn-default btn-lg"
-					href="${fn:escapeXml(flatReviewListUrl)}" aria-pressed="true">Reviews
-					of the flat</a>
-			</div>
-		</div>
-
 		<sec:authorize access="isAuthenticated()">
             <sec:authentication property="principal" var="user"/>
             <div class="row" align="center">
@@ -119,7 +107,10 @@
                     </tr>
                     <tr>
                         <th>Host</th>
-                        <td><c:out value="${host}"/></td>
+                        <td><spring:url value="/users/{user}" var="userPage">
+		                        <spring:param name="user" value="${host}"/>
+		                    </spring:url>
+		                    <a role="button" href="${fn:escapeXml(userPage)}" aria-pressed="true">${host}</a></td>
                     </tr>
                 </table>
             </div>

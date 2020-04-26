@@ -58,6 +58,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/tasks/**").hasAuthority("TENANT")
 				.antMatchers("/tenants/**").fullyAuthenticated()
 				.antMatchers("/logout").permitAll()
+				.antMatchers("/reports/**").permitAll()
 				.anyRequest().denyAll()
 				.and()
 				 	.formLogin()

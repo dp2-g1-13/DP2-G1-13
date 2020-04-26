@@ -8,17 +8,51 @@
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
 
 <flatbook:layout pageName="persons">
+<sec:authentication var="myname" property="name"/>
 
-    <h2>
-        ${username}
-    </h2>
-        <div class="form-group">
-            <spring:url value="/reviews/new?tenantId={tenantId}" var="tenantReviewUrl">
-				<spring:param name="tenantId" value="${username}" />
+        <div class="row">
+		     <h2>
+		        ${username}
+		    </h2>
+		    
+	        <c:if test="${username != myname}">
+	            <spring:url value="/messages/{username}" var="sendMessage">
+					<spring:param name="username" value="${username}" />
+				</spring:url>
+				<a role="button" class="btn btn-default"
+					href="${fn:escapeXml(sendMessage)}" aria-pressed="true">Send Message</a>
+					
+				<spring:url value="/reports/{username}/new" var="reportUrl">
+					<spring:param name="username" value="${username}" />
+				</spring:url>
+				<a role="button" class="btn btn-default"
+					href="${fn:escapeXml(reportUrl)}" aria-pressed="true">Report User</a>
+		   	</c:if>
+			
+			<c:if test="${username == myname && myFlatId != null}">
+			<spring:url value="/flats/{myFlatId}" var="myFlat">
+				<spring:param name="myFlatId" value="${myFlatId}" />
 			</spring:url>
-			<a role="button" class="btn btn-default btn-lg"
-				href="${fn:escapeXml(tenantReviewUrl)}" aria-pressed="true">New
-				Review</a>
+			<a role="button" class="btn btn-default"
+				href="${fn:escapeXml(myFlat)}" aria-pressed="true">My flat</a>
+			</c:if>
         </div>
+        <br>
+        
+        <c:if test="${reviews != null}">
+        	<%@include file="/WEB-INF/jsp/reviews/listReviews.jsp"%>
+        </c:if>
+        <c:if test="${selections != null}">
+        <div class="row">
+            <div class="panel panel-default">
+       			 <div class="panel-heading"><h3>Advertisements</h3></div>
+       			 <div class="panel-body">
+		         <c:if test="${selections.size() > 0}">
+		        	<%@include file="/WEB-INF/jsp/advertisements/advertisementsListPanel.jsp"%>
+		        </c:if>
+	        	</div>
+	        </div>
+	    </div>
+        </c:if>
 
 </flatbook:layout>

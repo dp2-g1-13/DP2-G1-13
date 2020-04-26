@@ -82,6 +82,7 @@
 									<div class="row">
 										<div class="col-lg-12">
 											<p>
+												<a href="/users/<sec:authentication property="name"/>" class="btn btn-primary btn-block">My User Page</a> 
 												<a href="/users/<sec:authentication property="name"/>/edit" class="btn btn-primary btn-block">My Profile</a> 
 												<a href="/users/<sec:authentication property="name"/>/editPassword"	class="btn btn-danger btn-block">Change Password</a>
 											</p>

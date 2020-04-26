@@ -39,22 +39,5 @@
         </c:forEach>
         </tbody>
     </table>
-    
-    <h2>
-        New message
-    </h2>
-    <form:form action="/messages/new" modelAttribute="message" class="form-horizontal" id="add-person-form">
-        <div class="form-group has-feedback">
-            <flatbook:inputField label="To " name="receiver.username"/>
-            <flatbook:textAreaField label="Message " name="body"/>
-            <form:hidden path="creationMoment"/>
-            <form:hidden path="sender.username"/>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                 <button class="btn btn-default" type="submit">Send</button>
-            </div>
-        </div>
-    </form:form>
 
 </flatbook:layout>

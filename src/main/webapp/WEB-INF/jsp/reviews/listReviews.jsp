@@ -110,7 +110,7 @@
                             </c:when>
                             <c:otherwise>
                                 <spring:url value="/reviews/new?tenantId={tenantId}" var="reviewUrl">
-                                    <spring:param name="flatId" value="${tenantId}" />
+                                    <spring:param name="tenantId" value="${tenantId}" />
                                 </spring:url>
                             </c:otherwise>
                         </c:choose>

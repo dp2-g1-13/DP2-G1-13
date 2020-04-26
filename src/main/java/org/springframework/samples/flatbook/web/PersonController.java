@@ -22,6 +22,7 @@ import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
+import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.PasswordValidator;
 import org.springframework.samples.flatbook.web.validators.PersonAuthorityValidator;
 import org.springframework.stereotype.Controller;
@@ -186,9 +187,12 @@ public class PersonController {
 
 			if (this.authoritiesService.findAuthorityById(username).equals(AuthoritiesType.TENANT)) {
 				Tenant tenant = this.tenantService.findTenantById(username);
+				model.put("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewATenant(principal.getName(), username));
 				model.put("reviews", new ArrayList<>(tenant.getReviews()));
+				model.put("tenantId", username);
+				model.put("myFlatId", tenant.getFlat() != null ? tenant.getFlat().getId() : null);
 			} else {
-				model.put("advertisement", this.advertisementService.findAdvertisementsByHost(username));
+				model.put("selections", this.advertisementService.findAdvertisementsByHost(username));
 			}
 			return PersonController.USER_PAGE;
 		} else {
