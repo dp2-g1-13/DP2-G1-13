@@ -15,4 +15,6 @@ public interface TenantRepository {
 	Tenant findByRequestId(int requestId) throws DataAccessException;
 
 	void save(Tenant tenant) throws DataAccessException;
+
+	Tenant findByReviewId(int reviewId) throws DataAccessException;
 }

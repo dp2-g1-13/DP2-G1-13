@@ -22,6 +22,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.samples.flatbook.model.mappers.ReviewForm;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,6 +32,15 @@ import lombok.Setter;
 @Setter
 @Table(name = "tenant_reviews")
 public class TenantReview extends Review {
+
+	public TenantReview() {
+	}
+
+	public TenantReview(final ReviewForm review) {
+		super(review);
+		this.creator = review.getCreator();
+	}
+
 
 	@NotNull
 	@ManyToOne(fetch = FetchType.EAGER)

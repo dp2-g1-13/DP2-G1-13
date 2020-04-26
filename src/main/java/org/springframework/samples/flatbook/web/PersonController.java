@@ -2,6 +2,7 @@
 package org.springframework.samples.flatbook.web;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,11 +11,14 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
 import org.springframework.samples.flatbook.model.mappers.PersonForm;
+import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.PersonService;
+import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
@@ -33,6 +37,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class PersonController {
 
+	private static final String	USER_PAGE							= "users/userPage";
+
 	private static final String	ONLY_CAN_EDIT_YOUR_OWN_PROFILE		= "Only can edit your own profile";
 
 	private static final String	ONLY_CAN_EDIT_YOUR_OWN_PASSWORD		= "Only can edit your own password";
@@ -47,10 +53,16 @@ public class PersonController {
 	@Autowired
 	AuthoritiesService			authoritiesService;
 
-	public static final String		USERNAME_DUPLICATED					= "username in use";
-	public static final String		DNI_DUPLICATED						= "dni in use";
-	public static final String		EMAIL_DUPLICATED					= "email in use";
-	public static final String		WRONG_PASSWORD						= "wrong password";
+	@Autowired
+	TenantService				tenantService;
+
+	@Autowired
+	AdvertisementService		advertisementService;
+
+	public static final String	USERNAME_DUPLICATED					= "username in use";
+	public static final String	DNI_DUPLICATED						= "dni in use";
+	public static final String	EMAIL_DUPLICATED					= "email in use";
+	public static final String	WRONG_PASSWORD						= "wrong password";
 
 
 	@ModelAttribute("types")
@@ -164,6 +176,23 @@ public class PersonController {
 			} catch (DuplicatedUsernameException | DuplicatedDniException | DuplicatedEmailException e) {
 			}
 			return "redirect:/";
+		}
+	}
+
+	@GetMapping("/users/{username}")
+	public String initUserPage(final ModelMap model, @PathVariable("username") final String username, final Principal principal) {
+		if (this.personService.findUserById(username) != null) {
+			model.put("username", username);
+
+			if (this.authoritiesService.findAuthorityById(username).equals(AuthoritiesType.TENANT)) {
+				Tenant tenant = this.tenantService.findTenantById(username);
+				model.put("reviews", new ArrayList<>(tenant.getReviews()));
+			} else {
+				model.put("advertisement", this.advertisementService.findAdvertisementsByHost(username));
+			}
+			return PersonController.USER_PAGE;
+		} else {
+			throw new RuntimeException("This user does not exists");
 		}
 	}
 

@@ -15,13 +15,14 @@ public class TenantService {
 
 	private TenantRepository tenantRepository;
 
+
 	@Autowired
-	public TenantService(TenantRepository tenantRepository) {
+	public TenantService(final TenantRepository tenantRepository) {
 		this.tenantRepository = tenantRepository;
 	}
 
 	@Transactional(readOnly = true)
-	public Tenant findTenantById(String username) throws DataAccessException {
+	public Tenant findTenantById(final String username) throws DataAccessException {
 		return this.tenantRepository.findByUsername(username);
 	}
 
@@ -31,12 +32,18 @@ public class TenantService {
 	}
 
 	@Transactional
-    public void saveTenant(Tenant tenant) throws DataAccessException {
-        this.tenantRepository.save(tenant);
-    }
+	public void saveTenant(final Tenant tenant) throws DataAccessException {
+		this.tenantRepository.save(tenant);
+	}
 
-    @Transactional(readOnly = true)
-    public Tenant findTenantByRequestId(int requestId) throws DataAccessException {
-        return this.tenantRepository.findByRequestId(requestId);
-    }
+	@Transactional(readOnly = true)
+	public Tenant findTenantByRequestId(final int requestId) throws DataAccessException {
+		return this.tenantRepository.findByRequestId(requestId);
+	}
+
+	@Transactional(readOnly = true)
+	public Tenant findTenantByReviewId(final int reviewId) throws DataAccessException {
+		return this.tenantRepository.findByReviewId(reviewId);
+	}
+
 }

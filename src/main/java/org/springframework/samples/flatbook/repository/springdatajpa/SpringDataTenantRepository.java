@@ -10,7 +10,11 @@ import org.springframework.samples.flatbook.repository.TenantRepository;
 
 public interface SpringDataTenantRepository extends TenantRepository, Repository<Tenant, String> {
 
-    @Override
-    @Query("SELECT tenant FROM Tenant tenant JOIN tenant.requests req WHERE req.id = :request_id")
-    Tenant findByRequestId(@Param("request_id")int requestId) throws DataAccessException;
+	@Override
+	@Query("SELECT tenant FROM Tenant tenant JOIN tenant.requests req WHERE req.id = :request_id")
+	Tenant findByRequestId(@Param("request_id") int requestId) throws DataAccessException;
+
+	@Override
+	@Query("SELECT tenant FROM Tenant tenant JOIN tenant.reviews r WHERE r.id = ?1")
+	Tenant findByReviewId(int reviewId) throws DataAccessException;
 }

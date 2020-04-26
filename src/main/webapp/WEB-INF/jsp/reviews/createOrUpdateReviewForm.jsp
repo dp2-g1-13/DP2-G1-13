@@ -6,26 +6,21 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
 
-<flatbook:layout pageName="flatReview">
+<flatbook:layout pageName="reviewForm">
 <jsp:body>
-    <h2><c:if test="${flatReview['new']}">New </c:if>Flat Review</h2>
-    <form:form modelAttribute="flatReview" class="form-horizontal" id="add-flatReview-form">
+    <h2>Reviews</h2>
+    <form:form modelAttribute="reviewForm" class="form-horizontal" id="add-review-form">
         <div class="form-group has-feedback">
         	<flatbook:textAreaField name="description" label="Description"/>
         	<flatbook:number name="rate" label = "Rate" max="5"  min="0"/>
         	<flatbook:hidden name="creationDate"/>
+        	<flatbook:hidden name="reviwed"/>
         	<flatbook:hidden name="creator"/>
+        	<flatbook:hidden name="type"/>
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-            	<c:choose>
-                    <c:when test="${flatReview['new']}">
-                        <button class="btn btn-default" type="submit">Create Flat Review</button>
-                    </c:when>
-                    <c:otherwise>
-                        <button class="btn btn-default" type="submit">Update Flat Review</button>
-                    </c:otherwise>
-            	</c:choose>
+                  <button class="btn btn-default" type="submit">Submit</button>
             </div>
         </div>
     </form:form>
