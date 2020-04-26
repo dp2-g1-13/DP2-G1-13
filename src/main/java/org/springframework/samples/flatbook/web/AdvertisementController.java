@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
 import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -16,10 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.security.Principal;
+import java.util.*;
 
 @Controller
 public class AdvertisementController {
@@ -122,15 +121,23 @@ public class AdvertisementController {
     }
 
     @GetMapping(value = "/advertisements/{advertisementId}")
-    public ModelAndView showAdvertisement(@PathVariable("advertisementId") int advertisementId) {
+    public ModelAndView showAdvertisement(@PathVariable("advertisementId") int advertisementId, Principal principal) {
         ModelAndView mav = new ModelAndView("advertisements/advertisementDetails");
         Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
         mav.addObject(advertisement);
+
         Collection<DBImage> images = this.dbImageService.getImagesByFlatId(advertisement.getFlat().getId());
         mav.addObject("images", images);
+
         String hostUsername = this.hostService.findHostByFlatId(advertisement.getFlat().getId()).getUsername();
         mav.addObject("host", hostUsername);
-        mav.addObject("reviews", new ArrayList<>(advertisement.getFlat().getFlatReviews()));
+
+        List<FlatReview> reviews = new ArrayList<>(advertisement.getFlat().getFlatReviews());
+        reviews.sort(Comparator.comparing(FlatReview::getCreationDate).reversed());
+        mav.addObject("reviews", reviews);
+        mav.addObject("flatId", advertisement.getFlat().getId());
+        mav.addObject("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewAFlat(principal.getName(), advertisement.getFlat().getId()));
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ROLE_ANONYMOUS"))) {
             Person person = this.personService.findUserById(((User) auth.getPrincipal()).getUsername());

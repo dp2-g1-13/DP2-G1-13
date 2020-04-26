@@ -71,6 +71,6 @@ public class ReviewForm {
 	@NotNull
 	private Person		creator;
 
-	private String		reviwed;
+	private String reviewed;
 
 }

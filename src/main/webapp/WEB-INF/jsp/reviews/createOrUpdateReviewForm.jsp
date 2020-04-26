@@ -14,7 +14,7 @@
         	<flatbook:textAreaField name="description" label="Description"/>
         	<flatbook:number name="rate" label = "Rate" max="5"  min="0"/>
         	<flatbook:hidden name="creationDate"/>
-        	<flatbook:hidden name="reviwed"/>
+        	<flatbook:hidden name="reviewed"/>
         	<flatbook:hidden name="creator"/>
         	<flatbook:hidden name="type"/>
         </div>

@@ -23,6 +23,7 @@ import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.TenantReviewService;
 import org.springframework.samples.flatbook.service.TenantService;
+import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -38,8 +39,6 @@ public class ReviewController {
 
 	private final PersonService			personService;
 	private final TenantService			tenantService;
-	private final HostService			hostService;
-	private final AuthoritiesService	authoritiesService;
 	private final FlatReviewService		flatReviewService;
 	private final FlatService			flatService;
 	private final TenantReviewService	tenantReviewService;
@@ -51,8 +50,6 @@ public class ReviewController {
 		this.flatReviewService = flatReviewService;
 		this.tenantService = tenantService;
 		this.flatService = flatService;
-		this.hostService = hostService;
-		this.authoritiesService = authoritiesService;
 		this.personService = personService;
 		this.tenantReviewService = tenantReviewService;
 	}
@@ -70,7 +67,7 @@ public class ReviewController {
 		review.setCreator(user);
 		review.setCreationDate(LocalDate.now());
 		review.setType(type);
-		review.setReviwed(type.equals(ReviewType.TENANT_REVIEW) ? tenantId : flatId.toString());
+		review.setReviewed(type.equals(ReviewType.TENANT_REVIEW) ? tenantId : flatId.toString());
 		model.put("reviewForm", review);
 
 		return ReviewController.VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
@@ -79,7 +76,7 @@ public class ReviewController {
 	@PostMapping(value = "/reviews/new")
 	public String processCreationForm(@Valid final ReviewForm review, final BindingResult result, final Principal principal) {
 		Person user = this.personService.findUserById(principal.getName());
-		ReviewType type = this.getReviewType(review.getType().equals(ReviewType.FLAT_REVIEW) ? Integer.parseInt(review.getReviwed()) : null, review.getType().equals(ReviewType.TENANT_REVIEW) ? review.getReviwed() : null, user);
+		ReviewType type = this.getReviewType(review.getType().equals(ReviewType.FLAT_REVIEW) ? Integer.parseInt(review.getReviewed()) : null, review.getType().equals(ReviewType.TENANT_REVIEW) ? review.getReviewed() : null, user);
 
 		if (type == null) {
 			throw new IllegalArgumentException("Illegal access.");
@@ -92,19 +89,19 @@ public class ReviewController {
 			review.setCreator(user);
 
 			if (type.equals(ReviewType.FLAT_REVIEW)) {
-				Flat flat = this.flatService.findFlatById(Integer.parseInt(review.getReviwed()));
+				Flat flat = this.flatService.findFlatById(Integer.parseInt(review.getReviewed()));
 				FlatReview flatReview = new FlatReview(review);
 				flat.getFlatReviews().add(flatReview);
 				this.flatReviewService.saveFlatReview(flatReview);
 				this.flatService.saveFlat(flat);
-				return "redirect:/flats/" + Integer.parseInt(review.getReviwed());
+				return "redirect:/flats/" + Integer.parseInt(review.getReviewed());
 			} else {
-				Tenant tenant = this.tenantService.findTenantById(review.getReviwed());
+				Tenant tenant = this.tenantService.findTenantById(review.getReviewed());
 				TenantReview tenantReview = new TenantReview(review);
 				tenant.getReviews().add(tenantReview);
 				this.tenantReviewService.saveTenantReview(tenantReview);
 				this.tenantService.saveTenant(tenant);
-				return "redirect:/users/" + review.getReviwed();
+				return "redirect:/users/" + review.getReviewed();
 			}
 
 		}
@@ -140,18 +137,20 @@ public class ReviewController {
 					flatReview.setId(reviewId);
 					flatReview.setCreator((Tenant) creator);
 					this.flatReviewService.saveFlatReview(flatReview);
-					return "redirect:/flats/" + Integer.parseInt(review.getReviwed());
+					Integer reviewed = this.flatService.findFlatByReviewId(reviewId).getId();
+					return "redirect:/flats/" + reviewed;
 				} else {
 					TenantReview tenantReview = new TenantReview(review);
 					tenantReview.setId(reviewId);
 					tenantReview.setCreator(creator);
 					this.tenantReviewService.saveTenantReview(tenantReview);
-					return "redirect:/users/" + review.getReviwed();
+					String reviewed = this.tenantService.findTenantByReviewId(reviewId).getUsername();
+					return "redirect:/users/" + reviewed;
 				}
 
 			}
 		} else {
-			throw new RuntimeException("You dont have acces to this review!");
+			throw new RuntimeException("You don't have access to this review!");
 		}
 	}
 
@@ -185,10 +184,10 @@ public class ReviewController {
 	}
 
 	private ReviewType getReviewType(final Integer flatId, final String tenantId, final Person user) {
-		if (flatId != null && tenantId == null && this.isAllowedToReviewAFlat(user.getUsername(), flatId)) {
+		if (flatId != null && tenantId == null && ReviewUtils.isAllowedToReviewAFlat(user.getUsername(), flatId)) {
 			return ReviewType.FLAT_REVIEW;
 
-		} else if (tenantId != null && flatId == null && this.isAllowedToReviewATenant(user.getUsername(), tenantId)) {
+		} else if (tenantId != null && flatId == null && ReviewUtils.isAllowedToReviewATenant(user.getUsername(), tenantId)) {
 			return ReviewType.TENANT_REVIEW;
 
 		} else {
@@ -209,30 +208,5 @@ public class ReviewController {
 		return reviewForm;
 	}
 
-	private boolean isAllowedToReviewATenant(final String username, final String tenantId) {
-		Boolean allowed = false;
-		Tenant tenantToBeReviewed = this.tenantService.findTenantById(tenantId);
 
-		if (tenantToBeReviewed != null && tenantToBeReviewed.getReviews().stream().noneMatch(r -> r.getCreator().getUsername().equals(username))) {
-			AuthoritiesType type = this.authoritiesService.findAuthorityById(username);
-
-			if (type.equals(AuthoritiesType.TENANT)) {
-				Tenant tenant = this.tenantService.findTenantById(username);
-				if (tenant.getFlat() != null && tenant.getFlat().getTenants().contains(tenantToBeReviewed) && tenant != tenantToBeReviewed) {
-					allowed = true;
-				}
-			} else if (type.equals(AuthoritiesType.HOST)) {
-				allowed = this.hostService.findHostById(username).getFlats().stream().anyMatch(x -> x.getTenants().contains(tenantToBeReviewed));
-			}
-		}
-
-		return allowed;
-	}
-
-	private boolean isAllowedToReviewAFlat(final String username, final Integer flatId) {
-		Flat flat = this.flatService.findFlatById(flatId);
-
-		return this.authoritiesService.findAuthorityById(username).equals(AuthoritiesType.TENANT) && flat != null && flat.getTenants().stream().anyMatch(x -> x.getUsername().equals(username))
-			&& flat.getFlatReviews().stream().noneMatch(f -> f.getCreator().getUsername().equals(username));
-	}
 }

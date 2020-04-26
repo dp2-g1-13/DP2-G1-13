@@ -3,6 +3,7 @@ package org.springframework.samples.flatbook.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -135,16 +137,26 @@ public class FlatController {
     }
 
     @GetMapping(value = "/flats/{flatId}")
-    public ModelAndView showFlat(@PathVariable("flatId") int flatId) {
+    public ModelAndView showFlat(@PathVariable("flatId") int flatId, Principal principal) {
+        if(!validateHost(flatId) && !validateTenant(flatId)) {
+            throw new RuntimeException("Illegal access");
+        }
         ModelAndView mav = new ModelAndView("flats/flatDetails");
         Flat flat = this.flatService.findFlatById(flatId);
         mav.addObject(flat);
+
         Host host = this.hostService.findHostByFlatId(flat.getId());
         mav.addObject("host", host.getUsername());
         mav.addObject("images", flat.getImages());
+
         Boolean existAd = this.advertisementService.isAdvertisementWithFlatId(flat.getId());
         mav.addObject("existAd", existAd);
-        mav.addObject("reviews", new ArrayList<>(flat.getFlatReviews()));
+
+        List<FlatReview> reviews = new ArrayList<>(flat.getFlatReviews());
+        reviews.sort(Comparator.comparing(FlatReview::getCreationDate).reversed());
+        mav.addObject("reviews", reviews);
+        mav.addObject("flatId", flat.getId());
+        mav.addObject("canCreateReview", principal != null &&ReviewUtils.isAllowedToReviewAFlat(principal.getName(), flat.getId()));
         return mav;
     }
 
@@ -164,7 +176,7 @@ public class FlatController {
         return mav;
     }
 
-    public Boolean validateHost(int flatId) {
+    public boolean validateHost(int flatId) {
         Boolean userIsHost = true;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("admin"))) {
@@ -173,6 +185,17 @@ public class FlatController {
             userIsHost = username.equals(hostUsername);
         }
         return userIsHost;
+    }
+
+    private boolean validateTenant(int flatId) {
+        boolean userIsTenantOfFlat = true;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("admin"))) {
+            String username = ((User) auth.getPrincipal()).getUsername();
+            Flat flat = this.flatService.findFlatById(flatId);
+            userIsTenantOfFlat = flat.getTenants().stream().anyMatch(x -> x.getUsername().equals(username));
+        }
+        return userIsTenantOfFlat;
     }
 
 
