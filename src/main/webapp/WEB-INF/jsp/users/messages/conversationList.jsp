@@ -7,7 +7,16 @@
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
 
 <flatbook:layout pageName="messages">
-
+    <jsp:attribute name="customScript">
+        <script>
+            $(document).ready(function () {
+                var interval = setInterval(function () {
+                    $("#messagesList").load("${pageContext.request.contextPath}/messages/list #messagesList");
+                }, 2000);
+            });
+         </script>
+    </jsp:attribute>
+    <jsp:body>
     <h2>
         Active conversations
     </h2>
@@ -39,5 +48,5 @@
         </c:forEach>
         </tbody>
     </table>
-
+</jsp:body>
 </flatbook:layout>
