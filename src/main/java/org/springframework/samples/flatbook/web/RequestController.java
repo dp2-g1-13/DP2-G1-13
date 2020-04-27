@@ -37,6 +37,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Controller
 public class RequestController {
 
@@ -52,8 +61,21 @@ public class RequestController {
 
 	private HostService				hostService;
 
-	private TenantService			tenantService;
+    private FlatService flatService;
 
+    private TenantService tenantService;
+
+    @Autowired
+    public RequestController(RequestService requestService, PersonService personService, AdvertisementService advertisementService,
+                             AuthoritiesService authoritiesService, HostService hostService, TenantService tenantService, FlatService flatService) {
+        this.requestService = requestService;
+        this.personService = personService;
+        this.advertisementService = advertisementService;
+        this.authoritiesService = authoritiesService;
+        this.hostService = hostService;
+        this.tenantService = tenantService;
+        this.flatService = flatService;
+    }
 
 	@Autowired
 	public RequestController(final RequestService requestService, final PersonService personService, final AdvertisementService advertisementService, final AuthoritiesService authoritiesService, final HostService hostService,
@@ -132,21 +154,56 @@ public class RequestController {
 		}
 		return "redirect:/advertisements/{advertisementId}/requests/list";
 	}
+    @GetMapping("/advertisements/{advertisementId}/requests/{requestId}/cancel")
+    public String processCancelRequest(@PathVariable("advertisementId") int advertisementId, @PathVariable("requestId") int requestId) {
+        if(validateHostAcceptingOrRejectingRequest(requestId)) {
+            Request request = this.requestService.findRequestById(requestId);
+            if(!request.getStatus().equals(RequestStatus.ACCEPTED) || !request.getStartDate().isAfter(LocalDate.now())) {
+                throw new RuntimeException("Illegal access");
+            }
+            request.setFinishDate(LocalDate.now().plusDays(1));
+            request.setStatus(RequestStatus.CANCELED);
+            processCancelOrConclude(request, requestId);
+        }
+        return "redirect:/advertisements/{advertisementId}/requests/list";
+    }
 
-	@GetMapping("/requests/list")
-	public ModelAndView showRequestsOfTenant() {
-		ModelAndView mav = new ModelAndView("requests/requestsList");
-		String username = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-		List<Request> requests = new ArrayList<>(this.requestService.findRequestsByTenantUsername(username));
-		List<Integer> advIds = requests.stream().map(x -> {
-			Advertisement adv = this.advertisementService.findAdvertisementWithRequestId(x.getId());
-			return adv == null ? null : adv.getId();
-		}).collect(Collectors.toList());
-		mav.addObject("requests", requests);
-		mav.addObject("advIds", advIds);
-		return mav;
-	}
+    @GetMapping("/advertisements/{advertisementId}/requests/{requestId}/conclude")
+    public String processConcludeRequest(@PathVariable("advertisementId") int advertisementId, @PathVariable("requestId") int requestId) {
+        if(validateHostAcceptingOrRejectingRequest(requestId)) {
+            Request request = this.requestService.findRequestById(requestId);
+            if(!request.getStatus().equals(RequestStatus.ACCEPTED) || request.getStartDate().isAfter(LocalDate.now())) {
+                throw new RuntimeException("Illegal access");
+            }
+            request.setFinishDate(LocalDate.now().plusDays(1));
+            request.setStatus(RequestStatus.FINISHED);
+            processCancelOrConclude(request, requestId);
+        }
+        return "redirect:/advertisements/{advertisementId}/requests/list";
+    }
 
+    @GetMapping("/requests/list")
+    public ModelAndView showRequestsOfTenant() {
+        ModelAndView mav = new ModelAndView("requests/requestsList");
+        String username = ((User)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        List<Request> requests = new ArrayList<>(this.requestService.findRequestsByTenantUsername(username));
+        List<Integer> advIds = requests.stream()
+            .map(x -> {
+                Advertisement adv = this.advertisementService.findAdvertisementWithRequestId(x.getId());
+                return adv == null? null : adv.getId();
+            }).collect(Collectors.toList());
+        mav.addObject("requests", requests);
+        mav.addObject("advIds", advIds);
+        return mav;
+    }
+
+    public void validateTenant(Authentication auth, Tenant tenant, Advertisement advertisement, int advertisementId) {
+        if(tenant.getFlat() != null
+            || this.requestService.isThereRequestOfTenantByAdvertisementId(((User)auth.getPrincipal()).getUsername(), advertisementId)
+            || advertisement == null) {
+            throw new RuntimeException("Illegal access");
+        }
+    }
 	@GetMapping("/advertisements/{advertisementId}/requests/list")
 	public ModelAndView showRequestsOfAdvertisement(@PathVariable("advertisementId") final int advertisementId) {
 		ModelAndView mav = new ModelAndView("requests/requestsList");
@@ -168,20 +225,16 @@ public class RequestController {
 		return mav;
 	}
 
-	public boolean validateTenantDoesNotHaveRequestsToFlat(final Authentication auth, final int advertisementId) {
-		return !this.requestService.isThereRequestOfTenantByAdvertisementId(((User) auth.getPrincipal()).getUsername(), advertisementId);
-	}
 
-	public boolean validateHostAcceptingOrRejectingRequest(final int requestId) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
-			String username = ((User) auth.getPrincipal()).getUsername();
-			Host host = this.hostService.findHostOfAdvertisementByRequestId(requestId);
-			if (!username.equals(host.getUsername())) {
-				throw new RuntimeException("Illegal access");
-			}
-		}
-		return true;
-	}
+    private void processCancelOrConclude(Request request, int requestId) {
+        Tenant tenant = this.tenantService.findTenantByRequestId(requestId);
+        Flat flat = tenant.getFlat();
+        flat.kickTenantOut(tenant);
+        tenant.setFlat(null);
+        this.flatService.saveFlat(flat);
+        this.tenantService.saveTenant(tenant);
+        this.requestService.saveRequest(request);
+    }
+
 
 }

@@ -28,19 +28,28 @@
 				<a role="button" class="btn btn-default"
 					href="${fn:escapeXml(reportUrl)}" aria-pressed="true">Report User</a>
 		   	</c:if>
-			
-			<c:if test="${username == myname && myFlatId != null}">
-			<spring:url value="/flats/{myFlatId}" var="myFlat">
-				<spring:param name="myFlatId" value="${myFlatId}" />
-			</spring:url>
-			<a role="button" class="btn btn-default"
-				href="${fn:escapeXml(myFlat)}" aria-pressed="true">My flat</a>
-			</c:if>
+
+
+            <sec:authorize access="hasAuthority('TENANT')">
+                <c:choose>
+                    <c:when test="${username == myname && myFlatId != null}">
+                        <spring:url value="/flats/{myFlatId}" var="myFlat">
+                            <spring:param name="myFlatId" value="${myFlatId}" />
+                        </spring:url>
+                        <a role="button" class="btn btn-default"
+                            href="${fn:escapeXml(myFlat)}" aria-pressed="true">My flat</a>
+                        <a role="button" class="btn btn-default" href="${pageContext.request.contextPath}/tasks/list" aria-pressed="true">Your tasks</a>
+                    </c:when>
+                    <c:when test="${username == myname && myFlatId == null}">
+                        <a role="button" class="btn btn-default" href="${pageContext.request.contextPath}/requests/list" aria-pressed="true">See your requests</a>
+                    </c:when>
+                </c:choose>
+            </sec:authorize>
         </div>
         <br>
         
         <c:if test="${reviews != null}">
-        	<%@include file="/WEB-INF/jsp/reviews/listReviews.jsp"%>
+        	<%@include file="/WEB-INF/jsp/reviews/reviewsList.jsp"%>
         </c:if>
         <c:if test="${selections != null}">
         <div class="row">

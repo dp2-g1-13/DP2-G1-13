@@ -39,16 +39,4 @@
             </form:form>
         </div>
     </div>
-    <sec:authorize access="hasAuthority('TENANT')">
-        <c:if test="${!hasFlat}">
-            <div class="row">
-                <a role="button" class="btn btn-default btn-lg" href="${pageContext.request.contextPath}/requests/list" aria-pressed="true">See your requests</a>
-            </div>
-        </c:if>
-        <c:if test="${hasFlat}">
-            <div class="row">
-                <a role="button" class="btn btn-default btn-lg" href="${pageContext.request.contextPath}/tasks/list" aria-pressed="true">Your tasks</a>
-            </div>
-        </c:if>
-    </sec:authorize>
 </flatbook:layout>

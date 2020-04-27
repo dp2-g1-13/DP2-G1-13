@@ -1,4 +1,5 @@
 <%@ page import="org.springframework.samples.flatbook.model.enums.RequestStatus" %>
+<%@ page import="java.time.LocalDate" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -54,28 +55,60 @@
                     </div>
                     </sec:authorize>
                     <sec:authorize access="hasAnyAuthority('HOST', 'ADMIN')">
-                        <c:if test="${requests.get(i).status == RequestStatus.PENDING}">
-                        <div class="col-md-4" align="center">
-                            <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/accept" var="acceptRequestUrl">
-                                <spring:param name="advertisementId" value="${advId}"/>
-                                <spring:param name="requestId" value="${requests.get(i).id}"/>
-                            </spring:url>
-                            <a role="button" href="${fn:escapeXml(acceptRequestUrl)}" class="btn btn-success" aria-pressed="true">Accept request</a>
-                        </div>
-                        <div class="col-md-4" align="center">
-                            <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/reject" var="rejectRequestUrl">
-                                <spring:param name="advertisementId" value="${advId}"/>
-                                <spring:param name="requestId" value="${requests.get(i).id}"/>
-                            </spring:url>
-                            <a role="button" href="${fn:escapeXml(rejectRequestUrl)}" class="btn btn-danger" aria-pressed="true">Reject request</a>
-                        </div>
-                        <div class="col-md-4" align="center">
-                            <spring:url value="/messages/{username}" var="messageUrl">
-                                <spring:param name="username" value="${tenants.get(i).username}"/>
-                            </spring:url>
-                            <a role="button" href="${fn:escapeXml(messageUrl)}" class="btn btn-info" aria-pressed="true">Send message</a>
-                        </div>
-                        </c:if>
+                        <c:choose>
+                            <c:when test="${requests.get(i).status == RequestStatus.PENDING}">
+                                <div class="col-md-4" align="center">
+                                    <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/accept" var="acceptRequestUrl">
+                                        <spring:param name="advertisementId" value="${advId}"/>
+                                        <spring:param name="requestId" value="${requests.get(i).id}"/>
+                                    </spring:url>
+                                    <a role="button" href="${fn:escapeXml(acceptRequestUrl)}" class="btn btn-success" aria-pressed="true">Accept request</a>
+                                </div>
+                                <div class="col-md-4" align="center">
+                                    <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/reject" var="rejectRequestUrl">
+                                        <spring:param name="advertisementId" value="${advId}"/>
+                                        <spring:param name="requestId" value="${requests.get(i).id}"/>
+                                    </spring:url>
+                                    <a role="button" href="${fn:escapeXml(rejectRequestUrl)}" class="btn btn-danger" aria-pressed="true">Reject request</a>
+                                </div>
+                                <div class="col-md-4" align="center">
+                                    <spring:url value="/messages/{username}" var="messageUrl">
+                                        <spring:param name="username" value="${tenants.get(i).username}"/>
+                                    </spring:url>
+                                    <a role="button" href="${fn:escapeXml(messageUrl)}" class="btn btn-info" aria-pressed="true">Send message</a>
+                                </div>
+                            </c:when>
+                            <c:when test="${requests.get(i).status == RequestStatus.ACCEPTED}">
+                                <c:choose>
+                                    <c:when test="${requests.get(i).startDate.isAfter(LocalDate.now())}">
+                                        <div class="col-md-6" align="center">
+                                            <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/cancel" var="cancelRequestUrl">
+                                                <spring:param name="advertisementId" value="${advId}"/>
+                                                <spring:param name="requestId" value="${requests.get(i).id}"/>
+                                            </spring:url>
+                                            <a role="button" href="${fn:escapeXml(cancelRequestUrl)}" class="btn btn-danger" aria-pressed="true">Cancel request</a>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="col-md-6" align="center">
+                                            <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/conclude" var="concludeRequestUrl">
+                                                <spring:param name="advertisementId" value="${advId}"/>
+                                                <spring:param name="requestId" value="${requests.get(i).id}"/>
+                                            </spring:url>
+                                            <a role="button" href="${fn:escapeXml(concludeRequestUrl)}" class="btn btn-warning" aria-pressed="true">Conclude request</a>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
+
+
+                                <div class="col-md-6" align="center">
+                                    <spring:url value="/messages/{username}" var="messageUrl">
+                                        <spring:param name="username" value="${tenants.get(i).username}"/>
+                                    </spring:url>
+                                    <a role="button" href="${fn:escapeXml(messageUrl)}" class="btn btn-info" aria-pressed="true">Send message</a>
+                                </div>
+                            </c:when>
+                        </c:choose>
                     </sec:authorize>
                 </div>
             </div>

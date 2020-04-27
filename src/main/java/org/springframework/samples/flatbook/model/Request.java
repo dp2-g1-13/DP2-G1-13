@@ -59,13 +59,11 @@ public class Request extends BaseEntity {
     @NotNull
     @Column(name = "start_date")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    @Future
     private LocalDate startDate;
 
     @NotNull
     @Column(name = "finish_date")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    @Future
     private LocalDate finishDate;
 
 }

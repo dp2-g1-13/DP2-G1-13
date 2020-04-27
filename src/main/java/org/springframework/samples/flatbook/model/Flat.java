@@ -62,17 +62,23 @@ public class Flat extends BaseEntity {
 	private Address					address;
 
 	@Valid
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")
 	private Set<FlatReview>	flatReviews;
 
 	@Valid
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "flat")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "flat")
 	private Set<Tenant>		tenants;
 
 	public void deleteImage(DBImage image) {
 	    if(image != null) {
 	        this.images.remove(image);
+        }
+    }
+
+    public void kickTenantOut(Tenant tenant) {
+	    if(tenant != null) {
+	        tenants.remove(tenant);
         }
     }
 
