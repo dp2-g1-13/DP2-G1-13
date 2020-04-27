@@ -43,4 +43,8 @@ public interface SpringDataAdvertisementRepository extends AdvertisementReposito
 	@Override
 	@Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND adv.flat.address.country = :country AND adv.flat.address.postalCode = :postal_code")
 	Set<Advertisement> findByCityAndCountryAndPostalCode(@Param("city") String city, @Param("country") String country, @Param("postal_code") String postalCode) throws DataAccessException;
+
+	@Override
+	@Query("SELECT count(f) FROM Advertisement f")
+	Integer numberOfAdvertisements() throws DataAccessException;
 }

@@ -196,7 +196,7 @@ public class FlatController {
 	public boolean validateHost(final int flatId) {
 		Boolean userIsHost = true;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("admin"))) {
+		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
 			String username = ((User) auth.getPrincipal()).getUsername();
 			String hostUsername = this.hostService.findHostByFlatId(flatId).getUsername();
 			userIsHost = username.equals(hostUsername);
@@ -207,7 +207,7 @@ public class FlatController {
 	private boolean validateTenant(final int flatId) {
 		boolean userIsTenantOfFlat = true;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("admin"))) {
+		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
 			String username = ((User) auth.getPrincipal()).getUsername();
 			Flat flat = this.flatService.findFlatById(flatId);
 			userIsTenantOfFlat = flat.getTenants().stream().anyMatch(x -> x.getUsername().equals(username));

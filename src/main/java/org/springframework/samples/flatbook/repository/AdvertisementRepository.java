@@ -29,4 +29,6 @@ public interface AdvertisementRepository {
 	void delete(Advertisement advertisement);
 
 	Set<Advertisement> findByHost(String host) throws DataAccessException;
+
+	Integer numberOfAdvertisements() throws DataAccessException;
 }
