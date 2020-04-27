@@ -11,18 +11,6 @@
             <h2>Flat in <c:out value="${advertisement.flat.address.city}"/>: <c:out value="${advertisement.title}"/></h2>
         </div>
 
-		<div class="row">
-			<div class="col-md-6">
-				<spring:url value="/flats/{flatId}/reviews/list"
-					var="flatReviewListUrl">
-					<spring:param name="flatId" value="${advertisement.flat.id}" />
-				</spring:url>
-				<a role="button" class="btn btn-default btn-lg"
-					href="${fn:escapeXml(flatReviewListUrl)}" aria-pressed="true">Reviews
-					of the flat</a>
-			</div>
-		</div>
-
 		<sec:authorize access="isAuthenticated()">
             <sec:authentication property="principal" var="user"/>
             <div class="row" align="center">
@@ -117,6 +105,13 @@
                         <th>Country</th>
                         <td><c:out value="${advertisement.flat.address.country}"/></td>
                     </tr>
+                    <tr>
+                        <th>Host</th>
+                        <td><spring:url value="/users/{user}" var="userPage">
+		                        <spring:param name="user" value="${host}"/>
+		                    </spring:url>
+		                    <a role="button" href="${fn:escapeXml(userPage)}" aria-pressed="true">${host}</a></td>
+                    </tr>
                 </table>
             </div>
         </div>
@@ -151,7 +146,7 @@
                         </c:choose>
                         <flatbook:image data="${image.data}" fileType="${image.fileType}" cssClass="img-responsive center-block" width="350" height="350"/>
                     </div>
-                    </c:forEach>
+                </c:forEach>
                 </div>
                 <a class="left carousel-control" href="#carouselImages" data-slide="prev">
                     <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
@@ -165,6 +160,8 @@
             </div>
         </div>
         <br>
+
+    <%@include file="/WEB-INF/jsp/reviews/listReviews.jsp"%>
 
         <div class="row">
             <div class="panel panel-success"><p>It was created on <flatbook:localDate date="${advertisement.creationDate}" pattern="dd/MM/yyyy"/> and has <c:out value="${advertisement.requests.size()}"/> requests.</p></div>

@@ -5,7 +5,7 @@ INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, l
 INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant2', 1, 'Is-Dp2-G1-13', '66655544A', 'tenant2@alum.us.es', 'Jose Ramon', 'Fernandez', '632014577', NULL);
 INSERT INTO users(DTYPE,username,password,enabled) VALUES ('Admin','admin1','4dm1n',TRUE);
 
-INSERT INTO authorities VALUES ('admin1','admin');
+INSERT INTO authorities VALUES ('admin1','ADMIN');
 
 INSERT INTO authorities (username, authority) VALUES('tenant1', 'TENANT');
 INSERT INTO authorities (username, authority) VALUES('host1', 'HOST');
@@ -112,6 +112,7 @@ INSERT INTO authorities (username, authority) VALUES('jorrapdia', 'HOST');
 INSERT INTO authorities (username, authority) VALUES('josferde5', 'TENANT');
 INSERT INTO reviews (dtype, id, creation_date, description, rate, creator_username, flat_id) VALUES ('FlatReview', 1, '2020-03-29', 'description', 2, 'dansanbal', 1);
 INSERT INTO reviews (dtype, id, creation_date, description, rate, creator_username, flat_id) VALUES ('TenantReview', 2, '2020-03-29', 'description', 3, 'josferde5', null);
+INSERT INTO users_reviews (tenant_username, reviews_id) VALUES ('dansanbal', 2);
 INSERT INTO reports (id, creation_date, reason, receiver_username, sender_username) VALUES (1, '2020-03-29', 'reason', 'dansanbal', 'josferde5');
 INSERT INTO tasks (id, creation_date, description, status, title, asignee_username, creator_username) VALUES (1, '2020-03-29', 'description', 'TODO', 'title', 'dansanbal', 'josferde5');
 

@@ -16,7 +16,7 @@
             <div class="panel-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
-                        <sec:authorize access="hasAnyAuthority('admin', 'HOST')">
+                        <sec:authorize access="hasAnyAuthority('ADMIN', 'HOST')">
                         <tr>
                             <th>Username</th>
                             <td><c:out value="${tenants.get(i).username}"/></td>
@@ -53,7 +53,7 @@
                         <a role="button" href="${fn:escapeXml(advertisementUrl)}" class="btn btn-default" aria-pressed="true">See details</a>
                     </div>
                     </sec:authorize>
-                    <sec:authorize access="hasAnyAuthority('HOST', 'admin')">
+                    <sec:authorize access="hasAnyAuthority('HOST', 'ADMIN')">
                         <c:if test="${requests.get(i).status == RequestStatus.PENDING}">
                         <div class="col-md-4" align="center">
                             <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/accept" var="acceptRequestUrl">
