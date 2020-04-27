@@ -37,7 +37,10 @@
     </jsp:attribute>
     <jsp:body>
     <div id="chat-container" class="panel panel-primary">
-        <div id="chat-heading" class="panel-heading"><h2 class="chat-heading">Chat: <c:out value="${message.receiver.username}"/></h2></div>
+        <spring:url value="/users/{user}" var="userPage">
+            <spring:param name="user" value="${message.receiver.username}"/>
+        </spring:url>
+        <div id="chat-heading" class="panel-heading"><h2 class="chat-heading">Chat: <a class="a-chat" href="${fn:escapeXml(userPage)}" aria-pressed="true"><c:out value="${message.receiver.username}"/></a></h2></div>
         <div id="chat-body" class="panel-body">
             <div id="chat-body-content" class="panel-group">
                 <c:forEach items="${messages}" var="mess">

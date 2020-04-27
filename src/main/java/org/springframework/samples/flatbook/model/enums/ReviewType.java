@@ -7,7 +7,7 @@ public enum ReviewType {
 	private final String type;
 
 
-	private ReviewType(final String type) {
+	ReviewType(final String type) {
 		this.type = type;
 	}
 

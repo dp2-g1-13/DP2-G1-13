@@ -5,13 +5,13 @@ public enum TaskStatus {
 
 	private final String type;
 
-	private TaskStatus(final String type) {
+	TaskStatus(final String type) {
 		this.type = type;
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.type;
 	}
-	
+
 }

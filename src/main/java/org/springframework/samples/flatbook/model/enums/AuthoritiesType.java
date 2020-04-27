@@ -7,7 +7,7 @@ public enum AuthoritiesType {
 	private final String type;
 
 
-	private AuthoritiesType(final String type) {
+	AuthoritiesType(final String type) {
 		this.type = type;
 	}
 

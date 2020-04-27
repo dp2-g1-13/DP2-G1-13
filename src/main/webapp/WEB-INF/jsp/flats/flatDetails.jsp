@@ -54,6 +54,13 @@
                 <th>Country</th>
                 <td><c:out value="${flat.address.country}"/></td>
             </tr>
+            <tr>
+                <th>Host</th>
+                <td><spring:url value="/users/{user}" var="userPage">
+                    <spring:param name="user" value="${host}"/>
+                </spring:url>
+                    <a role="button" href="${fn:escapeXml(userPage)}" aria-pressed="true">${host}</a></td>
+            </tr>
             </table>
         </div>
 
@@ -127,7 +134,23 @@
     <br>
     </c:if>
 
-    <%@include file="/WEB-INF/jsp/reviews/listReviews.jsp"%>
+    <%@include file="/WEB-INF/jsp/reviews/reviewsList.jsp"%>
+
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3>Tenants</h3></div>
+                <div class="panel-body">
+                    <ul>
+                        <c:forEach var="tenant" items="${flat.tenants}">
+                            <spring:url value="/users/{user}" var="tenantPage">
+                                <spring:param name="user" value="${tenant.username}"/>
+                            </spring:url>
+                            <li><a href="${fn:escapeXml(tenantPage)}" aria-pressed="true"><c:out value="${tenant.username}"/></a></li>
+                        </c:forEach>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
 
