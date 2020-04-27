@@ -18,12 +18,7 @@ import org.springframework.samples.flatbook.model.Request;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
 import org.springframework.samples.flatbook.model.mappers.RequestForm;
-import org.springframework.samples.flatbook.service.AdvertisementService;
-import org.springframework.samples.flatbook.service.AuthoritiesService;
-import org.springframework.samples.flatbook.service.HostService;
-import org.springframework.samples.flatbook.service.PersonService;
-import org.springframework.samples.flatbook.service.RequestService;
-import org.springframework.samples.flatbook.service.TenantService;
+import org.springframework.samples.flatbook.service.*;
 import org.springframework.samples.flatbook.web.validators.RequestFormValidator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,14 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 public class RequestController {
@@ -77,17 +65,6 @@ public class RequestController {
         this.flatService = flatService;
     }
 
-	@Autowired
-	public RequestController(final RequestService requestService, final PersonService personService, final AdvertisementService advertisementService, final AuthoritiesService authoritiesService, final HostService hostService,
-		final TenantService tenantService) {
-		this.requestService = requestService;
-		this.personService = personService;
-		this.advertisementService = advertisementService;
-		this.authoritiesService = authoritiesService;
-		this.hostService = hostService;
-		this.tenantService = tenantService;
-	}
-
 	@InitBinder("requestForm")
 	public void initBinder(final WebDataBinder dataBinder) {
 		String username = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
@@ -99,9 +76,7 @@ public class RequestController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Tenant tenant = (Tenant) this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
 		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
-		if (tenant.getFlat() != null || !this.validateTenantDoesNotHaveRequestsToFlat(auth, advertisementId) || advertisement == null) {
-			throw new RuntimeException("Illegal access");
-		}
+        validateTenant(auth, tenant, advertisement, advertisementId);
 		RequestForm req = new RequestForm();
 		model.put("requestForm", req);
 		return RequestController.VIEWS_REQUESTS_CREATE_FORM;
@@ -115,9 +90,7 @@ public class RequestController {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			Tenant tenant = (Tenant) this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
 			Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
-			if (tenant.getFlat() != null || !this.validateTenantDoesNotHaveRequestsToFlat(auth, advertisementId) || advertisement == null) {
-				throw new RuntimeException("Illegal access");
-			}
+            validateTenant(auth, tenant, advertisement, advertisementId);
 			Request req = new Request();
 			req.setDescription(request.getDescription());
 			req.setCreationDate(LocalDateTime.now());
@@ -224,6 +197,18 @@ public class RequestController {
 		mav.addObject("advId", advertisementId);
 		return mav;
 	}
+
+    public boolean validateHostAcceptingOrRejectingRequest(final int requestId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
+            String username = ((User) auth.getPrincipal()).getUsername();
+            Host host = this.hostService.findHostOfAdvertisementByRequestId(requestId);
+            if (!username.equals(host.getUsername())) {
+                throw new RuntimeException("Illegal access");
+            }
+        }
+        return true;
+    }
 
 
     private void processCancelOrConclude(Request request, int requestId) {
