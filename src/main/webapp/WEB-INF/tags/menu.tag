@@ -33,6 +33,13 @@
 					<span>Messages</span>
 				</flatbook:menuItem>
 
+				<sec:authorize access="hasAnyAuthority('ADMIN')">
+					<flatbook:menuItem active="${name eq 'statistics'}" url="/statistics" title="view the statistics">
+						<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+						<span>Statistics</span>
+					</flatbook:menuItem>
+				</sec:authorize>
+
 				<flatbook:menuItem active="${name eq 'error'}" url="/oups" title="trigger a RuntimeException to see how it is handled">
 					<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
 					<span>Error</span>
@@ -75,6 +82,7 @@
 									</div>
 								</div>
 							</li>
+							<sec:authorize access="hasAnyAuthority('HOST','TENANT')">
 							<li class="divider"></li>
 
 							<li>
@@ -90,8 +98,9 @@
 									</div>
 								</div>
 							</li>
-
+							</sec:authorize>
 						</ul></li>
+						
 				</sec:authorize>
 			</ul>
 		</div>

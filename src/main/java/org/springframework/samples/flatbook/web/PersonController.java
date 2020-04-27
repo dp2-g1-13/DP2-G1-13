@@ -113,7 +113,7 @@ public class PersonController {
 
 	@GetMapping("/users/{username}/edit")
 	public String findUserProfile(final ModelMap model, @PathVariable("username") final String username, final Principal principal) {
-		if (username.equals(principal.getName()) || this.authoritiesService.findAuthorityById(principal.getName()).equals(AuthoritiesType.ADMIN)) {
+		if (username.equals(principal.getName())) {
 			PersonForm user = new PersonForm(this.personService.findUserById(username));
 			user.setAuthority(this.authoritiesService.findAuthorityById(username));
 			user.setSaveType(SaveType.EDIT);
@@ -129,7 +129,7 @@ public class PersonController {
 	public String updateUserProfile(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username, final Principal principal) throws DataAccessException {
 		if (result.hasErrors()) {
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
-		} else if (!username.equals(principal.getName()) && !this.authoritiesService.findAuthorityById(principal.getName()).equals(AuthoritiesType.ADMIN)) {
+		} else if (!username.equals(principal.getName())) {
 			throw new RuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
 		} else {
 			user.setSaveType(SaveType.EDIT);

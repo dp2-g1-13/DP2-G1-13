@@ -1,6 +1,6 @@
 <%@page import="java.lang.Integer" %>
 
-<sec:authorize access="hasAnyAuthority('HOST','TENANT', 'admin')">
+<sec:authorize access="hasAnyAuthority('HOST','TENANT', 'ADMIN')">
     <sec:authentication var="principal" property="principal.username" />
 </sec:authorize>
 
@@ -37,7 +37,14 @@
                                     </tr>
                                     <tr>
                                         <th>Creator:</th>
-                                        <td><c:out value="${reviews.get(i).creator.username}" /></td>
+                                        <td><spring:url
+                                                        value="/users/{user}"
+                                                        var="creatorUrl">
+                                                    <spring:param name="user"
+                                                                  value="${reviews.get(i).creator.username}" />
+												</spring:url>
+                                  					 <a href="${fn:escapeXml(creatorUrl)}"
+                                     		 		      aria-pressed="true">${reviews.get(i).creator.username}</a></td>
                                     </tr>
                                     <tr>
                                         <th>Creation date:</th>

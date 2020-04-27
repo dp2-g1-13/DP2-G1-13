@@ -2,6 +2,8 @@
 package org.springframework.samples.flatbook.repository.springdatajpa;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +19,12 @@ public interface SpringDataTenantRepository extends TenantRepository, Repository
 	@Override
 	@Query("SELECT tenant FROM Tenant tenant JOIN tenant.reviews r WHERE r.id = ?1")
 	Tenant findByReviewId(int reviewId) throws DataAccessException;
+
+	@Override
+	@Query("SELECT t FROM Tenant t join t.reviews r group by t order by avg(r.rate) desc")
+	Page<Tenant> topBestReviewedTenants(Pageable pageable) throws DataAccessException;
+
+	@Override
+	@Query("SELECT t FROM Tenant t join t.reviews r group by t order by avg(r.rate) asc ")
+	Page<Tenant> topWorstReviewedTenants(Pageable pageable) throws DataAccessException;
 }
