@@ -42,23 +42,8 @@ public class AdvertisementService {
 	}
 
 	@Transactional(readOnly = true)
-	public Set<Advertisement> findAdvertisementsByCity(final String city) throws DataAccessException {
-		return this.advertisementRepository.findByCity(city);
-	}
-
-	@Transactional(readOnly = true)
-	public Set<Advertisement> findAdvertisementsByCityAndPostalCode(final String city, final String postalCode) throws DataAccessException {
-		return this.advertisementRepository.findByCityAndPostalCode(city, postalCode);
-	}
-
-	@Transactional(readOnly = true)
-	public Set<Advertisement> findAdvertisementsByCityAndCountry(final String city, final String country) throws DataAccessException {
-		return this.advertisementRepository.findByCityAndCountry(city, country);
-	}
-
-	@Transactional(readOnly = true)
-	public Set<Advertisement> findAdvertisementsByCityAndCountryAndPostalCode(final String city, final String country, final String postalCode) throws DataAccessException {
-		return this.advertisementRepository.findByCityAndCountryAndPostalCode(city, country, postalCode);
+	public Set<Advertisement> findAllAdvertisements() throws DataAccessException {
+		return this.advertisementRepository.findAll();
 	}
 
 	@Transactional

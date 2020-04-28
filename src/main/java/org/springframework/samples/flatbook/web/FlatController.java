@@ -1,6 +1,7 @@
 
 package org.springframework.samples.flatbook.web;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,16 +14,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.flatbook.model.Advertisement;
-import org.springframework.samples.flatbook.model.DBImage;
-import org.springframework.samples.flatbook.model.Flat;
-import org.springframework.samples.flatbook.model.FlatReview;
-import org.springframework.samples.flatbook.model.Host;
+import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.DBImageService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
+import org.springframework.samples.flatbook.web.apis.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.core.Authentication;
@@ -36,6 +34,8 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import static org.springframework.samples.flatbook.web.apis.GeocodeAPI.getGeocodeData;
 
 @Controller
 public class FlatController {
@@ -78,7 +78,7 @@ public class FlatController {
 	}
 
 	@PostMapping(value = "/flats/new")
-	public String processCreationForm(@Valid final Flat flat, final BindingResult result) {
+	public String processCreationForm(@Valid final Flat flat, final BindingResult result) throws UnsupportedEncodingException {
 		if (result.hasErrors()) {
 			return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 		} else {
@@ -86,6 +86,18 @@ public class FlatController {
 				result.rejectValue("images", "", "a minimum of 6 images is required.");
 				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 			}
+            Address address = flat.getAddress();
+            GeocodeResponse geocode = getGeocodeData(address.getAddress() + ", " + address.getCity());
+            if(geocode.getStatus().equals("ZERO_RESULTS")) {
+                result.rejectValue("address.address", "", "The address does not exist. Try again.");
+                return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+            } else if(!geocode.getStatus().equals("OK")) {
+                result.reject("An external error has occurred. Please try again later.");
+                return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+            }
+            address.setLatitude(geocode.getResults().get(0).getGeometry().getLocation().getLat());
+            address.setLongitude(geocode.getResults().get(0).getGeometry().getLocation().getLng());
+            flat.setAddress(address);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			Host host = (Host) this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
 			host.addFlat(flat);

@@ -29,22 +29,6 @@ public interface SpringDataAdvertisementRepository extends AdvertisementReposito
 	Advertisement findAdvertisementWithRequestId(@Param("request_id") int requestId) throws DataAccessException;
 
 	@Override
-	@Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city")
-	Set<Advertisement> findByCity(@Param("city") String city) throws DataAccessException;
-
-	@Override
-	@Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND adv.flat.address.postalCode = :postal_code")
-	Set<Advertisement> findByCityAndPostalCode(@Param("city") String city, @Param("postal_code") String postalCode) throws DataAccessException;
-
-	@Override
-	@Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND adv.flat.address.country = :country")
-	Set<Advertisement> findByCityAndCountry(@Param("city") String city, @Param("country") String country) throws DataAccessException;
-
-	@Override
-	@Query("SELECT adv FROM Advertisement adv WHERE adv.flat.address.city = :city AND adv.flat.address.country = :country AND adv.flat.address.postalCode = :postal_code")
-	Set<Advertisement> findByCityAndCountryAndPostalCode(@Param("city") String city, @Param("country") String country, @Param("postal_code") String postalCode) throws DataAccessException;
-
-	@Override
 	@Query("SELECT count(f) FROM Advertisement f")
 	Integer numberOfAdvertisements() throws DataAccessException;
 }

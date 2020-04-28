@@ -32,4 +32,10 @@ public class Address extends BaseEntity {
     @Pattern(regexp = "^[a-zA-Z]([a-zA-Z\\s]+)?$", message = "Numbers are not accepted here")
 	@NotBlank
 	private String	country;
+
+    @Column(name = "latitude")
+    private Double                  latitude;
+
+    @Column(name = "longitude")
+    private Double                  longitude;
 }
