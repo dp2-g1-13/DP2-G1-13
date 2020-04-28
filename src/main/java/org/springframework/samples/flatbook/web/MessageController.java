@@ -36,14 +36,19 @@ public class MessageController {
 
 	private static final String	USER_DOESNT_EXIST					= "user doesnt exist";
 
-	public static final String	CANT_RECEIVE_YOUR_OWN_MESSAGE		= "cant receive your own message";
+	private static final String	CANT_RECEIVE_YOUR_OWN_MESSAGE		= "cant receive your own message";
+
+	private MessageService		messageServiceTests;
+
+	private PersonService		personService;
+
 
 	@Autowired
-	MessageService				messageServiceTests;
-
-	@Autowired
-	PersonService				personService;
-
+	public MessageController(final MessageService messageService, final PersonService personService) {
+		super();
+		this.messageServiceTests = messageService;
+		this.personService = personService;
+	}
 
 	@ModelAttribute("message")
 	public Message putMessage(final ModelMap model, final Principal principal) {

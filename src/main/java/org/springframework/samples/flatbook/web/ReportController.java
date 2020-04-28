@@ -3,8 +3,11 @@ package org.springframework.samples.flatbook.web;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.samples.flatbook.model.Report;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.ReportService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +27,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class ReportController {
 
+	private static final String	REPORTS_LIST						= "reports/reportsList";
+
 	private static final String	VIEWS_REPORTS_CREATE_OR_UPDATE_FORM	= "reports/createOrUpdateReportForm";
 
 	private final PersonService	personService;
+
 	private final ReportService	reportService;
 
 
@@ -60,16 +67,48 @@ public class ReportController {
 	@PostMapping(value = "/reports/{userId}/new")
 	public String processCreationForm(@Valid final Report r, final BindingResult result, final Principal principal, @PathVariable("userId") final String userId) {
 		Person reported = this.personService.findUserById(userId);
+		Person creator = this.personService.findUserById(principal.getName());
 		if (reported != null) {
 			if (result.hasErrors()) {
 				return ReportController.VIEWS_REPORTS_CREATE_OR_UPDATE_FORM;
 			} else {
 				r.setCreationDate(LocalDate.now());
+				r.setSender(creator);
 				this.reportService.saveReport(r);
 				return "redirect:/users/{userId}";
 			}
 		} else {
 			throw new IllegalArgumentException("Bad user id.");
+		}
+	}
+
+	@GetMapping(value = "/reports/list")
+	public String initList(final ModelMap model, final Principal principal) {
+		model.put("reports", this.reportService.findAllReports().stream().sorted(Comparator.comparing(Report::getCreationDate).reversed()).collect(Collectors.toList()));
+		return ReportController.REPORTS_LIST;
+	}
+
+	@GetMapping(value = "/reports/{userId}/list")
+	public String initUserList(final ModelMap model, final Principal principal, @PathVariable("userId") final String userId) {
+		Person reported = this.personService.findUserById(userId);
+		if (reported != null) {
+			model.put("username", userId);
+			model.put("reports", this.reportService.findReportsByReceiver(reported).stream().sorted(Comparator.comparing(Report::getCreationDate).reversed()).collect(Collectors.toList()));
+			return ReportController.REPORTS_LIST;
+		} else {
+			throw new IllegalArgumentException("Bad user id.");
+		}
+
+	}
+
+	@GetMapping(value = "/reports/{reportId}/delete")
+	public String deleteReport(final HttpServletRequest request, @Valid final Report r, final BindingResult result, final Principal principal, @PathVariable("reportId") final int reportId) {
+		Report report = this.reportService.findReportById(reportId);
+		if (report != null) {
+			this.reportService.deleteReportById(report.getId());
+			return "redirect:" + request.getHeader("Referer");
+		} else {
+			throw new IllegalArgumentException("Bad report id.");
 		}
 	}
 }

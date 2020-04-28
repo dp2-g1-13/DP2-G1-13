@@ -44,6 +44,8 @@ public class StatisticsService {
 		statistics.setNumberOfRequests(this.requestRepository.numberOfRequests());
 		statistics.setRatioOfAcceptedRequests(this.requestRepository.ratioOfAcceptedRequests());
 		statistics.setRatioOfRejectedRequests(this.requestRepository.ratioOfRejectedRequests());
+		statistics.setRatioOfFinishedRequests(this.requestRepository.ratioOfFinishedRequests());
+		statistics.setRatioOfCanceledRequests(this.requestRepository.ratioOfCanceledRequests());
 		statistics.setNumberOfAdvertisements(this.advertisementRepository.numberOfAdvertisements());
 		statistics.setNumberOfFlats(this.flatRepository.numberOfFlats());
 		statistics.setNumberOfUsers(this.personRepository.numberOfUsers());

@@ -3,7 +3,7 @@ INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, l
 INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'host1', 1, 'Is-Dp2-G1-13', '12345678B', 'host1@us.es', 'Ramon', 'Fernandez de la Rosa', '661707683', NULL);
 INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Host', 'host2', 1, 'Is-Dp2-G1-13', '11122233W', 'host2@alum.us.es', 'Jorge', 'Raposo', '698741203', NULL);
 INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant2', 1, 'Is-Dp2-G1-13', '66655544A', 'tenant2@alum.us.es', 'Jose Ramon', 'Fernandez', '632014577', NULL);
-INSERT INTO users(DTYPE,username,password,enabled) VALUES ('Admin','admin1','4dm1n',TRUE);
+INSERT INTO users(DTYPE,username,password,enabled) VALUES ('User','admin1','4dm1n',TRUE);
 
 INSERT INTO authorities VALUES ('admin1','ADMIN');
 

@@ -31,4 +31,12 @@ public interface SpringDataRequestRepository extends RequestRepository, Reposito
 	@Override
 	@Query("SELECT 1.0*count(r)/(select count(rq) FROM Request rq) from Request r where r.status='REJECTED'")
 	Double ratioOfRejectedRequests() throws DataAccessException;
+
+	@Override
+	@Query("SELECT 1.0*count(r)/(select count(rq) FROM Request rq) from Request r where r.status='CANCELED'")
+	Double ratioOfCanceledRequests() throws DataAccessException;
+
+	@Override
+	@Query("SELECT 1.0*count(r)/(select count(rq) FROM Request rq) from Request r where r.status='FINISHED'")
+	Double ratioOfFinishedRequests() throws DataAccessException;
 }

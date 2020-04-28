@@ -28,10 +28,12 @@
 				    </flatbook:menuItem>
                 </sec:authorize>
 
+				<sec:authorize access="hasAnyAuthority('TENANT', 'HOST')">
 				<flatbook:menuItem active="${name eq 'messages'}" url="/messages/list" title="messages">
 					<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
 					<span>Messages</span>
 				</flatbook:menuItem>
+				</sec:authorize>
 
 				<sec:authorize access="hasAnyAuthority('ADMIN')">
 					<flatbook:menuItem active="${name eq 'statistics'}" url="/statistics" title="view the statistics">
@@ -39,12 +41,13 @@
 						<span>Statistics</span>
 					</flatbook:menuItem>
 				</sec:authorize>
-
-				<flatbook:menuItem active="${name eq 'error'}" url="/oups" title="trigger a RuntimeException to see how it is handled">
-					<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-					<span>Error</span>
-				</flatbook:menuItem>
-
+				
+				<sec:authorize access="hasAnyAuthority('ADMIN')">
+					<flatbook:menuItem active="${name eq 'reports'}" url="/reports/list" title="view the reports">
+						<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+						<span>Reports</span>
+					</flatbook:menuItem>
+				</sec:authorize>
 			</ul>
 
 

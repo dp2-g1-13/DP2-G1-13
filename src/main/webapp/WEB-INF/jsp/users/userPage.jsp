@@ -16,17 +16,18 @@
 		    </h2>
 		    
 	        <c:if test="${username != myname}">
-	            <spring:url value="/messages/{username}" var="sendMessage">
-					<spring:param name="username" value="${username}" />
-				</spring:url>
-				<a role="button" class="btn btn-default"
-					href="${fn:escapeXml(sendMessage)}" aria-pressed="true">Send Message</a>
-					
-				<spring:url value="/reports/{username}/new" var="reportUrl">
-					<spring:param name="username" value="${username}" />
-				</spring:url>
-				<a role="button" class="btn btn-default"
-					href="${fn:escapeXml(reportUrl)}" aria-pressed="true">Report User</a>
+	        <sec:authorize access="hasAnyAuthority('TENANT', 'HOST')">
+		            <spring:url value="/messages/{username}" var="sendMessage">
+						<spring:param name="username" value="${username}" />
+					</spring:url>
+					<a role="button" class="btn btn-default"
+						href="${fn:escapeXml(sendMessage)}" aria-pressed="true">Send Message</a>
+					<spring:url value="/reports/{username}/new" var="reportUrl">
+						<spring:param name="username" value="${username}" />
+					</spring:url>
+					<a role="button" class="btn btn-default"
+						href="${fn:escapeXml(reportUrl)}" aria-pressed="true">Report User</a>
+				</sec:authorize>
 		   	</c:if>
 
 
@@ -44,6 +45,19 @@
                         <a role="button" class="btn btn-default" href="${pageContext.request.contextPath}/requests/list" aria-pressed="true">See your requests</a>
                     </c:when>
                 </c:choose>
+            </sec:authorize>
+            
+           <sec:authorize access="hasAuthority('ADMIN')">
+				<spring:url value="/reports/{username}/list" var="reportList">
+					<spring:param name="username" value="${username}" />
+				</spring:url>
+				<a role="button" href="${fn:escapeXml(reportList)}"
+					class="btn btn-default" aria-pressed="true">Report List</a>
+				<spring:url value="/users/{username}/delete" var="deleteUser">
+					<spring:param name="username" value="${username}" />
+				</spring:url>
+				<a role="button" href="${fn:escapeXml(deleteUser)}"
+					class="btn btn-default" aria-pressed="true">Delete User</a>
             </sec:authorize>
         </div>
         <br>
