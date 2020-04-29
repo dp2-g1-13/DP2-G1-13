@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Tenant;
+import org.springframework.samples.flatbook.model.User;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
 import org.springframework.samples.flatbook.model.mappers.PersonForm;
@@ -19,6 +20,7 @@ import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.TenantService;
+import org.springframework.samples.flatbook.service.UserService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
@@ -48,23 +50,34 @@ public class PersonController {
 
 	private static final String	USERS_CREATE_OR_UPDATE_USER_FORM	= "users/createOrUpdateUserForm";
 
-	@Autowired
-	PersonService				personService;
-
-	@Autowired
-	AuthoritiesService			authoritiesService;
-
-	@Autowired
-	TenantService				tenantService;
-
-	@Autowired
-	AdvertisementService		advertisementService;
-
 	public static final String	USERNAME_DUPLICATED					= "username in use";
+
 	public static final String	DNI_DUPLICATED						= "dni in use";
+
 	public static final String	EMAIL_DUPLICATED					= "email in use";
+
 	public static final String	WRONG_PASSWORD						= "wrong password";
 
+	PersonService				personService;
+
+	AuthoritiesService			authoritiesService;
+
+	TenantService				tenantService;
+
+	AdvertisementService		advertisementService;
+
+	UserService					userService;
+
+
+	@Autowired
+	public PersonController(final PersonService personService, final AuthoritiesService authoritiesService, final TenantService tenantService, final AdvertisementService advertisementService, final UserService userService) {
+		super();
+		this.personService = personService;
+		this.authoritiesService = authoritiesService;
+		this.tenantService = tenantService;
+		this.advertisementService = advertisementService;
+		this.userService = userService;
+	}
 
 	@ModelAttribute("types")
 	public List<AuthoritiesType> getTypes(final ModelMap model) {
@@ -182,8 +195,10 @@ public class PersonController {
 
 	@GetMapping("/users/{username}")
 	public String initUserPage(final ModelMap model, @PathVariable("username") final String username, final Principal principal) {
-		if (this.personService.findUserById(username) != null) {
+		User user = this.personService.findUserById(username);
+		if (user != null) {
 			model.put("username", username);
+			model.put("enabled", user.isEnabled());
 
 			if (this.authoritiesService.findAuthorityById(username).equals(AuthoritiesType.TENANT)) {
 				Tenant tenant = this.tenantService.findTenantById(username);
@@ -195,6 +210,20 @@ public class PersonController {
 				model.put("selections", this.advertisementService.findAdvertisementsByHost(username));
 			}
 			return PersonController.USER_PAGE;
+		} else {
+			throw new RuntimeException("This user does not exists");
+		}
+	}
+
+	@GetMapping({
+		"/users/{username}/ban", "/users/{username}/unban"
+	})
+	public String banOrUnbanUser(final ModelMap model, @PathVariable("username") final String username, final Principal principal) {
+		User user = this.personService.findUserById(username);
+		if (user != null) {
+			user.setEnabled(user.isEnabled() ? false : true);
+			this.userService.save(user);
+			return "redirect:/users/{username}";
 		} else {
 			throw new RuntimeException("This user does not exists");
 		}

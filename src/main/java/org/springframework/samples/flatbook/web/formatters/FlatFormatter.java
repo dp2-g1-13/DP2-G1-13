@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.web;
+package org.springframework.samples.flatbook.web.formatters;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.Formatter;

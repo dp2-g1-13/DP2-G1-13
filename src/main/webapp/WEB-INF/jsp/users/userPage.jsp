@@ -12,21 +12,25 @@
 
         <div class="row">
 		     <h2>
-		        ${username}
+		        ${username}<c:if test="${!enabled}"> (BANNED)</c:if>
 		    </h2>
+		    
+		     <sec:authorize access="hasAnyAuthority('ADMIN', 'TENANT', 'HOST')">
 		    
 	        <c:if test="${username != myname}">
 	        <sec:authorize access="hasAnyAuthority('TENANT', 'HOST')">
-		            <spring:url value="/messages/{username}" var="sendMessage">
-						<spring:param name="username" value="${username}" />
-					</spring:url>
-					<a role="button" class="btn btn-default"
-						href="${fn:escapeXml(sendMessage)}" aria-pressed="true">Send Message</a>
-					<spring:url value="/reports/{username}/new" var="reportUrl">
-						<spring:param name="username" value="${username}" />
-					</spring:url>
-					<a role="button" class="btn btn-default"
-						href="${fn:escapeXml(reportUrl)}" aria-pressed="true">Report User</a>
+	      			<c:if test="${enabled}">
+			            <spring:url value="/messages/{username}" var="sendMessage">
+							<spring:param name="username" value="${username}" />
+						</spring:url>
+						<a role="button" class="btn btn-default"
+							href="${fn:escapeXml(sendMessage)}" aria-pressed="true">Send Message</a>
+						<spring:url value="/reports/{username}/new" var="reportUrl">
+							<spring:param name="username" value="${username}" />
+						</spring:url>
+						<a role="button" class="btn btn-default"
+							href="${fn:escapeXml(reportUrl)}" aria-pressed="true">Report User</a>
+					</c:if>
 				</sec:authorize>
 		   	</c:if>
 
@@ -39,10 +43,10 @@
                         </spring:url>
                         <a role="button" class="btn btn-default"
                             href="${fn:escapeXml(myFlat)}" aria-pressed="true">My flat</a>
-                        <a role="button" class="btn btn-default" href="${pageContext.request.contextPath}/tasks/list" aria-pressed="true">Your tasks</a>
+                        <a role="button" class="btn btn-default" href="${pageContext.request.contextPath}/tasks/list" aria-pressed="true">My tasks</a>
                     </c:when>
                     <c:when test="${username == myname && myFlatId == null}">
-                        <a role="button" class="btn btn-default" href="${pageContext.request.contextPath}/requests/list" aria-pressed="true">See your requests</a>
+                        <a role="button" class="btn btn-default" href="${pageContext.request.contextPath}/requests/list" aria-pressed="true">My requests</a>
                     </c:when>
                 </c:choose>
             </sec:authorize>
@@ -53,13 +57,27 @@
 				</spring:url>
 				<a role="button" href="${fn:escapeXml(reportList)}"
 					class="btn btn-default" aria-pressed="true">Report List</a>
-				<spring:url value="/users/{username}/delete" var="deleteUser">
-					<spring:param name="username" value="${username}" />
-				</spring:url>
-				<a role="button" href="${fn:escapeXml(deleteUser)}"
-					class="btn btn-default" aria-pressed="true">Delete User</a>
+				<c:choose>
+					<c:when test="${enabled}">
+						<spring:url value="/users/{username}/ban" var="desactivateUser">
+							<spring:param name="username" value="${username}" />
+						</spring:url>
+						<a role="button" href="${fn:escapeXml(desactivateUser)}"
+							class="btn btn-default" aria-pressed="true">Ban User</a>
+					</c:when>
+					<c:otherwise>
+						<spring:url value="/users/{username}/unban" var="reactivateUser">
+							<spring:param name="username" value="${username}" />
+						</spring:url>
+						<a role="button" href="${fn:escapeXml(reactivateUser)}"
+							class="btn btn-default" aria-pressed="true">Unban User</a>
+					</c:otherwise>
+				</c:choose>
             </sec:authorize>
+            
+           	</sec:authorize>
         </div>
+        
         <br>
         
         <c:if test="${reviews != null}">
@@ -77,5 +95,5 @@
 	        </div>
 	    </div>
         </c:if>
-
+        
 </flatbook:layout>

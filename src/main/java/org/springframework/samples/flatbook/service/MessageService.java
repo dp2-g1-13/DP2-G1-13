@@ -12,30 +12,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.repository.MessageRepository;
-import org.springframework.samples.flatbook.repository.PersonRepository;
-import org.springframework.samples.flatbook.service.exceptions.UserNotExistException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MessageService {
 
-	private MessageRepository	messageRepository;
-
-	private PersonRepository	personRepository;
+	private MessageRepository messageRepository;
 
 
 	@Autowired
-	public MessageService(final MessageRepository messageRepository, final PersonRepository personRepository) {
+	public MessageService(final MessageRepository messageRepository) {
 		this.messageRepository = messageRepository;
-		this.personRepository = personRepository;
 	}
 
 	@Transactional
-	public void saveMessage(final Message message) throws DataAccessException, UserNotExistException {
-		if (this.personRepository.findByUsername(message.getReceiver().getUsername()) == null) {
-			throw new UserNotExistException();
-		}
+	public void saveMessage(final Message message) throws DataAccessException {
 		this.messageRepository.save(message);
 	}
 

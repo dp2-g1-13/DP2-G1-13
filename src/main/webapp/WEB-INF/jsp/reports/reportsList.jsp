@@ -7,7 +7,7 @@
 <flatbook:layout pageName="reports">
 
 		<h2>Reports 
-		<c:if test="${username != null}"><c:out value="of ${username}" /></c:if>
+		<c:if test="${username != null}">received by ${username}</c:if>
 		</h2>
 			<div class="panel panel-default">
        			 <div class="panel-body">
