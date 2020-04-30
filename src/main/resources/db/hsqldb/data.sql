@@ -12,9 +12,9 @@ INSERT INTO authorities (username, authority) VALUES('host1', 'HOST');
 INSERT INTO authorities (username, authority) VALUES('host2', 'HOST');
 INSERT INTO authorities (username, authority) VALUES('tenant2', 'TENANT');
 
-INSERT INTO addresses (id, address, city, country, postal_code) VALUES(1, 'Calle Enramadilla', 'Sevilla', 'Spain', '41018');
-INSERT INTO addresses (id, address, city, country, postal_code) VALUES(2, 'Paseo de la Castellana', 'Madrid', 'Spain', '28046');
-INSERT INTO addresses (id, address, city, country, postal_code) VALUES(3, 'Calle Amparo', 'Sevilla', 'Spain', '41003');
+INSERT INTO addresses (id, address, city, country, postal_code, latitude, longitude) VALUES(1, 'Calle Enramadilla', 'Sevilla', 'Spain', '41018', 37.3779461, -5.9829272);
+INSERT INTO addresses (id, address, city, country, postal_code, latitude, longitude) VALUES(2, 'Paseo de la Castellana', 'Madrid', 'Spain', '28046', 40.4533356, -3.6895169);
+INSERT INTO addresses (id, address, city, country, postal_code, latitude, longitude) VALUES(3, 'Calle Amparo', 'Sevilla', 'Spain', '41003', 37.3950787, -5.9922252);
 
 INSERT INTO flats (id, available_services, description, number_baths, number_rooms, square_meters, address_id, host_id) VALUES(1, 'TV, WiFi, central heating system', 'From the outside this house looks very elegant. It has been built with grey stones and has cypress wooden decorations. Small, rounded windows allow enough light to enter the home and have been added to the house in a mostly symmetric way.
 

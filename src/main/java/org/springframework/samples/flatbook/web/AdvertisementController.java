@@ -1,6 +1,7 @@
 
 package org.springframework.samples.flatbook.web;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -26,6 +28,8 @@ import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.RequestService;
+import org.springframework.samples.flatbook.web.apis.pojos.GeocodeResponse;
+import org.springframework.samples.flatbook.web.apis.pojos.Location;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,6 +41,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import static org.springframework.samples.flatbook.web.apis.GeocodeAPI.getGeocodeData;
 
 @Controller
 public class AdvertisementController {
@@ -143,6 +149,7 @@ public class AdvertisementController {
 		ModelAndView mav = new ModelAndView("advertisements/advertisementDetails");
 		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
 		mav.addObject(advertisement);
+		mav.addObject("flat", advertisement.getFlat());
 
 		Collection<DBImage> images = this.dbImageService.getImagesByFlatId(advertisement.getFlat().getId());
 		mav.addObject("images", images);
@@ -168,32 +175,34 @@ public class AdvertisementController {
 	}
 
 	@GetMapping(value = "/advertisements")
-	public String processFindForm(final Address address, final BindingResult result, final Map<String, Object> model) {
+	public String processFindForm(final Address address, final BindingResult result, final Map<String, Object> model) throws UnsupportedEncodingException {
 		if (address.getCity() == null || address.getCity().equals("")) {
 			result.rejectValue("city", "cityNotNull", "The field 'city' can't be null.");
 			return "welcome";
 		}
 
-		String[] sp = address.getCity().split(",");
-		String city = sp[0].trim();
-		String country = sp.length > 1 ? sp[1].trim() : null;
+        GeocodeResponse geocode = getGeocodeData(address.getCity() + (address.getPostalCode() != null? address.getPostalCode() : ""));
+        if(geocode.getStatus().equals("ZERO_RESULTS")) {
+            result.rejectValue("city", "", "The address does not exist. Try again.");
+            return "welcome";
+        } else if(!geocode.getStatus().equals("OK")) {
+            result.reject("An external error has occurred. Please try again later.");
+            return "welcome";
+        }
 
-		Set<Advertisement> results;
-		if (country == null && (address.getPostalCode() == null || address.getPostalCode().isEmpty())) {
-			results = this.advertisementService.findAdvertisementsByCity(city);
-		} else if (country == null && address.getPostalCode() != null && !address.getPostalCode().isEmpty()) {
-			results = this.advertisementService.findAdvertisementsByCityAndPostalCode(city, address.getPostalCode());
-		} else if (country != null && (address.getPostalCode() == null || address.getPostalCode().isEmpty())) {
-			results = this.advertisementService.findAdvertisementsByCityAndCountry(city, country);
-		} else {
-			results = this.advertisementService.findAdvertisementsByCityAndCountryAndPostalCode(city, country, address.getPostalCode());
-		}
+        Location location = geocode.getResults().get(0).getGeometry().getLocation();
+
+		Set<Advertisement> results = this.advertisementService.findAllAdvertisements().stream()
+            .filter(x -> haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
+            .collect(Collectors.toSet());
 
 		if (results.isEmpty()) {
 			result.rejectValue("postalCode", "advNotFound", "Not found.");
 			return "welcome";
 		} else {
 			model.put("selections", results);
+			model.put("latitude", location.getLat());
+			model.put("longitude", location.getLng());
 			return "advertisements/advertisementsList";
 		}
 	}
@@ -208,5 +217,18 @@ public class AdvertisementController {
 		}
 		return userIsHost;
 	}
+
+	private Double haversineFormula(Double latitudeAd, Double longitudeAd, Double latitudeQuery, Double longitudeQuery) {
+        double earthRadius = 6371e3;
+        double lat1 = Math.toRadians(latitudeAd);
+        double lat2 = Math.toRadians(latitudeQuery);
+        double dlat = lat2-lat1;
+        double dlon = Math.toRadians(longitudeQuery-longitudeAd);
+
+        double haversine = Math.pow(Math.sin(dlat/2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon/2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1-haversine));
+
+        return earthRadius * c;
+    }
 
 }
