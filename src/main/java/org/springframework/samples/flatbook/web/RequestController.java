@@ -13,7 +13,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Flat;
-import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Request;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
@@ -113,6 +112,8 @@ public class RequestController {
 			tenant.setFlat(flat);
 			this.requestService.saveRequest(request);
 			this.tenantService.saveTenant(tenant);
+		} else {
+			throw new RuntimeException("Illegal access");
 		}
 		return "redirect:/flats/{flatId}/requests/list";
 	}
@@ -123,34 +124,34 @@ public class RequestController {
 			Request request = this.requestService.findRequestById(requestId);
 			request.setStatus(RequestStatus.REJECTED);
 			this.requestService.saveRequest(request);
+		} else {
+			throw new RuntimeException("Illegal access");
 		}
 		return "redirect:/flats/{flatId}/requests/list";
 	}
+
 	@GetMapping("/flats/{flatId}/requests/{requestId}/cancel")
 	public String processCancelRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
-		if (this.validateHostAcceptingOrRejectingRequest(flatId)) {
-			Request request = this.requestService.findRequestById(requestId);
-			if (!request.getStatus().equals(RequestStatus.ACCEPTED) || !request.getStartDate().isAfter(LocalDate.now())) {
-				throw new RuntimeException("Illegal access");
-			}
-			request.setFinishDate(LocalDate.now().plusDays(1));
-			request.setStatus(RequestStatus.CANCELED);
-			this.processCancelOrConclude(request, requestId);
+		Request request = this.requestService.findRequestById(requestId);
+		if (!this.validateHostAcceptingOrRejectingRequest(flatId) || !request.getStatus().equals(RequestStatus.ACCEPTED) || !request.getStartDate().isAfter(LocalDate.now())) {
+			throw new RuntimeException("Illegal access");
 		}
+		request.setFinishDate(LocalDate.now().plusDays(1));
+		request.setStatus(RequestStatus.CANCELED);
+		this.processCancelOrConclude(request, requestId);
+
 		return "redirect:/flats/{flatId}/requests/list";
 	}
 
 	@GetMapping("/flats/{flatId}/requests/{requestId}/conclude")
 	public String processConcludeRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
-		if (this.validateHostAcceptingOrRejectingRequest(flatId)) {
-			Request request = this.requestService.findRequestById(requestId);
-			if (!request.getStatus().equals(RequestStatus.ACCEPTED) || request.getStartDate().isAfter(LocalDate.now())) {
-				throw new RuntimeException("Illegal access");
-			}
-			request.setFinishDate(LocalDate.now().plusDays(1));
-			request.setStatus(RequestStatus.FINISHED);
-			this.processCancelOrConclude(request, requestId);
+		Request request = this.requestService.findRequestById(requestId);
+		if (!this.validateHostAcceptingOrRejectingRequest(flatId) || !request.getStatus().equals(RequestStatus.ACCEPTED) || request.getStartDate().isAfter(LocalDate.now())) {
+			throw new RuntimeException("Illegal access");
 		}
+		request.setFinishDate(LocalDate.now().plusDays(1));
+		request.setStatus(RequestStatus.FINISHED);
+		this.processCancelOrConclude(request, requestId);
 		return "redirect:/flats/{flatId}/requests/list";
 	}
 
@@ -168,24 +169,13 @@ public class RequestController {
 		return mav;
 	}
 
-	public void validateTenant(final Authentication auth, final Tenant tenant, final Flat flat, final int flatId) {
-		if (tenant.getFlat() != null || this.requestService.isThereRequestOfTenantByFlatId(((User) auth.getPrincipal()).getUsername(), flatId) || flat == null) {
-			throw new RuntimeException("Illegal access");
-		}
-	}
-
 	@GetMapping("/flats/{flatId}/requests/list")
 	public ModelAndView showRequestsOfFlat(@PathVariable("flatId") final int flatId) {
-		ModelAndView mav = new ModelAndView("requests/requestsList");
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Flat flat = this.flatService.findFlatById(flatId);
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
-			String username = ((User) auth.getPrincipal()).getUsername();
-			Host creator = this.hostService.findHostByFlatId(flat.getId());
-			if (!username.equals(creator.getUsername())) {
-				throw new RuntimeException("Illegal access");
-			}
+		if (!this.validateHostAcceptingOrRejectingRequest(flatId)) {
+			throw new RuntimeException("Illegal access");
 		}
+		ModelAndView mav = new ModelAndView("requests/requestsList");
+		Flat flat = this.flatService.findFlatById(flatId);
 		List<Request> requests = new ArrayList<>(flat.getRequests());
 		requests.sort(Comparator.comparing(Request::getCreationDate).reversed());
 		List<Tenant> tenants = requests.stream().map(x -> this.tenantService.findTenantByRequestId(x.getId())).collect(Collectors.toList());
@@ -195,16 +185,16 @@ public class RequestController {
 		return mav;
 	}
 
-	public boolean validateHostAcceptingOrRejectingRequest(final int flatId) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
-			String username = ((User) auth.getPrincipal()).getUsername();
-			Host host = this.hostService.findHostByFlatId(flatId);
-			if (!username.equals(host.getUsername())) {
-				throw new RuntimeException("Illegal access");
-			}
+	private void validateTenant(final Authentication auth, final Tenant tenant, final Flat flat, final int flatId) {
+		if (tenant.getFlat() != null || this.requestService.isThereRequestOfTenantByFlatId(((User) auth.getPrincipal()).getUsername(), flatId) || flat == null) {
+			throw new RuntimeException("Illegal access");
 		}
-		return true;
+	}
+
+	private boolean validateHostAcceptingOrRejectingRequest(final int flatId) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String username = ((User) auth.getPrincipal()).getUsername();
+		return username.equals(this.hostService.findHostByFlatId(flatId).getUsername());
 	}
 
 	private void processCancelOrConclude(final Request request, final int requestId) {
