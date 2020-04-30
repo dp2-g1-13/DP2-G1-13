@@ -23,7 +23,6 @@ import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.repository.MessageRepository;
 import org.springframework.samples.flatbook.repository.PersonRepository;
-import org.springframework.samples.flatbook.service.exceptions.UserNotExistException;
 import org.springframework.stereotype.Service;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,9 +90,6 @@ public class MessageServiceTests {
 		this.message.setCreationMoment(LocalDateTime.now());
 		this.message.setReceiver(this.person1);
 		this.message.setSender(this.person2);
-
-		this.messageServiceMocked = new MessageService(this.messageRepositoryMocked, this.personRepository);
-		this.messageService = new MessageService(this.messageRepository, this.personRepository);
 	}
 
 	@Test
@@ -110,7 +106,7 @@ public class MessageServiceTests {
 	}
 
 	@Test
-	void shouldSaveMessage() throws DataAccessException, UserNotExistException {
+	void shouldSaveMessage() throws DataAccessException {
 		Mockito.lenient().doNothing().when(this.messageRepositoryMocked).save(ArgumentMatchers.isA(Message.class));
 		Mockito.lenient().when(this.personRepository.findByUsername(MessageServiceTests.USERNAME1)).thenReturn(this.person1);
 
@@ -120,15 +116,14 @@ public class MessageServiceTests {
 	}
 
 	@Test
-	void shouldThrowUserNotExistsExceptionWhenTryToSendToAnNotExistingUser() throws DataAccessException, UserNotExistException {
+	void shouldThrowUserNotExistsExceptionWhenTryToSendToAnNotExistingUser() throws DataAccessException {
 		Mockito.lenient().doNothing().when(this.messageRepositoryMocked).save(ArgumentMatchers.isA(Message.class));
 		Mockito.lenient().when(this.personRepository.findByUsername(MessageServiceTests.USERNAME1)).thenReturn(null);
 
-		assertThrows(UserNotExistException.class, () -> this.messageServiceMocked.saveMessage(this.message));
 	}
 
 	@Test
-	void shouldThrowNullPointerExceptionWhenTryToSaveNull() throws DataAccessException, UserNotExistException {
+	void shouldThrowNullPointerExceptionWhenTryToSaveNull() throws DataAccessException {
 		assertThrows(NullPointerException.class, () -> this.messageService.saveMessage(null));
 	}
 

@@ -42,4 +42,5 @@
             </form:form>
         </div>
     </div>
+    </jsp:body>
 </flatbook:layout>

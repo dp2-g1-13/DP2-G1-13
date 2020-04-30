@@ -98,7 +98,7 @@
 </div>
 <br>
 
-<%@include file="/WEB-INF/jsp/reviews/listReviews.jsp"%>
+<%@include file="/WEB-INF/jsp/reviews/reviewsList.jsp"%>
 
 <div class="row">
             <div class="panel panel-default">

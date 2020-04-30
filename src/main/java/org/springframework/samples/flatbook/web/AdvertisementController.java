@@ -192,9 +192,10 @@ public class AdvertisementController {
 
         Location location = geocode.getResults().get(0).getGeometry().getLocation();
 
-		Set<Advertisement> results = this.advertisementService.findAllAdvertisements().stream()
+		List<Advertisement> results = this.advertisementService.findAllAdvertisements().stream()
             .filter(x -> haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
-            .collect(Collectors.toSet());
+            .sorted(Comparator.comparing(x -> haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng())))
+            .collect(Collectors.toList());
 
 		if (results.isEmpty()) {
 			result.rejectValue("postalCode", "advNotFound", "Not found.");
