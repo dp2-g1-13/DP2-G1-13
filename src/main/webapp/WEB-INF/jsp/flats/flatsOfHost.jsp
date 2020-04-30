@@ -9,8 +9,9 @@
     <div class="row">
         <h2>These are your flats:</h2>
     </div>
-
+	
     <c:if test="${flats.size()>0}">
+    <div class="panel-body overflow">
     <c:forEach var="i" begin="0" end="${flats.size()-1}">
         <div class="row">
             <div class="panel panel-default">
@@ -48,8 +49,9 @@
             </div>
         </div>
     </c:forEach>
+    </div>
     </c:if>
-
+	<br>
     <div class="row">
         <spring:url value="/flats/new" var="newFlatUrl" />
         <a role="button" href="${fn:escapeXml(newFlatUrl)}" class="btn btn-default" aria-pressed="true">New flat</a>

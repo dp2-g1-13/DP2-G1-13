@@ -12,6 +12,7 @@
     <h2>These are the results:</h2>
 
     <c:if test="${requests.size() > 0}">
+    <div class="panel-body overflow">
     <c:forEach var="i" begin="0" end="${requests.size()-1}">
         <div class="panel panel-default">
             <div class="panel-body">
@@ -114,6 +115,7 @@
             </div>
         </div>
     </c:forEach>
+    </div>
     </c:if>
 
 </flatbook:layout>
