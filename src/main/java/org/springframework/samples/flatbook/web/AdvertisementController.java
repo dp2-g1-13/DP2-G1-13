@@ -149,6 +149,7 @@ public class AdvertisementController {
 		ModelAndView mav = new ModelAndView("advertisements/advertisementDetails");
 		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
 		mav.addObject(advertisement);
+		mav.addObject("flat", advertisement.getFlat());
 
 		Collection<DBImage> images = this.dbImageService.getImagesByFlatId(advertisement.getFlat().getId());
 		mav.addObject("images", images);
@@ -200,6 +201,8 @@ public class AdvertisementController {
 			return "welcome";
 		} else {
 			model.put("selections", results);
+			model.put("latitude", location.getLat());
+			model.put("longitude", location.getLng());
 			return "advertisements/advertisementsList";
 		}
 	}
