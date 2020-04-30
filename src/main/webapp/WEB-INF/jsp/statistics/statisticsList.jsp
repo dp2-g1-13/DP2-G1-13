@@ -27,6 +27,14 @@
 		                <th>Ratio Of Rejected Requests</th>
 		                <td><c:out value="${statistics.ratioOfRejectedRequests}" /></td>
 		            </tr>
+		           <tr>
+		                <th>Ratio Of Canceled Requests</th>
+		                <td><c:out value="${statistics.ratioOfCanceledRequests}" /></td>
+		            </tr>
+		            <tr>
+		                <th>Ratio Of Finished Requests</th>
+		                <td><c:out value="${statistics.ratioOfFinishedRequests}" /></td>
+		            </tr>
 		            </table>
 		       </div>
 	      </div>

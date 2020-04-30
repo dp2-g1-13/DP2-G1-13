@@ -18,6 +18,10 @@ public class Statistics extends BaseEntity {
 
 	private Double			ratioOfFlatsWithAdvertisement;
 
+	private Double			ratioOfFinishedRequests;
+
+	private Double			ratioOfCanceledRequests;
+
 	private Integer			numberOfFlats;
 
 	private Integer			numberOfAdvertisements;

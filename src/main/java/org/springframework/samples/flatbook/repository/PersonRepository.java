@@ -16,7 +16,7 @@ public interface PersonRepository {
 
 	Person findByDni(String dni) throws DataAccessException;
 
-	void save(Person flat) throws DataAccessException;
+	void save(Person person) throws DataAccessException;
 
 	Person findByEmail(String email) throws DataAccessException;
 

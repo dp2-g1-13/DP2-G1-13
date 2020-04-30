@@ -57,10 +57,11 @@ public class Tenant extends Person {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<TenantReview>	reviews;
 
-	public void addRequest(Request request) {
-        if(this.requests == null) {
-            this.requests = new HashSet<>();
-        }
-        requests.add(request);
-    }
+
+	public void addRequest(final Request request) {
+		if (this.requests == null) {
+			this.requests = new HashSet<>();
+		}
+		this.requests.add(request);
+	}
 }

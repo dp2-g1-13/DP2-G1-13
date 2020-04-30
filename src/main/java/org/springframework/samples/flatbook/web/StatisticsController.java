@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class StatisticsController {
 
-	private StatisticsService statisticsService;
+	private static final String	STATISTICS_LIST	= "statistics/statisticsList";
+
+	private StatisticsService	statisticsService;
 
 
 	@Autowired
@@ -24,6 +26,6 @@ public class StatisticsController {
 	@GetMapping("/statistics")
 	public String welcome(final ModelMap model, final Principal principal) {
 		model.put("statistics", this.statisticsService.findStatistics());
-		return "statistics/statisticsList";
+		return StatisticsController.STATISTICS_LIST;
 	}
 }

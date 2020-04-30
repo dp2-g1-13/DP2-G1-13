@@ -20,6 +20,10 @@ public interface RequestRepository {
 
 	Double ratioOfRejectedRequests() throws DataAccessException;
 
+	Double ratioOfCanceledRequests() throws DataAccessException;
+
+	Double ratioOfFinishedRequests() throws DataAccessException;
+
 	Integer numberOfRequests() throws DataAccessException;
 
 }

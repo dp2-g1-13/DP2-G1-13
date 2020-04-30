@@ -12,6 +12,6 @@ import org.springframework.samples.flatbook.repository.MessageRepository;
 public interface SpringDataMessageRepository extends MessageRepository, Repository<Message, Integer> {
 
 	@Override
-	@Query("SELECT message FROM Message message WHERE message.sender.username = :username or message.receiver.username = :username")
+	@Query("SELECT message FROM Message message WHERE (message.receiver.enabled = true and message.sender.username = :username) or (message.sender.enabled = true and message.receiver.username = :username)")
 	Collection<Message> findByParticipant(@Param("username") String username);
 }
