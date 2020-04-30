@@ -21,7 +21,6 @@
     <jsp:body>
     <div class="container">
 
-        <sec:authorize access="isAuthenticated()">
             <sec:authentication var="user" property="principal.username" />
             <c:if test="${user == host}">
                 <div class="row">
@@ -42,7 +41,6 @@
                 </div>
                 <br>
             </c:if>
-        </sec:authorize>
 
         <%@include file="/WEB-INF/jsp/flats/flatPanel.jsp" %>
 
