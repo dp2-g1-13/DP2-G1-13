@@ -65,7 +65,7 @@ public class PersonServiceTests {
 
 		this.authorities = new Authorities(USERNAME, AuthoritiesType.TENANT);
 
-		this.personService = new PersonService(this.personRepository, this.authoritiesRepository);
+//		this.personService = new PersonService(this.personRepository, this.authoritiesRepository);
 	}
 
 	@Test

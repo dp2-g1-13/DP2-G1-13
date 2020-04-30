@@ -11,7 +11,7 @@ PetClinic :: a Spring Framework demonstration
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <%-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags --%>
 
-    <spring:url value="/resources/images/favicon.png" var="favicon"/>
+    <spring:url value="/resources/images/pivotal-logo.png" var="favicon"/>
     <link rel="shortcut icon" type="image/x-icon" href="${favicon}">
 
     <title>FlatBook :: Find a flat to share!</title>
@@ -31,4 +31,7 @@ PetClinic :: a Spring Framework demonstration
     <link href="${jQueryUiCss}" rel="stylesheet"/>
     <spring:url value="/webjars/jquery-ui/1.11.4/jquery-ui.theme.min.css" var="jQueryUiThemeCss"/>
     <link href="${jQueryUiThemeCss}" rel="stylesheet"/>
+
+    <spring:url value="/resources/js/functions.js" var="js"/>
+    <script type="text/javascript" src="${js}"></script>
 </head>

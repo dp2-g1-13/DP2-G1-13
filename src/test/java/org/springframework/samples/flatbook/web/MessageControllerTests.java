@@ -22,7 +22,6 @@ import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.service.MessageService;
 import org.springframework.samples.flatbook.service.PersonService;
-import org.springframework.samples.flatbook.service.exceptions.UserNotExistException;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -217,7 +216,6 @@ class MessageControllerTests {
 		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(map);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME1)).willReturn(this.person1);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME2)).willReturn(this.person2);
-		BDDMockito.lenient().doThrow(UserNotExistException.class).when(this.messageService).saveMessage(Mockito.any(Message.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/{username}/new", USERNAME2)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -235,7 +233,6 @@ class MessageControllerTests {
 		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(map);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME1)).willReturn(this.person1);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME2)).willReturn(this.person2);
-		BDDMockito.lenient().doThrow(UserNotExistException.class).when(this.messageService).saveMessage(this.message1);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/{username}/new", USERNAME2)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())

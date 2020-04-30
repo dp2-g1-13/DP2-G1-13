@@ -1,6 +1,7 @@
 
 package org.springframework.samples.flatbook.web;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +37,8 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import static org.springframework.samples.flatbook.web.apis.MailjetAPI.sendSimpleMessage;
 
 @Controller
 public class PersonController {
@@ -103,13 +106,14 @@ public class PersonController {
 	}
 
 	@PostMapping("/users/new")
-	public String registerUser(final ModelMap model, @Valid final PersonForm user, final BindingResult result) throws DataAccessException {
+	public String registerUser(final ModelMap model, @Valid final PersonForm user, final BindingResult result) throws DataAccessException, IOException {
 		if (result.hasErrors()) {
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else {
 			try {
 				user.setSaveType(SaveType.NEW);
 				this.personService.saveUser(user);
+				sendSimpleMessage(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword());
 				return "redirect:/login";
 			} catch (DuplicatedUsernameException e) {
 				result.rejectValue("username", PersonController.USERNAME_DUPLICATED, PersonController.USERNAME_DUPLICATED);

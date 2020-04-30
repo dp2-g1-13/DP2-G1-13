@@ -56,11 +56,11 @@
 						</spring:url>
 						<a role="button" href="${fn:escapeXml(taskEditUrl)}"
 							class="btn btn-default" aria-pressed="true">Edit</a>
-						<spring:url value="/tasks/{taskId}/remove" var="taskRemoveUrl">
+						<spring:url value="/tasks/{taskId}/delete" var="taskRemoveUrl">
 							<spring:param name="taskId" value="${tasks.get(i).id}" />
 						</spring:url>
 						<a role="button" href="${fn:escapeXml(taskRemoveUrl)}"
-							class="btn btn-default" aria-pressed="true">Remove</a>
+							class="btn btn-default" aria-pressed="true">Delete</a>
 					</div>
 				</div>
 			</div>

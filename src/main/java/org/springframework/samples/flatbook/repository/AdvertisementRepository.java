@@ -8,6 +8,8 @@ import org.springframework.samples.flatbook.model.Advertisement;
 
 public interface AdvertisementRepository {
 
+    Set<Advertisement> findAll() throws DataAccessException;
+
 	Advertisement findById(int id) throws DataAccessException;
 
 	Boolean isAdvertisementWithFlatId(int flatId) throws DataAccessException;
@@ -15,14 +17,6 @@ public interface AdvertisementRepository {
 	Advertisement findAdvertisementWithFlatId(int flatId) throws DataAccessException;
 
 	Advertisement findAdvertisementWithRequestId(int requestId) throws DataAccessException;
-
-	Set<Advertisement> findByCity(String city) throws DataAccessException;
-
-	Set<Advertisement> findByCityAndPostalCode(String city, String postalCode) throws DataAccessException;
-
-	Set<Advertisement> findByCityAndCountry(String city, String country) throws DataAccessException;
-
-	Set<Advertisement> findByCityAndCountryAndPostalCode(String city, String country, String postalCode) throws DataAccessException;
 
 	void save(Advertisement advertisement);
 

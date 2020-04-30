@@ -128,7 +128,6 @@ public class AdvertisementControllerTests {
         given(this.personService.findUserById(TEST_HOST_USERNAME)).willReturn(host);
         given(this.personService.findUserById(TEST_TENANT_USERNAME)).willReturn(tenant);
         given(this.requestService.isThereRequestOfTenantByAdvertisementId(TEST_TENANT_USERNAME, TEST_ADVERTISEMENT_ID)).willReturn(true);
-        given(this.advertisementService.findAdvertisementsByCityAndCountryAndPostalCode(TEST_CITY_FLAT, TEST_COUNTRY_FLAT, TEST_POSTAL_CODE_FLAT)).willReturn(advertisements);
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
