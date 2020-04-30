@@ -15,6 +15,7 @@
 	<br>
 	<h2>These are your tasks:</h2>
 	<c:if test="${tasks.size() > 0}">
+	<div class="panel-body overflow">
 		<c:forEach var="i" begin="0" end="${tasks.size()-1}">
 			<div class="panel panel-default">
 			<c:if test="${tasks.get(i).status == TaskStatus.TODO}">
@@ -66,6 +67,7 @@
 			</div>
 		</div>
 		</c:forEach>
+		</div>
 	</c:if>
 	<c:if test="${tasks.size() == 0}">
 		<p>There are no tasks to show. Please create a new task to begin.</p>

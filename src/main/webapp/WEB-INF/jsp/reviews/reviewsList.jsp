@@ -8,7 +8,7 @@
 <div class="row">
     <div class="panel panel-default">
         <div class="panel-heading"><h3>Reviews</h3></div>
-        <div class="panel-body">
+        <div class="panel-body overflow">
             <c:if test="${reviews.size() > 0}">
             <div class="panel-group">
                 <c:forEach var="i" begin="0" end="${reviews.size()-1}">
