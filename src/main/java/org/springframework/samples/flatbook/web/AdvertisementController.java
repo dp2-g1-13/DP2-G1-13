@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -22,14 +21,15 @@ import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
+import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
+import org.springframework.samples.flatbook.model.pojos.Location;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.DBImageService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.RequestService;
-import org.springframework.samples.flatbook.web.apis.pojos.GeocodeResponse;
-import org.springframework.samples.flatbook.web.apis.pojos.Location;
+import org.springframework.samples.flatbook.web.apis.GeocodeAPI;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,8 +41,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import static org.springframework.samples.flatbook.web.apis.GeocodeAPI.getGeocodeData;
 
 @Controller
 public class AdvertisementController {
@@ -125,7 +123,6 @@ public class AdvertisementController {
 			Advertisement newAdvertisement = new Advertisement(adv);
 			newAdvertisement.setFlat(advertisement.getFlat());
 			newAdvertisement.setCreationDate(advertisement.getCreationDate());
-			newAdvertisement.setRequests(advertisement.getRequests());
 			newAdvertisement.setId(advertisement.getId());
 			this.advertisementService.saveAdvertisement(newAdvertisement);
 			return "redirect:/advertisements/" + newAdvertisement.getId();
@@ -167,7 +164,7 @@ public class AdvertisementController {
 		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ROLE_ANONYMOUS"))) {
 			Person person = this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
 			if (person instanceof Tenant) {
-				mav.addObject("requestMade", this.requestService.isThereRequestOfTenantByAdvertisementId(person.getUsername(), advertisementId));
+				mav.addObject("requestMade", this.requestService.isThereRequestOfTenantByFlatId(person.getUsername(), advertisement.getFlat().getId()));
 				mav.addObject("hasFlat", ((Tenant) person).getFlat() != null);
 			}
 		}
@@ -181,21 +178,20 @@ public class AdvertisementController {
 			return "welcome";
 		}
 
-        GeocodeResponse geocode = getGeocodeData(address.getCity() + (address.getPostalCode() != null? address.getPostalCode() : ""));
-        if(geocode.getStatus().equals("ZERO_RESULTS")) {
-            result.rejectValue("city", "", "The address does not exist. Try again.");
-            return "welcome";
-        } else if(!geocode.getStatus().equals("OK")) {
-            result.reject("An external error has occurred. Please try again later.");
-            return "welcome";
-        }
+		GeocodeResponse geocode = GeocodeAPI.getGeocodeData(address.getCity() + (address.getPostalCode() != null ? address.getPostalCode() : ""));
+		if (geocode.getStatus().equals("ZERO_RESULTS")) {
+			result.rejectValue("city", "", "The address does not exist. Try again.");
+			return "welcome";
+		} else if (!geocode.getStatus().equals("OK")) {
+			result.reject("An external error has occurred. Please try again later.");
+			return "welcome";
+		}
 
-        Location location = geocode.getResults().get(0).getGeometry().getLocation();
+		Location location = geocode.getResults().get(0).getGeometry().getLocation();
 
 		List<Advertisement> results = this.advertisementService.findAllAdvertisements().stream()
-            .filter(x -> haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
-            .sorted(Comparator.comparing(x -> haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng())))
-            .collect(Collectors.toList());
+			.filter(x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
+			.sorted(Comparator.comparing(x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()))).collect(Collectors.toList());
 
 		if (results.isEmpty()) {
 			result.rejectValue("postalCode", "advNotFound", "Not found.");
@@ -219,17 +215,17 @@ public class AdvertisementController {
 		return userIsHost;
 	}
 
-	private Double haversineFormula(Double latitudeAd, Double longitudeAd, Double latitudeQuery, Double longitudeQuery) {
-        double earthRadius = 6371e3;
-        double lat1 = Math.toRadians(latitudeAd);
-        double lat2 = Math.toRadians(latitudeQuery);
-        double dlat = lat2-lat1;
-        double dlon = Math.toRadians(longitudeQuery-longitudeAd);
+	private Double haversineFormula(final Double latitudeAd, final Double longitudeAd, final Double latitudeQuery, final Double longitudeQuery) {
+		double earthRadius = 6371e3;
+		double lat1 = Math.toRadians(latitudeAd);
+		double lat2 = Math.toRadians(latitudeQuery);
+		double dlat = lat2 - lat1;
+		double dlon = Math.toRadians(longitudeQuery - longitudeAd);
 
-        double haversine = Math.pow(Math.sin(dlat/2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon/2), 2);
-        double c = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1-haversine));
+		double haversine = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
+		double c = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
 
-        return earthRadius * c;
-    }
+		return earthRadius * c;
+	}
 
 }

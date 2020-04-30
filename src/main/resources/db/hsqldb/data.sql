@@ -84,11 +84,11 @@ INSERT INTO advertisements (id, creation_date, description, price_per_month, req
 INSERT INTO advertisements (id, creation_date, description, price_per_month, requirements, title, flat_id) VALUES(2, '2020-03-26', 'I rent a flat in Paseo de la Castellana. It is an excellent centrical and luminous one.', 1650, 'There are no requirements for this flat.', 'Centrical flat in Madrid', 2);
 INSERT INTO advertisements (id, creation_date, description, price_per_month, requirements, title, flat_id) VALUES(3, '2020-03-27', 'I rent a beautiful apartment in the centre of Seville, in Encarnación-Regina', 670.95, 'There are no requirements for this flat.', 'Beautiful apartment in Encarnación-Regina', 3);
 
-INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, advertisement_id) VALUES(1, '2020-03-27 18:42:27.109905', 'This is sample request', '2021-12-30', '2020-12-31', 'PENDING', 1);
-INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, advertisement_id) VALUES(2, '2020-03-27 18:43:04.920847', 'This is another sample request', '2021-07-30', '2020-09-30', 'PENDING', 3);
-INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, advertisement_id) VALUES(3, '2020-03-27 18:44:05.251223', 'This is a sample request from tenant2.', '2020-12-30', '2020-10-31', 'PENDING', 1);
-INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, advertisement_id) VALUES(4, '2020-03-27 19:00:34.521884', 'Sample description of request.', '2020-08-29', '2020-03-28', 'ACCEPTED', 2);
-INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, advertisement_id) VALUES(5, '2020-03-27 19:01:07.185945', 'Sample description of tenant4', '2020-11-28', '2020-03-28', 'ACCEPTED', 2);
+INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, flat_id) VALUES(1, '2020-03-27 18:42:27.109905', 'This is sample request', '2021-12-30', '2020-12-31', 'PENDING', 1);
+INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, flat_id) VALUES(2, '2020-03-27 18:43:04.920847', 'This is another sample request', '2021-07-30', '2020-09-30', 'PENDING', 3);
+INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, flat_id) VALUES(3, '2020-03-27 18:44:05.251223', 'This is a sample request from tenant2.', '2020-12-30', '2020-10-31', 'PENDING', 1);
+INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, flat_id) VALUES(4, '2020-03-27 19:00:34.521884', 'Sample description of request.', '2020-08-29', '2020-03-28', 'ACCEPTED', 2);
+INSERT INTO requests (id, creation_date, description, finish_date, start_date, status, flat_id) VALUES(5, '2020-03-27 19:01:07.185945', 'Sample description of tenant4', '2020-11-28', '2020-03-28', 'ACCEPTED', 2);
 
 INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant3', 1, 'Is-Dp2-G1-13', '36954820X', 'tenant3@us.es', 'Tenant', 'Three', '820314698', 2);
 INSERT INTO users (dtype, username, enabled, password, dni, email, first_name, last_name, phone_number, flat_id) VALUES('Tenant', 'tenant4', 1, 'Is-Dp2-G1-13', '45688700Q', 'tenant4@us.es', 'Tenant', 'Four', '999888777', 2);

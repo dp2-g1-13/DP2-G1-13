@@ -31,4 +31,7 @@ public interface FlatRepository {
 	Integer numberOfFlats() throws DataAccessException;
 
 	Double ratioOfFlatsWithAdvertisement() throws DataAccessException;
+
+	Flat findFlatWithRequestId(int requestId) throws DataAccessException;
+
 }

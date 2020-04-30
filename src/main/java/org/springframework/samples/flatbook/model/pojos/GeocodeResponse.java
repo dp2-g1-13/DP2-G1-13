@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.web.apis.pojos;
+package org.springframework.samples.flatbook.model.pojos;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;

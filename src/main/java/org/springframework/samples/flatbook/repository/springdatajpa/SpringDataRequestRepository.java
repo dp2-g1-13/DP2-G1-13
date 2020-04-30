@@ -17,8 +17,8 @@ public interface SpringDataRequestRepository extends RequestRepository, Reposito
 	Set<Request> findManyByTenantUsername(@Param("username") String username) throws DataAccessException;
 
 	@Override
-	@Query("SELECT CASE WHEN count(req) > 0 THEN true ELSE false END FROM Tenant tenant JOIN tenant.requests req WHERE tenant.username = :username AND req.status = 'PENDING' AND req IN(SELECT r FROM Advertisement adv JOIN adv.requests r WHERE adv.id = :adv_id)")
-	Boolean isThereRequestOfTenantByAdvertisementId(@Param("username") String tenantUser, @Param("adv_id") int advId) throws DataAccessException;
+	@Query("SELECT CASE WHEN count(req) > 0 THEN true ELSE false END FROM Tenant tenant JOIN tenant.requests req WHERE tenant.username = :username AND req.status = 'PENDING' AND req IN(SELECT r FROM Flat adv JOIN adv.requests r WHERE adv.id = :flat_id)")
+	Boolean isThereRequestOfTenantByFlatId(@Param("username") String tenantUser, @Param("flat_id") int flatId) throws DataAccessException;
 
 	@Override
 	@Query("SELECT count(r) FROM Request r")

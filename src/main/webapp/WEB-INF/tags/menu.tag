@@ -22,7 +22,7 @@
 					<span>Home</span>
 				</flatbook:menuItem>
                 <sec:authorize access="hasAuthority('HOST')">
-				    <flatbook:menuItem active="${name eq 'flats'}" url="/flats/my-flats" title="find my flats">
+				    <flatbook:menuItem active="${name eq 'flats'}" url="/flats/list" title="find my flats">
 					    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
 					    <span>Find my flats</span>
 				    </flatbook:menuItem>

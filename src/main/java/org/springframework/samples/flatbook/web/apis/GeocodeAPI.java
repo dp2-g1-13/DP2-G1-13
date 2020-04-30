@@ -1,6 +1,6 @@
 package org.springframework.samples.flatbook.web.apis;
 
-import org.springframework.samples.flatbook.web.apis.pojos.GeocodeResponse;
+import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.UnsupportedEncodingException;

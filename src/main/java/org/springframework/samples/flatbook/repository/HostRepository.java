@@ -16,7 +16,7 @@ public interface HostRepository {
 
 	Host findByFlatId(int flatId) throws DataAccessException;
 
-	Host findHostOfAdvertisementByRequestId(int requestId) throws DataAccessException;
+	Host findHostOfFlatByRequestId(int requestId) throws DataAccessException;
 
 	void save(Host host) throws DataAccessException;
 

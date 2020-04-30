@@ -37,8 +37,8 @@
                             <a role="button" href="${fn:escapeXml(advUrl)}" class="btn btn-default" aria-pressed="true">See advertisement</a>
                         </div>
                         <div class="col-md-4">
-                            <spring:url value="/advertisements/{advId}/requests/list" var="requestsUrl">
-                                <spring:param name="advId" value="${advIds.get(i)}"/>
+                            <spring:url value="/flats/{flatId}/requests/list" var="requestsUrl">
+                                <spring:param name="flatId" value="${flats.get(i).id}"/>
                             </spring:url>
                             <a role="button" href="${fn:escapeXml(requestsUrl)}" class="btn btn-default" aria-pressed="true">See requests</a>
                         </div>
