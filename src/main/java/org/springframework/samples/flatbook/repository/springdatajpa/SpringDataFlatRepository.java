@@ -43,4 +43,8 @@ public interface SpringDataFlatRepository extends FlatRepository, Repository<Fla
 	@Override
 	@Query("SELECT 1.0*count(*)/(select count(fl) from Flat fl) FROM Advertisement a join Flat f on a.flat=f")
 	Double ratioOfFlatsWithAdvertisement() throws DataAccessException;
+
+	@Override
+	@Query("SELECT adv FROM Flat adv JOIN adv.requests req WHERE req.id = :request_id")
+	Flat findFlatWithRequestId(@Param("request_id") int requestId) throws DataAccessException;
 }

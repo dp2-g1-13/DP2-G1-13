@@ -12,7 +12,7 @@ public interface RequestRepository {
 
 	Set<Request> findManyByTenantUsername(String username) throws DataAccessException;
 
-	Boolean isThereRequestOfTenantByAdvertisementId(String tenantUser, int advId) throws DataAccessException;
+	Boolean isThereRequestOfTenantByFlatId(String tenantUser, int advId) throws DataAccessException;
 
 	void save(Request request) throws DataAccessException;
 

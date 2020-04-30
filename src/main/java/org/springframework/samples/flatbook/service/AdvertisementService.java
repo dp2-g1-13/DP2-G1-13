@@ -37,11 +37,6 @@ public class AdvertisementService {
 	}
 
 	@Transactional(readOnly = true)
-	public Advertisement findAdvertisementWithRequestId(final int requestId) throws DataAccessException {
-		return this.advertisementRepository.findAdvertisementWithRequestId(requestId);
-	}
-
-	@Transactional(readOnly = true)
 	public Set<Advertisement> findAllAdvertisements() throws DataAccessException {
 		return this.advertisementRepository.findAll();
 	}

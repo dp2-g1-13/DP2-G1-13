@@ -1,42 +1,43 @@
+
 package org.springframework.samples.flatbook.service;
+
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.samples.flatbook.model.Advertisement;
 import org.springframework.samples.flatbook.model.Request;
 import org.springframework.samples.flatbook.repository.RequestRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
-
 @Service
 public class RequestService {
 
-    private RequestRepository requestRepository;
+	private RequestRepository requestRepository;
 
-    @Autowired
-    public RequestService(RequestRepository requestRepository) {
-        this.requestRepository = requestRepository;
-    }
 
-    @Transactional(readOnly = true)
-    public Request findRequestById(int id) throws DataAccessException {
-        return this.requestRepository.findById(id);
-    }
+	@Autowired
+	public RequestService(final RequestRepository requestRepository) {
+		this.requestRepository = requestRepository;
+	}
 
-    @Transactional(readOnly = true)
-    public Set<Request> findRequestsByTenantUsername(String username) throws DataAccessException {
-        return this.requestRepository.findManyByTenantUsername(username);
-    }
+	@Transactional(readOnly = true)
+	public Request findRequestById(final int id) throws DataAccessException {
+		return this.requestRepository.findById(id);
+	}
 
-    @Transactional(readOnly = true)
-    public Boolean isThereRequestOfTenantByAdvertisementId(String tenantUser, int advId) throws DataAccessException {
-        return this.requestRepository.isThereRequestOfTenantByAdvertisementId(tenantUser, advId);
-    }
+	@Transactional(readOnly = true)
+	public Set<Request> findRequestsByTenantUsername(final String username) throws DataAccessException {
+		return this.requestRepository.findManyByTenantUsername(username);
+	}
 
-     @Transactional
-    public void saveRequest(Request request) {
-        this.requestRepository.save(request);
-    }
+	@Transactional(readOnly = true)
+	public Boolean isThereRequestOfTenantByFlatId(final String tenantUser, final int advId) throws DataAccessException {
+		return this.requestRepository.isThereRequestOfTenantByFlatId(tenantUser, advId);
+	}
+
+	@Transactional
+	public void saveRequest(final Request request) {
+		this.requestRepository.save(request);
+	}
 }

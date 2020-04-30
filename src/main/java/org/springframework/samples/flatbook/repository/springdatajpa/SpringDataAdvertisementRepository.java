@@ -25,10 +25,6 @@ public interface SpringDataAdvertisementRepository extends AdvertisementReposito
 	Advertisement findAdvertisementWithFlatId(@Param("flat_id") int flatId) throws DataAccessException;
 
 	@Override
-	@Query("SELECT adv FROM Advertisement adv JOIN adv.requests req WHERE req.id = :request_id")
-	Advertisement findAdvertisementWithRequestId(@Param("request_id") int requestId) throws DataAccessException;
-
-	@Override
 	@Query("SELECT count(f) FROM Advertisement f")
 	Integer numberOfAdvertisements() throws DataAccessException;
 }

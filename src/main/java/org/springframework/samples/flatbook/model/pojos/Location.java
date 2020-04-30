@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.web.apis.pojos;
+package org.springframework.samples.flatbook.model.pojos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "lat",
     "lng"
 })
-public class Southwest {
+public class Location {
 
     @JsonProperty("lat")
     private Double lat;

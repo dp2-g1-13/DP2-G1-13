@@ -12,14 +12,12 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.flatbook.model.Advertisement;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Request;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
 import org.springframework.samples.flatbook.model.mappers.RequestForm;
-import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
@@ -41,24 +39,23 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class RequestController {
 
-	private static final String		VIEWS_REQUESTS_CREATE_FORM	= "requests/createRequestForm";
+	private static final String	VIEWS_REQUESTS_CREATE_FORM	= "requests/createRequestForm";
 
-	private RequestService			requestService;
+	private RequestService		requestService;
 
-	private AdvertisementService	advertisementService;
+	private FlatService			advertisementService;
 
-	private AuthoritiesService		authoritiesService;
+	private AuthoritiesService	authoritiesService;
 
-	private HostService				hostService;
+	private HostService			hostService;
 
-	private FlatService				flatService;
+	private FlatService			flatService;
 
-	private TenantService			tenantService;
+	private TenantService		tenantService;
 
 
 	@Autowired
-	public RequestController(final RequestService requestService, final AdvertisementService advertisementService, final AuthoritiesService authoritiesService, final HostService hostService, final TenantService tenantService,
-		final FlatService flatService) {
+	public RequestController(final RequestService requestService, final FlatService advertisementService, final AuthoritiesService authoritiesService, final HostService hostService, final TenantService tenantService, final FlatService flatService) {
 		this.requestService = requestService;
 		this.advertisementService = advertisementService;
 		this.authoritiesService = authoritiesService;
@@ -73,26 +70,26 @@ public class RequestController {
 		dataBinder.addValidators(new RequestFormValidator(this.authoritiesService.findAuthorityById(username)));
 	}
 
-	@GetMapping("/advertisements/{advertisementId}/requests/new")
-	public String initCreationForm(@PathVariable("advertisementId") final int advertisementId, final Map<String, Object> model) {
+	@GetMapping("/flats/{flatId}/requests/new")
+	public String initCreationForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Tenant tenant = this.tenantService.findTenantById(((User) auth.getPrincipal()).getUsername());
-		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
-		this.validateTenant(auth, tenant, advertisement, advertisementId);
+		Flat advertisement = this.advertisementService.findFlatById(flatId);
+		this.validateTenant(auth, tenant, advertisement, flatId);
 		RequestForm req = new RequestForm();
 		model.put("requestForm", req);
 		return RequestController.VIEWS_REQUESTS_CREATE_FORM;
 	}
 
-	@PostMapping("/advertisements/{advertisementId}/requests/new")
-	public String processCreationForm(@Valid final RequestForm request, final BindingResult result, @PathVariable("advertisementId") final int advertisementId) {
+	@PostMapping("/flats/{flatId}/requests/new")
+	public String processCreationForm(@Valid final RequestForm request, final BindingResult result, @PathVariable("flatId") final int flatId) {
 		if (result.hasErrors()) {
 			return RequestController.VIEWS_REQUESTS_CREATE_FORM;
 		} else {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			Tenant tenant = this.tenantService.findTenantById(((User) auth.getPrincipal()).getUsername());
-			Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
-			this.validateTenant(auth, tenant, advertisement, advertisementId);
+			Flat flat = this.flatService.findFlatById(flatId);
+			this.validateTenant(auth, tenant, flat, flatId);
 			Request req = new Request();
 			req.setDescription(request.getDescription());
 			req.setCreationDate(LocalDateTime.now());
@@ -100,38 +97,38 @@ public class RequestController {
 			req.setStartDate(request.getStartDate());
 			req.setFinishDate(request.getFinishDate());
 			tenant.addRequest(req);
-			advertisement.addRequest(req);
+			flat.addRequest(req);
 			this.requestService.saveRequest(req);
 			return "redirect:/requests/list";
 		}
 	}
 
-	@GetMapping("/advertisements/{advertisementId}/requests/{requestId}/accept")
-	public String processAcceptRequest(@PathVariable("advertisementId") final int advertisementId, @PathVariable("requestId") final int requestId) {
-		if (this.validateHostAcceptingOrRejectingRequest(requestId)) {
+	@GetMapping("/flats/{flatId}/requests/{requestId}/accept")
+	public String processAcceptRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
+		if (this.validateHostAcceptingOrRejectingRequest(flatId)) {
 			Request request = this.requestService.findRequestById(requestId);
 			request.setStatus(RequestStatus.ACCEPTED);
-			Flat flat = this.advertisementService.findAdvertisementById(advertisementId).getFlat();
+			Flat flat = this.flatService.findFlatById(flatId);
 			Tenant tenant = this.tenantService.findTenantByRequestId(requestId);
 			tenant.setFlat(flat);
 			this.requestService.saveRequest(request);
 			this.tenantService.saveTenant(tenant);
 		}
-		return "redirect:/advertisements/{advertisementId}/requests/list";
+		return "redirect:/flats/{flatId}/requests/list";
 	}
 
-	@GetMapping("/advertisements/{advertisementId}/requests/{requestId}/reject")
-	public String processRejectRequest(@PathVariable("advertisementId") final int advertisementId, @PathVariable("requestId") final int requestId) {
-		if (this.validateHostAcceptingOrRejectingRequest(requestId)) {
+	@GetMapping("/flats/{flatId}/requests/{requestId}/reject")
+	public String processRejectRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
+		if (this.validateHostAcceptingOrRejectingRequest(flatId)) {
 			Request request = this.requestService.findRequestById(requestId);
 			request.setStatus(RequestStatus.REJECTED);
 			this.requestService.saveRequest(request);
 		}
-		return "redirect:/advertisements/{advertisementId}/requests/list";
+		return "redirect:/flats/{flatId}/requests/list";
 	}
-	@GetMapping("/advertisements/{advertisementId}/requests/{requestId}/cancel")
-	public String processCancelRequest(@PathVariable("advertisementId") final int advertisementId, @PathVariable("requestId") final int requestId) {
-		if (this.validateHostAcceptingOrRejectingRequest(requestId)) {
+	@GetMapping("/flats/{flatId}/requests/{requestId}/cancel")
+	public String processCancelRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
+		if (this.validateHostAcceptingOrRejectingRequest(flatId)) {
 			Request request = this.requestService.findRequestById(requestId);
 			if (!request.getStatus().equals(RequestStatus.ACCEPTED) || !request.getStartDate().isAfter(LocalDate.now())) {
 				throw new RuntimeException("Illegal access");
@@ -140,12 +137,12 @@ public class RequestController {
 			request.setStatus(RequestStatus.CANCELED);
 			this.processCancelOrConclude(request, requestId);
 		}
-		return "redirect:/advertisements/{advertisementId}/requests/list";
+		return "redirect:/flats/{flatId}/requests/list";
 	}
 
-	@GetMapping("/advertisements/{advertisementId}/requests/{requestId}/conclude")
-	public String processConcludeRequest(@PathVariable("advertisementId") final int advertisementId, @PathVariable("requestId") final int requestId) {
-		if (this.validateHostAcceptingOrRejectingRequest(requestId)) {
+	@GetMapping("/flats/{flatId}/requests/{requestId}/conclude")
+	public String processConcludeRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
+		if (this.validateHostAcceptingOrRejectingRequest(flatId)) {
 			Request request = this.requestService.findRequestById(requestId);
 			if (!request.getStatus().equals(RequestStatus.ACCEPTED) || request.getStartDate().isAfter(LocalDate.now())) {
 				throw new RuntimeException("Illegal access");
@@ -154,7 +151,7 @@ public class RequestController {
 			request.setStatus(RequestStatus.FINISHED);
 			this.processCancelOrConclude(request, requestId);
 		}
-		return "redirect:/advertisements/{advertisementId}/requests/list";
+		return "redirect:/flats/{flatId}/requests/list";
 	}
 
 	@GetMapping("/requests/list")
@@ -163,7 +160,7 @@ public class RequestController {
 		String username = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
 		List<Request> requests = new ArrayList<>(this.requestService.findRequestsByTenantUsername(username));
 		List<Integer> advIds = requests.stream().map(x -> {
-			Advertisement adv = this.advertisementService.findAdvertisementWithRequestId(x.getId());
+			Flat adv = this.flatService.findFlatWithRequestId(x.getId());
 			return adv == null ? null : adv.getId();
 		}).collect(Collectors.toList());
 		mav.addObject("requests", requests);
@@ -171,37 +168,38 @@ public class RequestController {
 		return mav;
 	}
 
-	public void validateTenant(final Authentication auth, final Tenant tenant, final Advertisement advertisement, final int advertisementId) {
-		if (tenant.getFlat() != null || this.requestService.isThereRequestOfTenantByAdvertisementId(((User) auth.getPrincipal()).getUsername(), advertisementId) || advertisement == null) {
+	public void validateTenant(final Authentication auth, final Tenant tenant, final Flat flat, final int flatId) {
+		if (tenant.getFlat() != null || this.requestService.isThereRequestOfTenantByFlatId(((User) auth.getPrincipal()).getUsername(), flatId) || flat == null) {
 			throw new RuntimeException("Illegal access");
 		}
 	}
-	@GetMapping("/advertisements/{advertisementId}/requests/list")
-	public ModelAndView showRequestsOfAdvertisement(@PathVariable("advertisementId") final int advertisementId) {
+
+	@GetMapping("/flats/{flatId}/requests/list")
+	public ModelAndView showRequestsOfFlat(@PathVariable("flatId") final int flatId) {
 		ModelAndView mav = new ModelAndView("requests/requestsList");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Advertisement adv = this.advertisementService.findAdvertisementById(advertisementId);
+		Flat flat = this.flatService.findFlatById(flatId);
 		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
 			String username = ((User) auth.getPrincipal()).getUsername();
-			Host creator = this.hostService.findHostByFlatId(adv.getFlat().getId());
+			Host creator = this.hostService.findHostByFlatId(flat.getId());
 			if (!username.equals(creator.getUsername())) {
 				throw new RuntimeException("Illegal access");
 			}
 		}
-		List<Request> requests = new ArrayList<>(adv.getRequests());
+		List<Request> requests = new ArrayList<>(flat.getRequests());
 		requests.sort(Comparator.comparing(Request::getCreationDate).reversed());
 		List<Tenant> tenants = requests.stream().map(x -> this.tenantService.findTenantByRequestId(x.getId())).collect(Collectors.toList());
 		mav.addObject("requests", requests);
 		mav.addObject("tenants", tenants);
-		mav.addObject("advId", advertisementId);
+		mav.addObject("flatId", flatId);
 		return mav;
 	}
 
-	public boolean validateHostAcceptingOrRejectingRequest(final int requestId) {
+	public boolean validateHostAcceptingOrRejectingRequest(final int flatId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
 			String username = ((User) auth.getPrincipal()).getUsername();
-			Host host = this.hostService.findHostOfAdvertisementByRequestId(requestId);
+			Host host = this.hostService.findHostByFlatId(flatId);
 			if (!username.equals(host.getUsername())) {
 				throw new RuntimeException("Illegal access");
 			}

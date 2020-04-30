@@ -12,16 +12,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class HostService {
-	
+
 	private HostRepository hostRepository;
 
+
 	@Autowired
-	public HostService(HostRepository hostRepository) {
+	public HostService(final HostRepository hostRepository) {
 		this.hostRepository = hostRepository;
 	}
 
 	@Transactional(readOnly = true)
-	public Host findHostById(String username) throws DataAccessException {
+	public Host findHostById(final String username) throws DataAccessException {
 		return this.hostRepository.findByUsername(username);
 	}
 
@@ -30,12 +31,12 @@ public class HostService {
 		return this.hostRepository.findAll();
 	}
 
-    public Host findHostByFlatId(int flatId) throws DataAccessException {
-        return this.hostRepository.findByFlatId(flatId);
-    }
+	public Host findHostByFlatId(final int flatId) throws DataAccessException {
+		return this.hostRepository.findByFlatId(flatId);
+	}
 
-    @Transactional(readOnly = true)
-    public Host findHostOfAdvertisementByRequestId(int requestId) throws DataAccessException {
-        return this.hostRepository.findHostOfAdvertisementByRequestId(requestId);
-    }
+	@Transactional(readOnly = true)
+	public Host findHostOfFlatByRequestId(final int requestId) throws DataAccessException {
+		return this.hostRepository.findHostOfFlatByRequestId(requestId);
+	}
 }

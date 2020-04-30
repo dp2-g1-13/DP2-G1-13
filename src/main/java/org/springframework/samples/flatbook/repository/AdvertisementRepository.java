@@ -8,15 +8,13 @@ import org.springframework.samples.flatbook.model.Advertisement;
 
 public interface AdvertisementRepository {
 
-    Set<Advertisement> findAll() throws DataAccessException;
+	Set<Advertisement> findAll() throws DataAccessException;
 
 	Advertisement findById(int id) throws DataAccessException;
 
 	Boolean isAdvertisementWithFlatId(int flatId) throws DataAccessException;
 
 	Advertisement findAdvertisementWithFlatId(int flatId) throws DataAccessException;
-
-	Advertisement findAdvertisementWithRequestId(int requestId) throws DataAccessException;
 
 	void save(Advertisement advertisement);
 

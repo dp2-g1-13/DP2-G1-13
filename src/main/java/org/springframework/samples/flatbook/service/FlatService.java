@@ -59,4 +59,9 @@ public class FlatService {
 	public Flat findFlatByReviewId(final Integer reviewId) {
 		return this.flatRepository.findByReviewId(reviewId);
 	}
+
+	public Flat findFlatWithRequestId(final int requestId) throws DataAccessException {
+		return this.flatRepository.findFlatWithRequestId(requestId);
+	}
+
 }

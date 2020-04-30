@@ -20,7 +20,7 @@ import org.springframework.samples.flatbook.service.DBImageService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
-import org.springframework.samples.flatbook.web.apis.pojos.GeocodeResponse;
+import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.core.Authentication;
@@ -190,7 +190,7 @@ public class FlatController {
 		return mav;
 	}
 
-	@GetMapping(value = "/flats/my-flats")
+	@GetMapping(value = "/flats/list")
 	public ModelAndView showFlatsOfHost() {
 		ModelAndView mav = new ModelAndView("flats/flatsOfHost");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
