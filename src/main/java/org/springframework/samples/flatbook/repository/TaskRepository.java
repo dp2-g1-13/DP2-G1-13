@@ -17,8 +17,8 @@ public interface TaskRepository {
 
 	void save(Task task) throws DataAccessException;
 
-	Set<Task> findManyByTenantUsername(String username) throws DataAccessException;
-
 	Set<Task> findByFlatId(int id) throws DataAccessException;
+
+	Set<Task> findByParticipant(String username) throws DataAccessException;
 
 }

@@ -18,6 +18,7 @@ import org.springframework.samples.flatbook.model.Advertisement;
 import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.FlatReview;
+import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
@@ -133,9 +134,7 @@ public class AdvertisementController {
 	public String processDeleteAdvertisement(@PathVariable("advertisementId") final int advertisementId, final Map<String, Object> model) {
 		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
 		if (advertisement == null || !this.validateHost(advertisement.getFlat().getId())) {
-			RuntimeException ex = new RuntimeException("Illegal access");
-			model.put("exception", ex);
-			return "exception";
+			throw new RuntimeException("Illegal access");
 		}
 		this.advertisementService.deleteAdvertisement(advertisement);
 		return "redirect:/";
@@ -145,16 +144,22 @@ public class AdvertisementController {
 	public ModelAndView showAdvertisement(@PathVariable("advertisementId") final int advertisementId, final Principal principal) {
 		ModelAndView mav = new ModelAndView("advertisements/advertisementDetails");
 		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
+		Host host = this.hostService.findHostByFlatId(advertisement.getFlat().getId());
+
+		if (!host.isEnabled()) {
+			throw new RuntimeException("Illegal access");
+		}
+
 		mav.addObject(advertisement);
 		mav.addObject("flat", advertisement.getFlat());
 
 		Collection<DBImage> images = this.dbImageService.getImagesByFlatId(advertisement.getFlat().getId());
 		mav.addObject("images", images);
 
-		String hostUsername = this.hostService.findHostByFlatId(advertisement.getFlat().getId()).getUsername();
-		mav.addObject("host", hostUsername);
+		mav.addObject("host", host.getUsername());
 
 		List<FlatReview> reviews = new ArrayList<>(advertisement.getFlat().getFlatReviews());
+		reviews.removeIf(x -> !x.getCreator().isEnabled());
 		reviews.sort(Comparator.comparing(FlatReview::getCreationDate).reversed());
 		mav.addObject("reviews", reviews);
 		mav.addObject("flatId", advertisement.getFlat().getId());
@@ -190,7 +195,7 @@ public class AdvertisementController {
 		Location location = geocode.getResults().get(0).getGeometry().getLocation();
 
 		List<Advertisement> results = this.advertisementService.findAllAdvertisements().stream()
-			.filter(x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
+			.filter(x -> this.hostService.findHostByFlatId(x.getId()).isEnabled() && this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
 			.sorted(Comparator.comparing(x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()))).collect(Collectors.toList());
 
 		if (results.isEmpty()) {
@@ -209,8 +214,8 @@ public class AdvertisementController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
 			String username = ((User) auth.getPrincipal()).getUsername();
-			String hostUsername = this.hostService.findHostByFlatId(flatId).getUsername();
-			userIsHost = username.equals(hostUsername);
+			Host host = this.hostService.findHostByFlatId(flatId);
+			userIsHost = username.equals(host.getUsername()) && host.isEnabled();
 		}
 		return userIsHost;
 	}

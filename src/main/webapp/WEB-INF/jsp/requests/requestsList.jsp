@@ -53,10 +53,17 @@
                 <div class="row">
                     <sec:authorize access="hasAuthority('TENANT')">
                     <div class="col-md-6">
-                        <spring:url value="/flat/{flatId}" var="flatUrl">
-                            <spring:param name="flatId" value="${flatIds.get(i)}"/>
+                    <c:choose>
+                    <c:when test="${advIds.get(i)!=null}"> 
+                        <spring:url value="/advertisements/{advId}" var="advUrl">
+                            <spring:param name="advId" value="${advIds.get(i)}"/>
                         </spring:url>
-                        <a role="button" href="${fn:escapeXml(flatUrl)}" class="btn btn-default" aria-pressed="true">See details</a>
+                        <a role="button" href="${fn:escapeXml(advUrl)}" class="btn btn-default" aria-pressed="true">See details</a>
+                    </c:when>
+                    <c:otherwise>
+                    	The advertisement that you request for has been deleted.
+                    </c:otherwise>
+                    </c:choose>
                     </div>
                     </sec:authorize>
                     <sec:authorize access="hasAnyAuthority('HOST', 'ADMIN')">

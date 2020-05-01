@@ -12,11 +12,13 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.samples.flatbook.model.Advertisement;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.Request;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
 import org.springframework.samples.flatbook.model.mappers.RequestForm;
+import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
@@ -38,23 +40,24 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class RequestController {
 
-	private static final String	VIEWS_REQUESTS_CREATE_FORM	= "requests/createRequestForm";
+	private static final String		VIEWS_REQUESTS_CREATE_FORM	= "requests/createRequestForm";
 
-	private RequestService		requestService;
+	private RequestService			requestService;
 
-	private FlatService			advertisementService;
+	private AdvertisementService	advertisementService;
 
-	private AuthoritiesService	authoritiesService;
+	private AuthoritiesService		authoritiesService;
 
-	private HostService			hostService;
+	private HostService				hostService;
 
-	private FlatService			flatService;
+	private FlatService				flatService;
 
-	private TenantService		tenantService;
+	private TenantService			tenantService;
 
 
 	@Autowired
-	public RequestController(final RequestService requestService, final FlatService advertisementService, final AuthoritiesService authoritiesService, final HostService hostService, final TenantService tenantService, final FlatService flatService) {
+	public RequestController(final RequestService requestService, final AdvertisementService advertisementService, final AuthoritiesService authoritiesService, final HostService hostService, final TenantService tenantService,
+		final FlatService flatService) {
 		this.requestService = requestService;
 		this.advertisementService = advertisementService;
 		this.authoritiesService = authoritiesService;
@@ -73,8 +76,8 @@ public class RequestController {
 	public String initCreationForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Tenant tenant = this.tenantService.findTenantById(((User) auth.getPrincipal()).getUsername());
-		Flat advertisement = this.advertisementService.findFlatById(flatId);
-		this.validateTenant(auth, tenant, advertisement, flatId);
+		Flat flat = this.flatService.findFlatById(flatId);
+		this.validateTenant(auth, tenant, flat, flatId);
 		RequestForm req = new RequestForm();
 		model.put("requestForm", req);
 		return RequestController.VIEWS_REQUESTS_CREATE_FORM;
@@ -161,7 +164,8 @@ public class RequestController {
 		String username = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
 		List<Request> requests = new ArrayList<>(this.requestService.findRequestsByTenantUsername(username));
 		List<Integer> advIds = requests.stream().map(x -> {
-			Flat adv = this.flatService.findFlatWithRequestId(x.getId());
+			Flat flat = this.flatService.findFlatWithRequestId(x.getId());
+			Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(flat.getId());
 			return adv == null ? null : adv.getId();
 		}).collect(Collectors.toList());
 		mav.addObject("requests", requests);
@@ -177,6 +181,7 @@ public class RequestController {
 		ModelAndView mav = new ModelAndView("requests/requestsList");
 		Flat flat = this.flatService.findFlatById(flatId);
 		List<Request> requests = new ArrayList<>(flat.getRequests());
+		requests.removeIf(x -> !this.tenantService.findTenantByRequestId(x.getId()).isEnabled());
 		requests.sort(Comparator.comparing(Request::getCreationDate).reversed());
 		List<Tenant> tenants = requests.stream().map(x -> this.tenantService.findTenantByRequestId(x.getId())).collect(Collectors.toList());
 		mav.addObject("requests", requests);

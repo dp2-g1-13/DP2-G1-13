@@ -48,6 +48,13 @@
 						<span>Reports</span>
 					</flatbook:menuItem>
 				</sec:authorize>
+				
+				<sec:authorize access="hasAnyAuthority('ADMIN')">
+					<flatbook:menuItem active="${name eq 'userList'}" url="/users/list" title="view the users">
+						<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+						<span>User List</span>
+					</flatbook:menuItem>
+				</sec:authorize>
 			</ul>
 
 

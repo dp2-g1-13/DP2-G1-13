@@ -3,16 +3,33 @@ package org.springframework.samples.flatbook.web;
 
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.flatbook.model.*;
-import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.model.Address;
+import org.springframework.samples.flatbook.model.Advertisement;
+import org.springframework.samples.flatbook.model.DBImage;
+import org.springframework.samples.flatbook.model.Flat;
+import org.springframework.samples.flatbook.model.FlatReview;
+import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
+import org.springframework.samples.flatbook.service.AdvertisementService;
+import org.springframework.samples.flatbook.service.DBImageService;
+import org.springframework.samples.flatbook.service.FlatReviewService;
+import org.springframework.samples.flatbook.service.FlatService;
+import org.springframework.samples.flatbook.service.HostService;
+import org.springframework.samples.flatbook.service.PersonService;
+import org.springframework.samples.flatbook.service.RequestService;
+import org.springframework.samples.flatbook.service.TenantService;
+import org.springframework.samples.flatbook.web.apis.GeocodeAPI;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.core.Authentication;
@@ -21,10 +38,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import static org.springframework.samples.flatbook.web.apis.GeocodeAPI.getGeocodeData;
 
 @Controller
 public class FlatController {
@@ -36,23 +54,16 @@ public class FlatController {
 	private final PersonService			personService;
 	private final HostService			hostService;
 	private final AdvertisementService	advertisementService;
-	private final TenantService         tenantService;
-	private final FlatReviewService     flatReviewService;
-	private final RequestService        requestService;
-
 
 
 	@Autowired
-	public FlatController(final FlatService flatService, final DBImageService dbImageService, final PersonService personService, final HostService hostService,
-                          final AdvertisementService advertisementService, final TenantService tenantService, final FlatReviewService flatReviewService, final RequestService requestService) {
+	public FlatController(final FlatService flatService, final DBImageService dbImageService, final PersonService personService, final HostService hostService, final AdvertisementService advertisementService, final TenantService tenantService,
+		final FlatReviewService flatReviewService, final RequestService requestService) {
 		this.flatService = flatService;
 		this.dbImageService = dbImageService;
 		this.personService = personService;
 		this.hostService = hostService;
 		this.advertisementService = advertisementService;
-		this.tenantService = tenantService;
-		this.flatReviewService = flatReviewService;
-		this.requestService = requestService;
 	}
 
 	@InitBinder
@@ -83,18 +94,18 @@ public class FlatController {
 				result.rejectValue("images", "", "a minimum of 6 images is required.");
 				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 			}
-            Address address = flat.getAddress();
-            GeocodeResponse geocode = getGeocodeData(address.getAddress() + ", " + address.getCity());
-            if(geocode.getStatus().equals("ZERO_RESULTS")) {
-                result.rejectValue("address.address", "", "The address does not exist. Try again.");
-                return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
-            } else if(!geocode.getStatus().equals("OK")) {
-                result.reject("An external error has occurred. Please try again later.");
-                return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
-            }
-            address.setLatitude(geocode.getResults().get(0).getGeometry().getLocation().getLat());
-            address.setLongitude(geocode.getResults().get(0).getGeometry().getLocation().getLng());
-            flat.setAddress(address);
+			Address address = flat.getAddress();
+			GeocodeResponse geocode = GeocodeAPI.getGeocodeData(address.getAddress() + ", " + address.getCity());
+			if (geocode.getStatus().equals("ZERO_RESULTS")) {
+				result.rejectValue("address.address", "", "The address does not exist. Try again.");
+				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+			} else if (!geocode.getStatus().equals("OK")) {
+				result.reject("An external error has occurred. Please try again later.");
+				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+			}
+			address.setLatitude(geocode.getResults().get(0).getGeometry().getLocation().getLat());
+			address.setLongitude(geocode.getResults().get(0).getGeometry().getLocation().getLng());
+			flat.setAddress(address);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			Host host = (Host) this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
 			host.addFlat(flat);
@@ -180,6 +191,7 @@ public class FlatController {
 		mav.addObject("existAd", existAd);
 
 		List<FlatReview> reviews = new ArrayList<>(flat.getFlatReviews());
+		reviews.removeIf(x -> !x.getCreator().isEnabled());
 		reviews.sort(Comparator.comparing(FlatReview::getCreationDate).reversed());
 		mav.addObject("reviews", reviews);
 		mav.addObject("flatId", flat.getId());
@@ -202,16 +214,16 @@ public class FlatController {
 		return mav;
 	}
 
-    @GetMapping(value = "/flats/{flatId}/delete")
-    public String processDeleteFlat(@PathVariable("flatId") int flatId) {
-        if (!this.validateHost(flatId)) {
-            throw new RuntimeException("Illegal access");
-        }
-        Flat flat = this.flatService.findFlatById(flatId);
-        this.flatService.deleteFlat(flat);
+	@GetMapping(value = "/flats/{flatId}/delete")
+	public String processDeleteFlat(@PathVariable("flatId") final int flatId) {
+		if (!this.validateHost(flatId)) {
+			throw new RuntimeException("Illegal access");
+		}
+		Flat flat = this.flatService.findFlatById(flatId);
+		this.flatService.deleteFlat(flat);
 
-        return "redirect:/flats/list";
-    }
+		return "redirect:/flats/list";
+	}
 
 	public boolean validateHost(final int flatId) {
 		Boolean userIsHost = true;
