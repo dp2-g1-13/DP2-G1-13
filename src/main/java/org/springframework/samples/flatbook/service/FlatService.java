@@ -4,19 +4,8 @@ package org.springframework.samples.flatbook.service;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.flatbook.model.Advertisement;
-import org.springframework.samples.flatbook.model.DBImage;
-import org.springframework.samples.flatbook.model.Flat;
-import org.springframework.samples.flatbook.model.Host;
-import org.springframework.samples.flatbook.model.Request;
-import org.springframework.samples.flatbook.model.Tenant;
-import org.springframework.samples.flatbook.repository.AddressRepository;
-import org.springframework.samples.flatbook.repository.AdvertisementRepository;
-import org.springframework.samples.flatbook.repository.DBImageRepository;
-import org.springframework.samples.flatbook.repository.FlatRepository;
-import org.springframework.samples.flatbook.repository.HostRepository;
-import org.springframework.samples.flatbook.repository.RequestRepository;
-import org.springframework.samples.flatbook.repository.TenantRepository;
+import org.springframework.samples.flatbook.model.*;
+import org.springframework.samples.flatbook.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,10 +26,12 @@ public class FlatService {
 
 	private HostRepository			hostRepository;
 
+	private TaskRepository          taskRepository;
+
 
 	@Autowired
 	public FlatService(final FlatRepository flatRepository, final DBImageRepository dbImageRepository, final AddressRepository addressRepository, final TenantRepository tenantRepository, final AdvertisementRepository advertisementRepository,
-		final RequestRepository requestRepository, final HostRepository hostRepository) {
+		final RequestRepository requestRepository, final HostRepository hostRepository, final TaskRepository taskRepository) {
 		this.flatRepository = flatRepository;
 		this.dbImageRepository = dbImageRepository;
 		this.addressRepository = addressRepository;
@@ -48,6 +39,7 @@ public class FlatService {
 		this.advertisementRepository = advertisementRepository;
 		this.requestRepository = requestRepository;
 		this.hostRepository = hostRepository;
+		this.taskRepository = taskRepository;
 	}
 
 	@Transactional(readOnly = true)
@@ -75,6 +67,11 @@ public class FlatService {
 
 	@Transactional
 	public void deleteFlat(final Flat flat) {
+        Set<Task> tasks = this.taskRepository.findByFlatId(flat.getId());
+        for(Task task : tasks) {
+            this.taskRepository.deleteById(task.getId());
+        }
+
 		for (Tenant tenant : flat.getTenants()) {
 			tenant.setFlat(null);
 			this.tenantRepository.save(tenant);
