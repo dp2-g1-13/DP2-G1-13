@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AdvertisementValidatorTests {
 
     private static Flat flat;
-    private static Set<Request> requests;
 
     private Validator createValidator() {
         LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
@@ -53,16 +52,6 @@ public class AdvertisementValidatorTests {
         flat.setAvailableServices("Wifi and TV");
         flat.setAddress(address);
         flat.setImages(images);
-
-        Request request = new Request();
-        request.setStatus(RequestStatus.PENDING);
-        request.setDescription("This is a sample description");
-        request.setCreationDate(LocalDateTime.now());
-        request.setStartDate(LocalDate.MAX);
-        request.setFinishDate(LocalDate.MAX);
-
-        requests = new HashSet<>();
-        requests.add(request);
     }
 
     @Test
@@ -75,7 +64,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -96,7 +84,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -117,7 +104,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -138,7 +124,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -159,7 +144,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -180,7 +164,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -201,7 +184,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(null);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -223,7 +205,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(price);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -244,7 +225,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(null);
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -265,7 +245,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(LocalDate.MAX);
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -286,7 +265,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(null);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);
@@ -311,7 +289,6 @@ public class AdvertisementValidatorTests {
         advertisement.setPricePerMonth(pricePerMonth);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Advertisement>> constraintViolations = validator.validate(advertisement);

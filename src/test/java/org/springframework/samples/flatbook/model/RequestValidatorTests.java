@@ -139,25 +139,6 @@ public class RequestValidatorTests {
     }
 
     @Test
-    void shouldNotValidateWhenStartDateIsPast() {
-        LocaleContextHolder.setLocale(Locale.ENGLISH);
-        Request request = new Request();
-        request.setDescription("Sample description");
-        request.setStatus(RequestStatus.PENDING);
-        request.setCreationDate(LocalDateTime.now());
-        request.setStartDate(LocalDate.MIN);
-        request.setFinishDate(LocalDate.MAX);
-
-        Validator validator = createValidator();
-        Set<ConstraintViolation<Request>> constraintViolations = validator.validate(request);
-
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        ConstraintViolation<Request> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("startDate");
-        assertThat(violation.getMessage()).isEqualTo("must be a future date");
-    }
-
-    @Test
     void shouldNotValidateWhenFinishDateNull() {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
         Request request = new Request();
@@ -174,25 +155,6 @@ public class RequestValidatorTests {
         ConstraintViolation<Request> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("finishDate");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
-    }
-
-    @Test
-    void shouldNotValidateWhenFinishDateIsPast() {
-        LocaleContextHolder.setLocale(Locale.ENGLISH);
-        Request request = new Request();
-        request.setDescription("Sample description");
-        request.setStatus(RequestStatus.PENDING);
-        request.setCreationDate(LocalDateTime.now());
-        request.setStartDate(LocalDate.MAX);
-        request.setFinishDate(LocalDate.MIN);
-
-        Validator validator = createValidator();
-        Set<ConstraintViolation<Request>> constraintViolations = validator.validate(request);
-
-        assertThat(constraintViolations.size()).isEqualTo(1);
-        ConstraintViolation<Request> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("finishDate");
-        assertThat(violation.getMessage()).isEqualTo("must be a future date");
     }
 
     @ParameterizedTest
