@@ -62,6 +62,10 @@ public class Task extends BaseEntity {
 
 	@NotNull
 	@ManyToOne(fetch = FetchType.EAGER)
+	private Flat		flat;
+
+	@NotNull
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Tenant		creator;
 
 	@ManyToOne(fetch = FetchType.EAGER)

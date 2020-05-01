@@ -5,7 +5,6 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Task;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.TaskStatus;
-import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.TaskService;
 import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.stereotype.Controller;
@@ -35,28 +33,25 @@ public class TaskController {
 
 	private final TaskService	taskService;
 	private final TenantService	tenantService;
-	private final FlatService	flatService;
 
 
 	@Autowired
-	public TaskController(final TaskService taskService, final TenantService tenantService, final FlatService flatService) {
+	public TaskController(final TaskService taskService, final TenantService tenantService) {
 		this.taskService = taskService;
 		this.tenantService = tenantService;
-		this.flatService = flatService;
 	}
 
 	@GetMapping(value = "/tasks/new")
 	public String initCreationForm(final Map<String, Object> model, final Principal principal) {
 		Tenant tenant = this.tenantService.findTenantById(principal.getName());
-		Integer creatorFlatId = tenant.getFlat() == null ? null : tenant.getFlat().getId();
-		if (creatorFlatId != null) {
-			Collection<Tenant> roommates = this.flatService.findTenantsById(creatorFlatId);
+		if (tenant.getFlat() != null) {
 			Task task = new Task();
-			task.setCreator(this.tenantService.findTenantById(principal.getName()));
+			task.setCreator(tenant);
 			task.setCreationDate(LocalDate.now());
 			task.setStatus(TaskStatus.TODO);
+			task.setFlat(tenant.getFlat());
 			model.put("task", task);
-			model.put("roommates", roommates);
+			model.put("roommates", new ArrayList<>(tenant.getFlat().getTenants()));
 			return TaskController.VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
 		} else {
 			throw new RuntimeException("You can't create a task if you dont live in a flat.");
@@ -66,20 +61,20 @@ public class TaskController {
 	@PostMapping(value = "/tasks/new")
 	public String processCreationForm(final Map<String, Object> model, @Valid final Task task, final BindingResult result, final Principal principal) {
 		Tenant tenant = this.tenantService.findTenantById(principal.getName());
-		Integer creatorFlatId = tenant.getFlat() == null ? null : tenant.getFlat().getId();
-		Collection<Tenant> roommates = this.flatService.findTenantsById(creatorFlatId);
-		if (creatorFlatId != null && roommates != null && (task.getAsignee() == null || roommates.contains(task.getAsignee()))) {
+		if (tenant.getFlat() != null && (task.getAsignee() == null || tenant.getFlat().getTenants().contains(task.getAsignee()))) {
 			if (result.hasErrors()) {
-				model.put("roommates", roommates);
+				model.put("roommates", new ArrayList<>(tenant.getFlat().getTenants()));
 				return TaskController.VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
 			} else {
+				task.setCreator(tenant);
 				task.setCreationDate(LocalDate.now());
 				task.setStatus(TaskStatus.TODO);
+				task.setFlat(tenant.getFlat());
 				this.taskService.saveTask(task);
 				return "redirect:/tasks/list";
 			}
 		} else {
-			throw new RuntimeException("Oops!");
+			throw new RuntimeException("You can't create a task if you dont live in a flat.");
 		}
 	}
 
@@ -87,13 +82,8 @@ public class TaskController {
 	public ModelAndView showTaskList(final Principal principal) {
 		ModelAndView mav = new ModelAndView(TaskController.VIEWS_TASKS_LIST);
 		Tenant tenant = this.tenantService.findTenantById(principal.getName());
-		Integer creatorFlatId = tenant.getFlat() == null ? null : tenant.getFlat().getId();
-		Collection<Tenant> creators = this.flatService.findTenantsById(creatorFlatId);
-		if (creators != null) {
-			List<Task> tasks = new ArrayList<>();
-			for (Tenant t : creators) {
-				tasks.addAll(this.taskService.findManyByTenantUsername(t.getUsername()));
-			}
+		if (tenant.getFlat() != null) {
+			List<Task> tasks = new ArrayList<>(this.taskService.findTasksByFlatId(tenant.getFlat().getId()));
 			tasks.sort(Comparator.comparing(Task::getStatus).thenComparing(Comparator.comparing(Task::getCreationDate).reversed()));
 			mav.addObject("tasks", tasks);
 			return mav;
@@ -106,13 +96,11 @@ public class TaskController {
 	public String processTaskRemoval(@PathVariable("taskId") final int taskId, final Principal principal) {
 		Task task = this.taskService.findTaskById(taskId);
 		Tenant tenant = this.tenantService.findTenantById(principal.getName());
-		Integer creatorFlatId = tenant.getFlat() == null ? null : tenant.getFlat().getId();
-		Collection<Tenant> roommates = this.flatService.findTenantsById(creatorFlatId);
-		if (creatorFlatId != null && task != null && roommates != null && roommates.contains(task.getCreator())) {
+		if (tenant.getFlat() != null && task != null && tenant.getFlat().equals(task.getFlat())) {
 			this.taskService.deleteTaskById(taskId);
 			return "redirect:/tasks/list";
 		} else {
-			throw new IllegalArgumentException("Bad task id or you are not the creator of the task.");
+			throw new IllegalArgumentException("Bad task id or you are cant delete this task.");
 		}
 	}
 
@@ -120,12 +108,10 @@ public class TaskController {
 	public String initUpdateForm(@PathVariable("taskId") final int taskId, final ModelMap model, final Principal principal) {
 		Task task = this.taskService.findTaskById(taskId);
 		Tenant tenant = this.tenantService.findTenantById(principal.getName());
-		Integer creatorFlatId = tenant.getFlat() == null ? null : tenant.getFlat().getId();
-		Collection<Tenant> roommates = this.flatService.findTenantsById(creatorFlatId);
-		if (creatorFlatId != null && task != null && roommates != null && roommates.contains(task.getCreator())) {
+		if (tenant.getFlat() != null && task != null && tenant.getFlat().equals(task.getFlat())) {
 			model.put("taskStatus", Arrays.asList(TaskStatus.values()));
 			model.put("task", task);
-			model.put("roommates", roommates);
+			model.put("roommates", new ArrayList<>(tenant.getFlat().getTenants()));
 			return TaskController.VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
 		} else {
 			throw new IllegalArgumentException("Bad task id or you can not edit the task.");
@@ -134,20 +120,23 @@ public class TaskController {
 
 	@PostMapping(value = "/tasks/{taskId}/edit")
 	public String processUpdateForm(@Valid final Task task, final BindingResult result, @PathVariable("taskId") final int taskId, final ModelMap model, final Principal principal) {
-		Integer creatorFlatId = this.tenantService.findTenantById(principal.getName()).getFlat() == null ? null : this.tenantService.findTenantById(principal.getName()).getFlat().getId();
-		Collection<Tenant> roommates = this.flatService.findTenantsById(creatorFlatId);
-		if (creatorFlatId != null && roommates != null && roommates.contains(task.getCreator())) {
+		Task previusTask = this.taskService.findTaskById(taskId);
+		Tenant tenant = this.tenantService.findTenantById(principal.getName());
+		if (tenant.getFlat() != null && task != null && tenant.getFlat().equals(previusTask.getFlat())) {
 			if (result.hasErrors()) {
-				model.put("roommates", roommates);
+				model.put("roommates", new ArrayList<>(tenant.getFlat().getTenants()));
 				model.put("taskStatus", Arrays.asList(TaskStatus.values()));
 				return TaskController.VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
 			} else {
 				task.setId(taskId);
+				task.setCreator(previusTask.getCreator());
+				task.setCreationDate(previusTask.getCreationDate());
+				task.setFlat(tenant.getFlat());
 				this.taskService.saveTask(task);
 				return "redirect:/tasks/list";
 			}
 		} else {
-			throw new RuntimeException("Oops!");
+			throw new RuntimeException("Bad task id or you can not edit the task.");
 		}
 	}
 }

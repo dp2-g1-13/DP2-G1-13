@@ -7,7 +7,7 @@
 <flatbook:layout pageName="tasks">
 	<div class="row">
 		<div class="col-md-6">
-			<a role="button" class="btn btn-default btn-lg"
+			<a role="button" class="btn btn-default"
 				href="${pageContext.request.contextPath}/tasks/new"
 				aria-pressed="true">New Task</a>
 		</div>
