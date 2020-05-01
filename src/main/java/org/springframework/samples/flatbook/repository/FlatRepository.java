@@ -22,6 +22,9 @@ public interface FlatRepository {
 
 	void save(Flat flat) throws DataAccessException;
 
+    void delete(Flat flat);
+    void deleteById(int id);
+
 	Flat findByReviewId(Integer reviewId) throws DataAccessException;
 
 	Page<Flat> topBestReviewedFlats(Pageable pageable) throws DataAccessException;

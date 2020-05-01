@@ -38,6 +38,12 @@
                             <a role="button" href="${fn:escapeXml(advertisementUrl)}" class="btn btn-default" aria-pressed="true">Publish an ad</a>
                         </div>
                     </c:if>
+                    <div class="col-md-1">
+                        <spring:url value="/flats/{flatId}/delete" var="flatDeleteUrl">
+                            <spring:param name="flatId" value="${flat.id}"/>
+                        </spring:url>
+                        <a role="button" href="${fn:escapeXml(flatDeleteUrl)}" class="btn btn-danger" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this flat?')">Delete flat</a>
+                    </div>
                 </div>
                 <br>
             </c:if>

@@ -3,11 +3,7 @@ package org.springframework.samples.flatbook.web;
 
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,11 +11,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.*;
-import org.springframework.samples.flatbook.service.AdvertisementService;
-import org.springframework.samples.flatbook.service.DBImageService;
-import org.springframework.samples.flatbook.service.FlatService;
-import org.springframework.samples.flatbook.service.HostService;
-import org.springframework.samples.flatbook.service.PersonService;
+import org.springframework.samples.flatbook.service.*;
 import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
@@ -29,10 +21,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import static org.springframework.samples.flatbook.web.apis.GeocodeAPI.getGeocodeData;
@@ -47,15 +36,23 @@ public class FlatController {
 	private final PersonService			personService;
 	private final HostService			hostService;
 	private final AdvertisementService	advertisementService;
+	private final TenantService         tenantService;
+	private final FlatReviewService     flatReviewService;
+	private final RequestService        requestService;
+
 
 
 	@Autowired
-	public FlatController(final FlatService flatService, final DBImageService dbImageService, final PersonService personService, final HostService hostService, final AdvertisementService advertisementService) {
+	public FlatController(final FlatService flatService, final DBImageService dbImageService, final PersonService personService, final HostService hostService,
+                          final AdvertisementService advertisementService, final TenantService tenantService, final FlatReviewService flatReviewService, final RequestService requestService) {
 		this.flatService = flatService;
 		this.dbImageService = dbImageService;
 		this.personService = personService;
 		this.hostService = hostService;
 		this.advertisementService = advertisementService;
+		this.tenantService = tenantService;
+		this.flatReviewService = flatReviewService;
+		this.requestService = requestService;
 	}
 
 	@InitBinder
@@ -204,6 +201,17 @@ public class FlatController {
 		mav.addObject("advIds", advIds);
 		return mav;
 	}
+
+    @GetMapping(value = "/flats/{flatId}/delete")
+    public String processDeleteFlat(@PathVariable("flatId") int flatId) {
+        if (!this.validateHost(flatId)) {
+            throw new RuntimeException("Illegal access");
+        }
+        Flat flat = this.flatService.findFlatById(flatId);
+        this.flatService.deleteFlat(flat);
+
+        return "redirect:/flats/list";
+    }
 
 	public boolean validateHost(final int flatId) {
 		Boolean userIsHost = true;

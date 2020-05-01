@@ -23,8 +23,8 @@
             <sec:authorize access="hasAnyAuthority('TENANT')">
                 <c:if test="${!hasFlat}">
                     <div class="col-md-1">
-                        <spring:url value="/advertisements/{advId}/requests/new" var="requestUrl">
-                            <spring:param name="advId" value="${advertisement.id}"/>
+                        <spring:url value="/flats/{flatId}/requests/new" var="requestUrl">
+                            <spring:param name="flatId" value="${advertisement.flat.id}"/>
                         </spring:url>
                         <c:choose>
                             <c:when test="${!requestMade}">

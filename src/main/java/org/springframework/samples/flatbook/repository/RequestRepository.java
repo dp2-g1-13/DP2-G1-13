@@ -16,6 +16,8 @@ public interface RequestRepository {
 
 	void save(Request request) throws DataAccessException;
 
+	void delete(Request request);
+
 	Double ratioOfAcceptedRequests() throws DataAccessException;
 
 	Double ratioOfRejectedRequests() throws DataAccessException;
