@@ -1,12 +1,10 @@
 package org.springframework.samples.flatbook.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +13,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
 import org.springframework.samples.flatbook.repository.AdvertisementRepository;
+import org.springframework.samples.flatbook.util.assertj.FlatAssert;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.samples.flatbook.util.assertj.AdvertisementAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
@@ -72,9 +72,6 @@ public class AdvertisementServiceTests {
         request.setStartDate(LocalDate.MAX);
         request.setFinishDate(LocalDate.MAX);
 
-        Set<Request> requests = new HashSet<>();
-        requests.add(request);
-
         advertisement = new Advertisement();
         advertisement.setId(1);
         advertisement.setTitle("Sample title");
@@ -83,7 +80,6 @@ public class AdvertisementServiceTests {
         advertisement.setPricePerMonth(100.50);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
     }
 
     @BeforeEach
@@ -94,10 +90,10 @@ public class AdvertisementServiceTests {
     @Test
     void shouldFindAdvertisementWithFlatId() {
         Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(1);
-        assertThat(adv.getId()).isEqualTo(1);
+        assertThat(adv).hasId(1);
 //        assertThat(adv.getRequests().size()).isEqualTo(?);
-        assertThat(adv.getPricePerMonth()).isEqualTo(850.9);
-        assertThat(adv.getTitle()).isEqualTo("Beautiful flat in San Bernardo");
+        assertThat(adv).hasPricePerMonth(850.9);
+        assertThat(adv).hasTitle("Beautiful flat in San Bernardo");
     }
 
     @Test
@@ -109,37 +105,44 @@ public class AdvertisementServiceTests {
     @Test
     void shouldCheckThereIsAdvertisementWithFlatId() {
         Boolean b = this.advertisementService.isAdvertisementWithFlatId(2);
-        assertThat(b).isTrue();
+        Assertions.assertThat(b).isTrue();
     }
 
     @Test
     void shouldCheckThereIsNotAdvertisementWithFlatId() {
         Boolean b = this.advertisementService.isAdvertisementWithFlatId(20);
-        assertThat(b).isFalse();
-    }
-
-    @ParameterizedTest
-    @ValueSource(ints = {1, 2, 4})
-    void shouldFindAdvertisementWithRequestId(int requestId) {
-        Advertisement adv = this.advertisementService.findAdvertisementWithRequestId(requestId);
-        assertThat(adv).isNotNull();
+        Assertions.assertThat(b).isFalse();
     }
 
     @Test
-    void shouldNotFindAdvertisementWithRequestId() {
-        Advertisement adv = this.advertisementService.findAdvertisementWithRequestId(10);
-        assertThat(adv).isNull();
+    void shouldFindAdvertisementsByHost() {
+        Set<Advertisement> advertisements = this.advertisementService.findAdvertisementsByHost("host1");
+        Assertions.assertThat(advertisements).hasSize(2);
+        Assertions.assertThat(advertisements).extracting(Advertisement::getTitle)
+            .containsExactlyInAnyOrder("Beautiful flat in San Bernardo", "Beautiful apartment in Encarnación-Regina");
+    }
+    @Test
+    void shouldNotFindAdvertisementsByHost() {
+        Set<Advertisement> advertisements = this.advertisementService.findAdvertisementsByHost("User1");
+        Assertions.assertThat(advertisements).isEmpty();
+    }
+    @Test
+    void shouldFindAllAdvertisements() {
+        when(this.mockedAdvertisementRepository.findAll()).thenReturn(Collections.singleton(advertisement));
+        Set<Advertisement> advertisements = this.advertisementServiceMockito.findAllAdvertisements();
+        Assertions.assertThat(advertisements).hasSize(1);
+        Assertions.assertThat(advertisements).extracting(Advertisement::getTitle)
+            .containsExactly("Sample title");
     }
 
     @Test
     void shouldFindAdvertisementById() {
         when(this.mockedAdvertisementRepository.findById(1)).thenReturn(advertisement);
         Advertisement advertisement = this.advertisementServiceMockito.findAdvertisementById(1);
-        assertThat(advertisement.getId()).isEqualTo(1);
-        assertThat(advertisement.getTitle()).isEqualTo("Sample title");
-        assertThat(advertisement.getPricePerMonth()).isEqualTo(100.50);
-        assertThat(advertisement.getFlat()).isNotNull();
-        assertThat(advertisement.getRequests().isEmpty()).isFalse();
+        assertThat(advertisement).hasId(1);
+        assertThat(advertisement).hasTitle("Sample title");
+        assertThat(advertisement).hasPricePerMonth(100.50);
+        FlatAssert.assertThat(advertisement.getFlat()).isNotNull();
     }
 
     @Test
@@ -161,7 +164,7 @@ public class AdvertisementServiceTests {
         doThrow(new IllegalArgumentException("Target object must not be null")).when(this.mockedAdvertisementRepository).save(isNull());
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> this.advertisementServiceMockito.saveAdvertisement(null));
-        assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
         verify(this.mockedAdvertisementRepository).save(null);
     }
 
@@ -178,7 +181,7 @@ public class AdvertisementServiceTests {
         doThrow(new IllegalArgumentException("Entity must not be null!")).when(this.mockedAdvertisementRepository).delete(isNull());
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> this.advertisementServiceMockito.deleteAdvertisement(null));
-        assertThat(exception.getMessage()).isEqualTo("Entity must not be null!");
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Entity must not be null!");
         verify(this.mockedAdvertisementRepository).delete(null);
 
     }

@@ -30,6 +30,7 @@
             <flatbook:selectField name="asignee" label="Asignee" names="${roommates}" size="3"/>
             <flatbook:hidden name="creationDate"/>
             <flatbook:hidden name="creator"/>
+            <flatbook:hidden name="flat"/>
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">

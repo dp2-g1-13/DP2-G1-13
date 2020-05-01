@@ -21,10 +21,10 @@ public interface SpringDataTenantRepository extends TenantRepository, Repository
 	Tenant findByReviewId(int reviewId) throws DataAccessException;
 
 	@Override
-	@Query("SELECT t FROM Tenant t join t.reviews r group by t order by avg(r.rate) desc")
+	@Query("SELECT t FROM Tenant t join t.reviews r where t.enabled=true group by t order by avg(r.rate) desc")
 	Page<Tenant> topBestReviewedTenants(Pageable pageable) throws DataAccessException;
 
 	@Override
-	@Query("SELECT t FROM Tenant t join t.reviews r group by t order by avg(r.rate) asc ")
+	@Query("SELECT t FROM Tenant t join t.reviews r where t.enabled=true group by t order by avg(r.rate) asc ")
 	Page<Tenant> topWorstReviewedTenants(Pageable pageable) throws DataAccessException;
 }

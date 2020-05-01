@@ -21,28 +21,32 @@
     <jsp:body>
     <div class="container">
 
-        <sec:authorize access="isAuthenticated()">
             <sec:authentication var="user" property="principal.username" />
             <c:if test="${user == host}">
-                <div class="row">
-                    <div class="col-md-1">
+                <div class="row" align="center">
+                    <div class="col-md-2">
                         <spring:url value="/flats/{flatId}/edit" var="flatUrl">
                             <spring:param name="flatId" value="${flat.id}"/>
                         </spring:url>
                         <a role="button" href="${fn:escapeXml(flatUrl)}" class="btn btn-default" aria-pressed="true">Edit flat</a>
                     </div>
                     <c:if test="${!existAd}">
-                        <div class="col-md-1">
+                        <div class="col-md-2">
                             <spring:url value="/flats/{flatId}/advertisements/new" var="advertisementUrl">
                                 <spring:param name="flatId" value="${flat.id}"/>
                             </spring:url>
                             <a role="button" href="${fn:escapeXml(advertisementUrl)}" class="btn btn-default" aria-pressed="true">Publish an ad</a>
                         </div>
                     </c:if>
+                    <div class="col-md-2">
+                        <spring:url value="/flats/{flatId}/delete" var="flatDeleteUrl">
+                            <spring:param name="flatId" value="${flat.id}"/>
+                        </spring:url>
+                        <a role="button" href="${fn:escapeXml(flatDeleteUrl)}" class="btn btn-danger" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this flat?')">Delete flat</a>
+                    </div>
                 </div>
                 <br>
             </c:if>
-        </sec:authorize>
 
         <%@include file="/WEB-INF/jsp/flats/flatPanel.jsp" %>
 

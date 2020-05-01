@@ -11,7 +11,7 @@
         <script>
             $(document).ready(function () {
                 var interval = setInterval(function () {
-                    $("#messagesList").load("${pageContext.request.contextPath}/messages/list #messagesList");
+                    $("#messagesListDiv").load("${pageContext.request.contextPath}/messages/list #messagesList");
                 }, 2000);
             });
          </script>
@@ -20,6 +20,7 @@
     <h2>
         Active conversations
     </h2>
+    <div id="messagesListDiv">
     <table id="messagesList" class="table table-striped">
         <thead>
         <tr>
@@ -48,5 +49,6 @@
         </c:forEach>
         </tbody>
     </table>
+    </div>
 </jsp:body>
 </flatbook:layout>

@@ -3,9 +3,10 @@ package org.springframework.samples.flatbook.web;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -25,6 +26,7 @@ import org.springframework.samples.flatbook.service.UserService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
+import org.springframework.samples.flatbook.web.apis.MailjetAPI;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.PasswordValidator;
 import org.springframework.samples.flatbook.web.validators.PersonAuthorityValidator;
@@ -37,13 +39,18 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import static org.springframework.samples.flatbook.web.apis.MailjetAPI.sendSimpleMessage;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class PersonController {
 
-	private static final String	USER_PAGE							= "users/userPage";
+	private static final String	BANNED								= "banned";
+
+	private static final String	ACTIVE								= "active";
+
+	private static final String	USER_PAGE							= "users/usersPage";
+
+	private static final String	USER_LIST							= "users/usersList";
 
 	private static final String	ONLY_CAN_EDIT_YOUR_OWN_PROFILE		= "Only can edit your own profile";
 
@@ -113,7 +120,7 @@ public class PersonController {
 			try {
 				user.setSaveType(SaveType.NEW);
 				this.personService.saveUser(user);
-				sendSimpleMessage(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword());
+				MailjetAPI.sendSimpleMessage(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword());
 				return "redirect:/login";
 			} catch (DuplicatedUsernameException e) {
 				result.rejectValue("username", PersonController.USERNAME_DUPLICATED, PersonController.USERNAME_DUPLICATED);
@@ -200,23 +207,39 @@ public class PersonController {
 	@GetMapping("/users/{username}")
 	public String initUserPage(final ModelMap model, @PathVariable("username") final String username, final Principal principal) {
 		User user = this.personService.findUserById(username);
-		if (user != null) {
+		if (user != null && (user.isEnabled() || !user.isEnabled() && this.authoritiesService.findAuthorityById(principal.getName()).equals(AuthoritiesType.ADMIN))) {
 			model.put("username", username);
 			model.put("enabled", user.isEnabled());
 
 			if (this.authoritiesService.findAuthorityById(username).equals(AuthoritiesType.TENANT)) {
 				Tenant tenant = this.tenantService.findTenantById(username);
 				model.put("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewATenant(principal.getName(), username));
-				model.put("reviews", new ArrayList<>(tenant.getReviews()));
+				model.put("reviews", tenant.getReviews().stream().filter(x -> x.getCreator().isEnabled()).collect(Collectors.toList()));
 				model.put("tenantId", username);
 				model.put("myFlatId", tenant.getFlat() != null ? tenant.getFlat().getId() : null);
 			} else {
 				model.put("selections", this.advertisementService.findAdvertisementsByHost(username));
 			}
 			return PersonController.USER_PAGE;
+		} else if (user != null && !user.isEnabled()) {
+			throw new RuntimeException("This user is banned");
 		} else {
 			throw new RuntimeException("This user does not exists");
 		}
+	}
+
+	@GetMapping("/users/list")
+	public String initUserList(final ModelMap model, final Principal principal, @RequestParam(name = "show", required = false) final String show) {
+		List<User> users = this.personService.findAllUsers().stream().sorted(Comparator.comparing(User::getUsername)).collect(Collectors.toList());
+
+		if (show != null && show.equals(PersonController.ACTIVE)) {
+			users.removeIf(x -> !x.isEnabled());
+		} else if (show != null && show.equals(PersonController.BANNED)) {
+			users.removeIf(x -> x.isEnabled());
+		}
+
+		model.put("users", users);
+		return PersonController.USER_LIST;
 	}
 
 	@GetMapping({
@@ -225,7 +248,12 @@ public class PersonController {
 	public String banOrUnbanUser(final ModelMap model, @PathVariable("username") final String username, final Principal principal) {
 		User user = this.personService.findUserById(username);
 		if (user != null) {
-			user.setEnabled(user.isEnabled() ? false : true);
+			if (user.isEnabled()) {
+				this.personService.banUser(username);
+				user.setEnabled(false);
+			} else {
+				user.setEnabled(true);
+			}
 			this.userService.save(user);
 			return "redirect:/users/{username}";
 		} else {
