@@ -2,6 +2,7 @@ package org.springframework.samples.flatbook.web;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -9,8 +10,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.samples.flatbook.configuration.SecurityConfiguration;
 import org.springframework.samples.flatbook.model.*;
+import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
 import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,16 +23,14 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(controllers = AdvertisementController.class,
+	includeFilters = {@ComponentScan.Filter(value = ReviewUtils.class, type = FilterType.ASSIGNABLE_TYPE)},
     excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class),
     excludeAutoConfiguration= SecurityConfiguration.class)
 public class AdvertisementControllerTests {
@@ -44,9 +45,6 @@ public class AdvertisementControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private AdvertisementController advertisementController;
 
     @MockBean
     private FlatService flatService;
@@ -64,6 +62,12 @@ public class AdvertisementControllerTests {
     private AdvertisementService advertisementService;
 
     @MockBean
+    private AuthoritiesService authoritiesService;
+    
+    @MockBean
+    private TenantService tenantService;
+    
+    @MockBean
     private RequestService requestService;
 
     @BeforeEach
@@ -73,6 +77,8 @@ public class AdvertisementControllerTests {
         address.setCity(TEST_CITY_FLAT);
         address.setPostalCode(TEST_POSTAL_CODE_FLAT);
         address.setAddress("Plaza Nueva");
+        address.setLatitude(37.3822261);
+        address.setLongitude(-6.0123468);
 
         DBImage image = new DBImage();
         image.setFilename("a");
@@ -80,16 +86,6 @@ public class AdvertisementControllerTests {
         image.setData(new byte[]{1, 2, 3});
         Set<DBImage> images = new HashSet<>();
         images.add(image);
-
-        Flat flat = new Flat();
-        flat.setId(TEST_FLAT_ID);
-        flat.setDescription("this is a sample description with more than 30 characters");
-        flat.setSquareMeters(100);
-        flat.setNumberRooms(3);
-        flat.setNumberBaths(2);
-        flat.setAvailableServices("Wifi and TV");
-        flat.setAddress(address);
-        flat.setImages(images);
 
         Request request = new Request();
         request.setStatus(RequestStatus.PENDING);
@@ -100,6 +96,21 @@ public class AdvertisementControllerTests {
 
         Set<Request> requests = new HashSet<>();
         requests.add(request);
+        
+        Set<FlatReview> fr = new HashSet<>();
+        Set<Tenant> tenants = new HashSet<>();
+        Flat flat = new Flat();
+        flat.setId(TEST_FLAT_ID);
+        flat.setDescription("this is a sample description with more than 30 characters");
+        flat.setSquareMeters(100);
+        flat.setNumberRooms(3);
+        flat.setNumberBaths(2);
+        flat.setAvailableServices("Wifi and TV");
+        flat.setAddress(address);
+        flat.setImages(images);
+        flat.setRequests(requests);
+        flat.setFlatReviews(fr);
+        flat.setTenants(tenants);
 
         Advertisement advertisement = new Advertisement();
         advertisement.setId(TEST_ADVERTISEMENT_ID);
@@ -109,16 +120,20 @@ public class AdvertisementControllerTests {
         advertisement.setPricePerMonth(985.50);
         advertisement.setCreationDate(LocalDate.now());
         advertisement.setFlat(flat);
-        advertisement.setRequests(requests);
 
         Set<Advertisement> advertisements = new HashSet<>();
         advertisements.add(advertisement);
 
         Host host = new Host();
         host.setUsername(TEST_HOST_USERNAME);
+        host.setEnabled(true);
 
         Tenant tenant = new Tenant();
         tenant.setUsername(TEST_TENANT_USERNAME);
+        tenant.setEnabled(true);
+        
+        Set<Advertisement> allAdverts = new HashSet<>();
+        allAdverts.add(advertisement);
 
         given(this.flatService.findFlatById(TEST_FLAT_ID)).willReturn(flat);
         given(this.advertisementService.isAdvertisementWithFlatId(TEST_FLAT_ID)).willReturn(false);
@@ -127,7 +142,10 @@ public class AdvertisementControllerTests {
         given(this.dbImageService.getImagesByFlatId(TEST_FLAT_ID)).willReturn(images);
         given(this.personService.findUserById(TEST_HOST_USERNAME)).willReturn(host);
         given(this.personService.findUserById(TEST_TENANT_USERNAME)).willReturn(tenant);
-        given(this.requestService.isThereRequestOfTenantByAdvertisementId(TEST_TENANT_USERNAME, TEST_ADVERTISEMENT_ID)).willReturn(true);
+        given(this.requestService.isThereRequestOfTenantByFlatId(TEST_TENANT_USERNAME, TEST_FLAT_ID)).willReturn(true);
+        given(this.authoritiesService.findAuthorityById(TEST_TENANT_USERNAME)).willReturn(AuthoritiesType.TENANT);
+        given(this.authoritiesService.findAuthorityById(TEST_HOST_USERNAME)).willReturn(AuthoritiesType.HOST);
+        given(this.advertisementService.findAllAdvertisements()).willReturn(allAdverts);
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
@@ -157,7 +175,7 @@ public class AdvertisementControllerTests {
             .param("requirements", "Sample requirements")
             .param("pricePerMonth", "985.50"))
             .andExpect(status().is3xxRedirection());
-        then(this.advertisementService).should().saveAdvertisement(isA(Advertisement.class));
+        then(this.advertisementService).should().saveAdvertisement(Mockito.isA(Advertisement.class));
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
@@ -219,7 +237,7 @@ public class AdvertisementControllerTests {
             .param("requirements", "Sample requirements")
             .param("pricePerMonth", "670.99"))
             .andExpect(status().is3xxRedirection());
-        then(this.advertisementService).should().saveAdvertisement(isA(Advertisement.class));
+        then(this.advertisementService).should().saveAdvertisement(Mockito.isA(Advertisement.class));
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
@@ -256,7 +274,7 @@ public class AdvertisementControllerTests {
         mockMvc.perform(get("/advertisements/{advertisementId}/delete", TEST_ADVERTISEMENT_ID))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/"));
-        then(this.advertisementService).should().deleteAdvertisement(isA(Advertisement.class));
+        then(this.advertisementService).should().deleteAdvertisement(Mockito.isA(Advertisement.class));
     }
 
     @WithMockUser(value = "spring-wrong", roles = {"HOST"})
