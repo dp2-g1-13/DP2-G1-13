@@ -123,7 +123,7 @@
 		            </tr>
 		            </table>
 		            
-		            <div class="col-xs-6 panel panel-default">
+		            <div class="col-xs-12 panel panel-default">
 				    	<div class="panel-heading">
 							<h2>Best Reviewed Tenants</h2>
 						</div>
@@ -146,7 +146,7 @@
 					       </div>
 					   </div>
 					   
-					   <div class="col-xs-6 panel panel-default">
+					   <div class="col-xs-12 panel panel-default">
 				    	<div class="panel-heading">
 							<h2>Best Reviewed Hosts</h2>
 						</div>
@@ -169,7 +169,7 @@
 					       </div>
 			      		</div>
 			      		
-			      		<div class="col-xs-4 panel panel-default">
+			      		<div class="col-xs-12 panel panel-default">
 				    	<div class="panel-heading">
 							<h2>Worst Reviewed Tenants</h2>
 						</div>
@@ -192,7 +192,7 @@
 					       </div>
 			      		</div>
 			      		
-			      		<div class="col-xs-4 panel panel-default">
+			      		<div class="col-xs-12 panel panel-default">
 				    	<div class="panel-heading">
 							<h2>Worst Reviewed Hosts</h2>
 						</div>
@@ -215,7 +215,7 @@
 					       </div>
 			      		</div>
 			      		
-			      		<div class="col-xs-4 panel panel-default">
+			      		<div class="col-xs-12 panel panel-default">
 				    	<div class="panel-heading">
 							<h2>Most Reported Users</h2>
 						</div>
