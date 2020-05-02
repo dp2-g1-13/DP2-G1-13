@@ -32,9 +32,6 @@
         </tr>
         </thead>
         <tbody>
-        <c:if test="${users.size() == 0}">
-			<p>There are no users to show.</p>
-		</c:if>
         <c:forEach items="${users}" var="user">
             <tr>
                 <td>
@@ -51,6 +48,9 @@
         </c:forEach>
         </tbody>
     </table>
+    <c:if test="${users.size() == 0}">
+			<p>There are no users to show.</p>
+	</c:if>
     </div>
     
 </flatbook:layout>
