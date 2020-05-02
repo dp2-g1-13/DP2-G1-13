@@ -11,6 +11,9 @@
 
     <h2>These are the results:</h2>
 
+	<c:if test="${requests.size() == 0}">
+		<p>There are no requests to show.</p>
+	</c:if>
     <c:if test="${requests.size() > 0}">
     <div class="panel-body overflow">
     <c:forEach var="i" begin="0" end="${requests.size()-1}">

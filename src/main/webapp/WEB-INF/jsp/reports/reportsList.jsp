@@ -11,6 +11,9 @@
 		</h2>
 			<div class="panel panel-default">
        			 <div class="panel-body overflow">
+       			 <c:if test="${reports.size() == 0}">
+					<p>There are no reports to show.</p>
+				 </c:if>
        			 <c:forEach items="${reports}" var="report">
        			 <div class="panel panel-default">
                         <div class="panel-body">

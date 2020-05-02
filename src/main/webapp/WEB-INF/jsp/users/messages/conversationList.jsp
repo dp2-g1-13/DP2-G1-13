@@ -50,5 +50,8 @@
         </tbody>
     </table>
     </div>
+    <c:if test="${messages.size() == 0}">
+			<p>There are no chats to show, send a message to someone!</p>
+	</c:if>
 </jsp:body>
 </flatbook:layout>

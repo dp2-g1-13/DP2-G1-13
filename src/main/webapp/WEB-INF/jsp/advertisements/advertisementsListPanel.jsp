@@ -1,4 +1,7 @@
 <div class="panel-body overflow">
+<c:if test="${selections.size() == 0}">
+	<p>There are no advertisements to show.</p>
+</c:if>
 <c:forEach items="${selections}" var="advertisement">
     <div class="panel panel-default">
         <div class="panel-heading"><h4><c:out value="${advertisement.title}" /></h4></div>

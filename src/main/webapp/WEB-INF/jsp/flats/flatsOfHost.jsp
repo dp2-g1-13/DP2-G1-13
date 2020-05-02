@@ -16,6 +16,9 @@
     </div>
     </div>
     <br>
+  	<c:if test="${flats.size() == 0}">
+		<p>There are no flats to show. Please, create a new flat.</p>
+	</c:if>
     <c:if test="${flats.size()>0}">
     <div class="panel-body overflow">
     <c:forEach var="i" begin="0" end="${flats.size()-1}">

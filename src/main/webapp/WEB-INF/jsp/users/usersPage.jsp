@@ -87,9 +87,7 @@
         <div class="row">
             <div class="panel panel-default">
        			 <div class="panel-heading"><h3>Advertisements</h3></div>
-		         <c:if test="${selections.size() > 0}">
 		        	<%@include file="/WEB-INF/jsp/advertisements/advertisementsListPanel.jsp"%>
-		        </c:if>
 	        </div>
 	    </div>
         </c:if>

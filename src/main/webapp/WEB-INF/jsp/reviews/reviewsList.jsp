@@ -9,6 +9,9 @@
     <div class="panel panel-default">
         <div class="panel-heading"><h3>Reviews</h3></div>
         <div class="panel-body overflow">
+        	<c:if test="${reviews.size() == 0}">
+				<p>There are no reviews to show.</p>
+			</c:if>
             <c:if test="${reviews.size() > 0}">
             <div class="panel-group">
                 <c:forEach var="i" begin="0" end="${reviews.size()-1}">
@@ -107,6 +110,7 @@
             </div>
             </c:if>
             <c:if test="${canCreateReview}">
+            <br>
                 <div class="row">
                     <div class="col-md-6">
                         <c:choose>
