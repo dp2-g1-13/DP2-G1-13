@@ -151,10 +151,10 @@ public class PersonService {
 		});
 
 		this.taskRepository.findByParticipant(tenant.getUsername()).stream().forEach(x -> {
-			if (x.getAsignee().equals(tenant)) {
+			if (tenant.equals(x.getAsignee())) {
 				x.setAsignee(null);
 				this.taskRepository.save(x);
-			} else if (x.getCreator().equals(tenant)) {
+			} else if (tenant.equals(x.getCreator())) {
 				this.taskRepository.deleteById(x.getId());
 			}
 		});
