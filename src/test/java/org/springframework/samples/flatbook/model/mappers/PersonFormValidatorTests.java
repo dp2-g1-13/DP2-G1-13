@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.model;
+package org.springframework.samples.flatbook.model.mappers;
 
 import java.util.Locale;
 

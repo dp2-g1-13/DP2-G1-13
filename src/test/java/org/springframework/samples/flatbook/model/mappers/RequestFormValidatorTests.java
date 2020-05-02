@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.model;
+package org.springframework.samples.flatbook.model.mappers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
