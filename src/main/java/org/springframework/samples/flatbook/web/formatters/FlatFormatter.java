@@ -2,7 +2,6 @@
 package org.springframework.samples.flatbook.web.formatters;
 
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +23,12 @@ public class FlatFormatter implements Formatter<Flat> {
 
 	@Override
 	public Flat parse(final String idText, final Locale locale) throws ParseException {
-		Collection<Flat> flats = this.flatService.findAllFlats();
-		Integer id = Integer.valueOf(idText);
-		for (Flat f : flats) {
-			if (f.getId().equals(id)) {
-				return f;
-			}
+		Flat flat = this.flatService.findFlatById(Integer.valueOf(idText));
+		if (flat != null) {
+			return flat;
+		} else {
+			throw new ParseException("Flat not found with id " + idText, 0);
 		}
-		throw new ParseException("Flat not found with id " + id, 0);
 	}
 
 	@Override
