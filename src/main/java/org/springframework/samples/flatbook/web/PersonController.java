@@ -42,6 +42,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.common.collect.Lists;
+
 @Controller
 public class PersonController {
 
@@ -219,7 +221,7 @@ public class PersonController {
 				model.put("tenantId", username);
 				model.put("myFlatId", tenant.getFlat() != null ? tenant.getFlat().getId() : null);
 			} else {
-				model.put("selections", this.advertisementService.findAdvertisementsByHost(username));
+				model.put("selections", user.isEnabled() ? this.advertisementService.findAdvertisementsByHost(username) : Lists.newArrayList());
 			}
 			return PersonController.USER_PAGE;
 		} else if (user != null && !user.isEnabled()) {
