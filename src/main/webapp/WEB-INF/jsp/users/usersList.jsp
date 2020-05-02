@@ -29,9 +29,11 @@
         <tr>
             <th>User</th>
             <th>Status</th>
+            <th>Type</th>
         </tr>
         </thead>
         <tbody>
+        <c:set var="i" value="0"/>
         <c:forEach items="${users}" var="user">
             <tr>
                 <td>
@@ -44,7 +46,11 @@
                   	<c:if test="${user.enabled}">Active</c:if>
                   	<c:if test="${!user.enabled}">Banned</c:if>
                 </td>
+                <td>
+                  	<c:out value="${authorities.get(i).authority}"/>
+                </td>
             </tr>
+            <c:set var="i" value="${i+1}"/>
         </c:forEach>
         </tbody>
     </table>

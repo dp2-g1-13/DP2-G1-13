@@ -58,7 +58,9 @@ public class Flat extends BaseEntity {
 
 	@Valid
 	@NotNull
-	@OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+	@OneToOne(cascade = {
+		CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST
+	}, fetch = FetchType.EAGER)
 	@JoinColumn(name = "address_id")
 	private Address			address;
 

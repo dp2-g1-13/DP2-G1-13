@@ -176,7 +176,7 @@
 					        <div class="panel-body">
 					            <table class="table table-striped">
 					            	<c:set var="contador" value="${1}" />
-					              	<c:forEach items="${statistics.topThreeBestReviewedTenants}" var="user">
+					              	<c:forEach items="${statistics.topThreeWorstReviewedTenants}" var="user">
 						             	<tr>
 											<th><c:out value="${contador}º" /></th>
 								            <c:set var="contador" value="${contador+1}" />

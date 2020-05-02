@@ -13,6 +13,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.User;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
@@ -231,6 +232,7 @@ public class PersonController {
 	@GetMapping("/users/list")
 	public String initUserList(final ModelMap model, final Principal principal, @RequestParam(name = "show", required = false) final String show) {
 		List<User> users = this.personService.findAllUsers().stream().sorted(Comparator.comparing(User::getUsername)).collect(Collectors.toList());
+		List<Authorities> authorities = this.authoritiesService.findAll().stream().sorted(Comparator.comparing(Authorities::getUsername)).collect(Collectors.toList());
 
 		if (show != null && show.equals(PersonController.ACTIVE)) {
 			users.removeIf(x -> !x.isEnabled());
@@ -238,7 +240,9 @@ public class PersonController {
 			users.removeIf(x -> x.isEnabled());
 		}
 
+		authorities.removeIf(x -> !users.stream().map(y -> y.getUsername()).collect(Collectors.toList()).contains(x.getUsername()));
 		model.put("users", users);
+		model.put("authorities", authorities);
 		return PersonController.USER_LIST;
 	}
 

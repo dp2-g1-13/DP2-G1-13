@@ -23,22 +23,22 @@
 
             <sec:authentication var="user" property="principal.username" />
             <c:if test="${user == host}">
-                <div class="row" align="center">
-                    <div class="col-md-2">
+                <div class="row" >
+                    <div align="left" class="col-md-4">
                         <spring:url value="/flats/{flatId}/edit" var="flatUrl">
                             <spring:param name="flatId" value="${flat.id}"/>
                         </spring:url>
                         <a role="button" href="${fn:escapeXml(flatUrl)}" class="btn btn-default" aria-pressed="true">Edit flat</a>
                     </div>
-                    <c:if test="${!existAd}">
-                        <div class="col-md-2">
+                    <c:if  test="${!existAd}">
+                        <div align="center" class="col-md-4">
                             <spring:url value="/flats/{flatId}/advertisements/new" var="advertisementUrl">
                                 <spring:param name="flatId" value="${flat.id}"/>
                             </spring:url>
                             <a role="button" href="${fn:escapeXml(advertisementUrl)}" class="btn btn-default" aria-pressed="true">Publish an ad</a>
                         </div>
                     </c:if>
-                    <div class="col-md-2">
+                    <div align="right" class="col-md-4">
                         <spring:url value="/flats/{flatId}/delete" var="flatDeleteUrl">
                             <spring:param name="flatId" value="${flat.id}"/>
                         </spring:url>

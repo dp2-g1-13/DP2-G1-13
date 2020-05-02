@@ -57,6 +57,13 @@
 				</spring:url>
 				<a role="button" href="${fn:escapeXml(reportList)}"
 					class="btn btn-default" aria-pressed="true">Report List</a>
+					<c:if test="${myFlatId != null}">
+                        <spring:url value="/flats/{myFlatId}" var="myFlat">
+                            <spring:param name="myFlatId" value="${myFlatId}" />
+                        </spring:url>
+                        <a role="button" class="btn btn-default"
+                            href="${fn:escapeXml(myFlat)}" aria-pressed="true">User's Flat</a>
+                    </c:if>
 				<c:choose>
 					<c:when test="${enabled}">
 						<spring:url value="/users/{username}/ban" var="desactivateUser">
