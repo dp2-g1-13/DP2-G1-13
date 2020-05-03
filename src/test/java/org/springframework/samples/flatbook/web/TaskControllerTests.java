@@ -18,7 +18,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
@@ -35,6 +37,7 @@ excludeAutoConfiguration= SecurityConfiguration.class)
 public class TaskControllerTests {
 
 	private static final Integer TEST_TASK_ID = 1;
+	private static final Integer TEST_BAD_TASK_ID = 5;
 	private static final Integer TEST_FLAT_ID = 1;
     private static final String TEST_CREATOR_USERNAME = "creator";
     private static final String TEST_ASIGNEE_USERNAME = "asignee";
@@ -85,6 +88,9 @@ public class TaskControllerTests {
         task.setStatus(status);
         task.setFlat(flat);
         
+        Set<Task> tasks = new HashSet<>();
+        tasks.add(task);
+        
         Tenant notAllowed = new Tenant();
         notAllowed.setUsername(TEST_NOTALLOWED_USERNAME);
 
@@ -93,6 +99,7 @@ public class TaskControllerTests {
         given(this.tenantService.findTenantById(TEST_NOTALLOWED_USERNAME)).willReturn(notAllowed);
         given(this.taskService.findTaskById(TEST_TASK_ID)).willReturn(task);
         given(this.flatService.findFlatById(TEST_FLAT_ID)).willReturn(flat);
+        given(this.taskService.findTasksByFlatId(TEST_FLAT_ID)).willReturn(tasks);
     }
 
     @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
@@ -103,6 +110,14 @@ public class TaskControllerTests {
             .andExpect(view().name("tasks/createOrUpdateTaskForm"))
             .andExpect(model().attributeExists("task"))
         	.andExpect(model().attributeExists("roommates"));
+    }
+    
+    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
+    @Test
+    void testInitCreationFormNotAllowedUser() throws Exception {
+        mockMvc.perform(get("/tasks/new"))
+        	.andExpect(status().is2xxSuccessful())
+        	.andExpect(view().name("exception"));
     }
 
     @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
@@ -182,7 +197,23 @@ public class TaskControllerTests {
             .andExpect(model().attribute("task", hasProperty("flat", is(this.flatService.findFlatById(TEST_FLAT_ID)))))
             .andExpect(view().name("tasks/createOrUpdateTaskForm"));
     }
+    
+    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
+    @Test
+    void testInitUpdateFormThrowExceptionBadUser() throws Exception {
+        mockMvc.perform(get("/tasks/{taskId}/edit", TEST_TASK_ID))
+            .andExpect(status().isOk())
+            .andExpect(view().name("exception"));
+    }
 
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
+    @Test
+    void testInitUpdateFormThrowExceptionBadTaskId() throws Exception {
+        mockMvc.perform(get("/tasks/{taskId}/edit", TEST_BAD_TASK_ID))
+            .andExpect(status().isOk())
+            .andExpect(view().name("exception"));
+    }
+    
     @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessUpdateFormSuccess() throws Exception {
@@ -196,6 +227,54 @@ public class TaskControllerTests {
         	.param("creator", TEST_CREATOR_USERNAME)
         	.param("status", "TODO"))
             .andExpect(status().is3xxRedirection());
+    }
+    
+    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
+    @Test
+    void testProcessUpdateFormThrowExceptionBadUser() throws Exception {
+        mockMvc.perform(post("/tasks/{taskId}/edit", TEST_TASK_ID)
+            .with(csrf())
+            .param("title", "updated title")
+            .param("description", "updated description")
+            .param("asignee", TEST_ASIGNEE_USERNAME)
+            .param("flat", TEST_FLAT_ID.toString())
+        	.param("creationDate", "01/01/2005")
+        	.param("creator", TEST_CREATOR_USERNAME)
+        	.param("status", "TODO"))
+            .andExpect(status().is2xxSuccessful())
+        	.andExpect(view().name("exception"));
+    }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
+    @Test
+    void testProcessUpdateFormThrowExceptionBadTaskId() throws Exception {
+        mockMvc.perform(post("/tasks/{taskId}/edit", TEST_BAD_TASK_ID)
+            .with(csrf())
+            .param("title", "updated title")
+            .param("description", "updated description")
+            .param("asignee", TEST_ASIGNEE_USERNAME)
+            .param("flat", TEST_FLAT_ID.toString())
+        	.param("creationDate", "01/01/2005")
+        	.param("creator", TEST_CREATOR_USERNAME)
+        	.param("status", "TODO"))
+            .andExpect(status().is2xxSuccessful())
+        	.andExpect(view().name("exception"));
+    }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
+    @Test
+    void testProcessUpdateFormHasErrors() throws Exception {
+        mockMvc.perform(post("/tasks/{taskId}/edit", TEST_TASK_ID)
+            .with(csrf())
+            .param("title", "updated title")
+            .param("description", "updated description")
+            .param("asignee", TEST_ASIGNEE_USERNAME)
+            .param("flat", TEST_FLAT_ID.toString())
+        	.param("creationDate", "01/01/2005")
+        	.param("creator", TEST_CREATOR_USERNAME))
+        	.andExpect(model().attributeExists("roommates"))
+        	.andExpect(model().attributeExists("taskStatus"))
+        	.andExpect(view().name("tasks/createOrUpdateTaskForm"));
     }
 
     @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
@@ -211,5 +290,22 @@ public class TaskControllerTests {
         mockMvc.perform(get("/tasks/{taskId}/delete", TEST_TASK_ID))
             .andExpect(status().is2xxSuccessful())
             .andExpect(view().name("exception"));
+    }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
+    @Test
+    void testTaskList() throws Exception {
+        mockMvc.perform(get("/tasks/list"))
+        	.andExpect(status().isOk())
+        	.andExpect(model().attributeExists("tasks"))
+        	.andExpect(view().name("tasks/tasksList"));
+    }
+    
+    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
+    @Test
+    void testTaskListThrowExceptionBadUser() throws Exception {
+        mockMvc.perform(get("/tasks/list"))
+        	.andExpect(status().isOk())
+        	.andExpect(view().name("exception"));
     }
 }

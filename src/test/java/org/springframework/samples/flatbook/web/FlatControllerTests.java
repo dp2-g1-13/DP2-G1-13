@@ -46,9 +46,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FlatControllerTests {
 
     private static final Integer TEST_FLAT_ID = 1;
+    private static final Integer TEST_FLAT_ID2 = 2;
+    private static final Integer TEST_FLAT_ID3 = 3;
     private static final String TEST_PERSON_USERNAME = "spring";
     private static final Integer TEST_IMAGE_ID = 1;
     private static final String TEST_CITY_FLAT = "Seville";
+    private static final String TEST_CITY_FLAT_NOT_EXISTS = "not";
+    private static final String TEST_ADDRESS_NOT_EXISTS = "notexists";
     private static final String TEST_COUNTRY_FLAT = "Spain";
     private static final String TEST_POSTAL_CODE_FLAT = "41010";
     private static final double LATITUDE = 37.3822261;
@@ -112,6 +116,12 @@ class FlatControllerTests {
         response.setResults(resultList);
         response.setStatus("OK");
         
+        GeocodeResponse responseZeroResults = new GeocodeResponse();
+        responseZeroResults.setStatus("ZERO_RESULTS");
+
+        GeocodeResponse responseError = new GeocodeResponse();
+        responseError.setStatus("ERROR");
+        
         DBImage image = new DBImage();
         image.setId(TEST_IMAGE_ID);
         images.add(image);
@@ -123,6 +133,7 @@ class FlatControllerTests {
         images.add(new DBImage());
 
         Set<FlatReview> fr = new HashSet<>();
+        Set<Tenant> tnnts = new HashSet<>();
         Flat flat = new Flat();
         flat.setId(TEST_FLAT_ID);
         flat.setDescription("this is a sample description with more than 30 chars");
@@ -133,6 +144,43 @@ class FlatControllerTests {
         flat.setAddress(address);
         flat.setImages(images);
         flat.setFlatReviews(fr);
+        flat.setTenants(tnnts);
+        
+        Set<DBImage> fourImages = new HashSet<>();
+        fourImages.add(image);
+        fourImages.add(new DBImage());
+        fourImages.add(new DBImage());
+        fourImages.add(new DBImage());
+        
+        Flat flat4Images = new Flat();
+        flat4Images.setId(TEST_FLAT_ID2);
+        flat4Images.setDescription("this is a sample description with more than 30 chars");
+        flat4Images.setSquareMeters(90);
+        flat4Images.setNumberBaths(2);
+        flat4Images.setNumberRooms(2);
+        flat4Images.setAvailableServices("Wifi and cable TV");
+        flat4Images.setAddress(address);
+        flat4Images.setImages(fourImages);
+        flat4Images.setFlatReviews(fr);
+        
+        Set<DBImage> sixImages = new HashSet<>();
+        sixImages.add(image);
+        sixImages.add(new DBImage());
+        sixImages.add(new DBImage());
+        sixImages.add(new DBImage());
+        sixImages.add(new DBImage());
+        sixImages.add(new DBImage());
+        
+        Flat flat6Images = new Flat();
+        flat6Images.setId(TEST_FLAT_ID3);
+        flat6Images.setDescription("this is a sample description with more than 30 chars");
+        flat6Images.setSquareMeters(90);
+        flat6Images.setNumberBaths(2);
+        flat6Images.setNumberRooms(2);
+        flat6Images.setAvailableServices("Wifi and cable TV");
+        flat6Images.setAddress(address);
+        flat6Images.setImages(sixImages);
+        flat6Images.setFlatReviews(fr);
 
         Set<Flat> flatsOfHost = new HashSet<>();
         flatsOfHost.add(flat);
@@ -142,10 +190,16 @@ class FlatControllerTests {
 
         given(this.personService.findUserById(TEST_PERSON_USERNAME)).willReturn(host);
         given(this.flatService.findFlatById(TEST_FLAT_ID)).willReturn(flat);
+        given(this.flatService.findFlatById(TEST_FLAT_ID2)).willReturn(flat4Images);
+        given(this.flatService.findFlatById(TEST_FLAT_ID3)).willReturn(flat6Images);
         given(this.flatService.findFlatByHostUsername(TEST_PERSON_USERNAME)).willReturn(flatsOfHost);
         given(this.dbImageService.getImageById(TEST_IMAGE_ID)).willReturn(image);
         given(this.dbImageService.getImagesByFlatId(TEST_FLAT_ID)).willReturn(images);
+        given(this.dbImageService.getImagesByFlatId(TEST_FLAT_ID2)).willReturn(fourImages);
+        given(this.dbImageService.getImagesByFlatId(TEST_FLAT_ID3)).willReturn(sixImages);
         given(this.hostService.findHostByFlatId(TEST_FLAT_ID)).willReturn(host);
+        given(this.hostService.findHostByFlatId(TEST_FLAT_ID2)).willReturn(host);
+        given(this.hostService.findHostByFlatId(TEST_FLAT_ID3)).willReturn(host);
         given(this.advertisementService.isAdvertisementWithFlatId(TEST_FLAT_ID)).willReturn(false);
         given(this.authoritiesService.findAuthorityById(TEST_PERSON_USERNAME)).willReturn(AuthoritiesType.HOST);
         willAnswer(invocation -> {
@@ -155,8 +209,10 @@ class FlatControllerTests {
         }).given(this.dbImageService).deleteImage(image);
         try {
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(address.getAddress() + ", " + address.getCity())).willReturn(response);
+			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_ADDRESS_NOT_EXISTS + ", " + TEST_CITY_FLAT_NOT_EXISTS)).willReturn(responseZeroResults);
+			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_ADDRESS_NOT_EXISTS + ", " + address.getCity())).willReturn(responseError);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_CITY_FLAT + ", " + TEST_COUNTRY_FLAT + TEST_POSTAL_CODE_FLAT)).willReturn(response);
-		} catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
 		}
     }
 
@@ -233,6 +289,97 @@ class FlatControllerTests {
             .andExpect(model().attributeHasFieldErrors("flat", "numberBaths"))
             .andExpect(view().name("flats/createOrUpdateFlatForm"));
     }
+    
+    @WithMockUser(value = "spring", roles = {"HOST"})
+    @Test
+    void testProcessCreationFormHasNotEnoughImages() throws Exception {
+        MockMultipartFile file1 = new MockMultipartFile("images", "image1.png", "image/png", "image1".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("images", "image2.png", "image/png", "image2".getBytes());
+        MockMultipartFile file3 = new MockMultipartFile("images", "image3.png", "image/png", "image3".getBytes());
+
+        mockMvc.perform(multipart("/flats/new")
+            .file(file1)
+            .file(file2)
+            .file(file3)
+            .with(csrf())
+            .param("description", "this is a sample description with more than 30 chars")
+            .param("squareMeters", "90")
+            .param("numberRooms", "2")
+            .param("numberBaths", "2")
+            .param("availableServices", "Wifi and cable TV")
+            .param("address.address", "Avenida de la República Argentina")
+            .param("address.postalCode", "41011")
+            .param("address.city", "Sevilla")
+            .param("address.country", "Spain"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeHasErrors("flat"))
+            .andExpect(model().attributeHasFieldErrors("flat", "images"))
+            .andExpect(view().name("flats/createOrUpdateFlatForm"));
+    }
+    
+    @WithMockUser(value = "spring", roles = {"HOST"})
+    @Test
+    void testProcessCreationFormZeroResults() throws Exception {
+    	MockMultipartFile file1 = new MockMultipartFile("images", "image1.png", "image/png", "image1".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("images", "image2.png", "image/png", "image2".getBytes());
+        MockMultipartFile file3 = new MockMultipartFile("images", "image3.png", "image/png", "image3".getBytes());
+        MockMultipartFile file4 = new MockMultipartFile("images", "image4.png", "image/png", "image4".getBytes());
+        MockMultipartFile file5 = new MockMultipartFile("images", "image5.png", "image/png", "image5".getBytes());
+        MockMultipartFile file6 = new MockMultipartFile("images", "image6.png", "image/png", "image6".getBytes());
+
+        mockMvc.perform(multipart("/flats/new")
+            .file(file1)
+            .file(file2)
+            .file(file3)
+            .file(file4)
+            .file(file5)
+            .file(file6)
+            .with(csrf())
+            .param("description", "this is a sample description with more than 30 chars")
+            .param("squareMeters", "90")
+            .param("numberRooms", "2")
+            .param("numberBaths", "2")
+            .param("availableServices", "Wifi and cable TV")
+            .param("address.address", TEST_ADDRESS_NOT_EXISTS)
+            .param("address.postalCode", "41011")
+            .param("address.city", TEST_CITY_FLAT_NOT_EXISTS)
+            .param("address.country", "Spain"))
+        	.andExpect(status().isOk())
+        	.andExpect(model().attributeHasErrors("flat"))
+            .andExpect(model().attributeHasFieldErrors("flat", "address.address"))
+        	.andExpect(view().name("flats/createOrUpdateFlatForm"));
+    }
+    
+    @WithMockUser(value = "spring", roles = {"HOST"})
+    @Test
+    void testProcessCreationFormErrorAddress() throws Exception {
+    	MockMultipartFile file1 = new MockMultipartFile("images", "image1.png", "image/png", "image1".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("images", "image2.png", "image/png", "image2".getBytes());
+        MockMultipartFile file3 = new MockMultipartFile("images", "image3.png", "image/png", "image3".getBytes());
+        MockMultipartFile file4 = new MockMultipartFile("images", "image4.png", "image/png", "image4".getBytes());
+        MockMultipartFile file5 = new MockMultipartFile("images", "image5.png", "image/png", "image5".getBytes());
+        MockMultipartFile file6 = new MockMultipartFile("images", "image6.png", "image/png", "image6".getBytes());
+
+        mockMvc.perform(multipart("/flats/new")
+            .file(file1)
+            .file(file2)
+            .file(file3)
+            .file(file4)
+            .file(file5)
+            .file(file6)
+            .with(csrf())
+            .param("description", "this is a sample description with more than 30 chars")
+            .param("squareMeters", "90")
+            .param("numberRooms", "2")
+            .param("numberBaths", "2")
+            .param("availableServices", "Wifi and cable TV")
+            .param("address.address", TEST_ADDRESS_NOT_EXISTS)
+            .param("address.postalCode", "41011")
+            .param("address.city", "Sevilla")
+            .param("address.country", "Spain"))
+        	.andExpect(status().isOk())
+        	.andExpect(view().name("flats/createOrUpdateFlatForm"));
+    }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
     @Test
@@ -283,6 +430,29 @@ class FlatControllerTests {
             .andExpect(view().name("redirect:/flats/{flatId}"));
         then(this.flatService).should().saveFlat(Mockito.isA(Flat.class));
     }
+    
+    @WithMockUser(value = "spring", roles = {"HOST"})
+    @Test
+    void testProcessUpdateFormHasNotMininmumImages() throws Exception {
+    	MockMultipartFile file1 = new MockMultipartFile("images", "image1.png", "image/png", "image1".getBytes());
+        mockMvc.perform(multipart("/flats/{flatId}/edit", TEST_FLAT_ID2)
+        	.file(file1)
+            .with(csrf())
+            .param("description", "this is a sample description with more than 30 chars")
+            .param("squareMeters", "90")
+            .param("numberRooms", "2")
+            .param("numberBaths", "2")
+            .param("availableServices", "Wifi and cable TV")
+            .param("address.address", "Calle Luis Montoto")
+            .param("address.postalCode", "41003")
+            .param("address.city", "Sevilla")
+            .param("address.country", "Spain"))
+        	.andExpect(status().isOk())
+        	.andExpect(model().attributeHasErrors("flat"))
+        	.andExpect(model().attributeHasFieldErrors("flat", "images"))
+        	.andExpect(view().name("flats/createOrUpdateFlatForm"));
+    }
+
 
     @WithMockUser(value = "spring", roles = {"HOST"})
     @Test
@@ -344,6 +514,14 @@ class FlatControllerTests {
             .andExpect(status().isOk())
             .andExpect(view().name("exception"));
     }
+    
+    @WithMockUser(value = "spring", roles = {"HOST"})
+    @Test
+    void testProcessDeleteImageThrowException6Images() throws Exception {
+        mockMvc.perform(get("/flats/{flatId}/images/{imageId}/delete", TEST_FLAT_ID3, TEST_IMAGE_ID))
+            .andExpect(status().isOk())
+            .andExpect(view().name("exception"));
+    }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
     @Test
@@ -355,6 +533,14 @@ class FlatControllerTests {
             .andExpect(model().attributeExists("host"))
             .andExpect(view().name("flats/flatDetails"));
 
+    }
+    
+    @WithMockUser(value = "spring-wrong-tenant", roles = {"TENANT"})
+    @Test
+    void testShowFlatExceptionNotAllowed() throws Exception {
+        mockMvc.perform(get("/flats/{flatId}", TEST_FLAT_ID))
+            .andExpect(status().isOk())
+            .andExpect(view().name("exception"));
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})

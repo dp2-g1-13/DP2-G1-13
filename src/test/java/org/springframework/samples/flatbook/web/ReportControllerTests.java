@@ -31,6 +31,7 @@ public class ReportControllerTests {
 	private static final Integer TEST_REPORT_ID = 1;
     private static final String TEST_CREATOR_USERNAME = "creator";
     private static final String TEST_REPORTED_USERNAME = "asignee";
+    private static final String TEST_BAD_REPORTED_USERNAME = "bad";
 
     @Autowired
     private MockMvc mockMvc;
@@ -72,6 +73,15 @@ public class ReportControllerTests {
             .andExpect(view().name("reports/createOrUpdateReportForm"))
             .andExpect(model().attributeExists("report"));
     }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME)
+    @Test
+    void testInitCreationFormThrowExceptionBadReportedUsername() throws Exception {
+        mockMvc.perform(get("/reports/{userId}/new", TEST_BAD_REPORTED_USERNAME))
+            .andExpect(status().isOk())
+            .andExpect(view().name("exception"));
+    }
+
 
     @WithMockUser(value = TEST_CREATOR_USERNAME)
     @Test
@@ -83,6 +93,19 @@ public class ReportControllerTests {
         	.param("receiver", TEST_REPORTED_USERNAME)
         	.param("sender", TEST_CREATOR_USERNAME))
             .andExpect(status().is3xxRedirection());
+    }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME)
+    @Test
+    void testProcessCreationFormThrowExceptionBadReportedUsername() throws Exception {
+        mockMvc.perform(post("/reports/{userId}/new", TEST_BAD_REPORTED_USERNAME)
+            .with(csrf())
+        	.param("creationDate", "01/01/2005")
+        	.param("reason", "reason")
+        	.param("receiver", TEST_REPORTED_USERNAME)
+        	.param("sender", TEST_CREATOR_USERNAME))
+        	.andExpect(status().isOk())
+        	.andExpect(view().name("exception"));
     }
 
     @WithMockUser(value = TEST_CREATOR_USERNAME)
