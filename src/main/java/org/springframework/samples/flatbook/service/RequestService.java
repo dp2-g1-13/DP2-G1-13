@@ -4,7 +4,6 @@ package org.springframework.samples.flatbook.service;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Request;
 import org.springframework.samples.flatbook.repository.RequestRepository;
 import org.springframework.stereotype.Service;
@@ -22,17 +21,17 @@ public class RequestService {
 	}
 
 	@Transactional(readOnly = true)
-	public Request findRequestById(final int id) throws DataAccessException {
+	public Request findRequestById(final int id) {
 		return this.requestRepository.findById(id);
 	}
 
 	@Transactional(readOnly = true)
-	public Set<Request> findRequestsByTenantUsername(final String username) throws DataAccessException {
+	public Set<Request> findRequestsByTenantUsername(final String username) {
 		return this.requestRepository.findManyByTenantUsername(username);
 	}
 
 	@Transactional(readOnly = true)
-	public Boolean isThereRequestOfTenantByFlatId(final String tenantUser, final int advId) throws DataAccessException {
+	public Boolean isThereRequestOfTenantByFlatId(final String tenantUser, final int advId) {
 		return this.requestRepository.isThereRequestOfTenantByFlatId(tenantUser, advId);
 	}
 

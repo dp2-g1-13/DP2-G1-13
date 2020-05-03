@@ -4,7 +4,6 @@ package org.springframework.samples.flatbook.service;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.repository.DBImageRepository;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,7 @@ public class DBImageService {
 	}
 
 	@Transactional
-	public void deleteImage(final DBImage image) throws DataAccessException {
+	public void deleteImage(final DBImage image) {
 		this.dbImageRepository.delete(image);
 	}
 

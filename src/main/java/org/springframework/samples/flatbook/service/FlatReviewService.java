@@ -18,15 +18,15 @@ public class FlatReviewService {
     }
 
     @Transactional(readOnly = true)
-    public FlatReview findFlatReviewById(int flatReviewId) throws DataAccessException {
+    public FlatReview findFlatReviewById(int flatReviewId) {
         return this.flatReviewRepository.findById(flatReviewId);
     }
-    
+
     @Transactional
-    public void saveFlatReview(FlatReview flatReview) throws DataAccessException {
+    public void saveFlatReview(FlatReview flatReview) {
         this.flatReviewRepository.save(flatReview);
     }
-    
+
     @Transactional
 	public void deleteFlatReviewById(final int flatReviewId) {
 		this.flatReviewRepository.deleteById(flatReviewId);

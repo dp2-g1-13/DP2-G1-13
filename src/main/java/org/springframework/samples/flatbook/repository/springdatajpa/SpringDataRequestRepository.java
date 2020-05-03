@@ -14,29 +14,29 @@ public interface SpringDataRequestRepository extends RequestRepository, Reposito
 
 	@Override
 	@Query("SELECT t.requests FROM Tenant t WHERE t.username = :username")
-	Set<Request> findManyByTenantUsername(@Param("username") String username) throws DataAccessException;
+	Set<Request> findManyByTenantUsername(@Param("username") String username);
 
 	@Override
 	@Query("SELECT CASE WHEN count(req) > 0 THEN true ELSE false END FROM Tenant tenant JOIN tenant.requests req WHERE tenant.username = :username AND req.status = 'PENDING' AND req IN(SELECT r FROM Flat adv JOIN adv.requests r WHERE adv.id = :flat_id)")
-	Boolean isThereRequestOfTenantByFlatId(@Param("username") String tenantUser, @Param("flat_id") int flatId) throws DataAccessException;
+	Boolean isThereRequestOfTenantByFlatId(@Param("username") String tenantUser, @Param("flat_id") int flatId);
 
 	@Override
 	@Query("SELECT count(r) FROM Request r")
-	Integer numberOfRequests() throws DataAccessException;
+	Integer numberOfRequests();
 
 	@Override
 	@Query("SELECT 1.0*count(r)/(select count(rq) FROM Request rq) from Request r where r.status='ACCEPTED'")
-	Double ratioOfAcceptedRequests() throws DataAccessException;
+	Double ratioOfAcceptedRequests();
 
 	@Override
 	@Query("SELECT 1.0*count(r)/(select count(rq) FROM Request rq) from Request r where r.status='REJECTED'")
-	Double ratioOfRejectedRequests() throws DataAccessException;
+	Double ratioOfRejectedRequests();
 
 	@Override
 	@Query("SELECT 1.0*count(r)/(select count(rq) FROM Request rq) from Request r where r.status='CANCELED'")
-	Double ratioOfCanceledRequests() throws DataAccessException;
+	Double ratioOfCanceledRequests();
 
 	@Override
 	@Query("SELECT 1.0*count(r)/(select count(rq) FROM Request rq) from Request r where r.status='FINISHED'")
-	Double ratioOfFinishedRequests() throws DataAccessException;
+	Double ratioOfFinishedRequests();
 }

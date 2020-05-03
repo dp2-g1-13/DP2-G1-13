@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
@@ -60,7 +59,7 @@ public class PersonService {
 	@Transactional(rollbackFor = {
 		DuplicatedUsernameException.class, DuplicatedDniException.class, DuplicatedEmailException.class
 	})
-	public void saveUser(final PersonForm user) throws DataAccessException, DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
+	public void saveUser(final PersonForm user) throws DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
 		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : user.getAuthority().equals(AuthoritiesType.TENANT) ? new Tenant(user) : null;
 		SaveType type = user.getSaveType();
 
@@ -116,20 +115,18 @@ public class PersonService {
 
 	private void banHost(final Host host) {
 		host.getFlats().forEach(x -> {
-			x.getTenants().stream().forEach(y -> {
+			x.getTenants().forEach(y -> {
 				y.setFlat(null);
 				this.tenantRepository.save(y);
 			});
 
-			x.getRequests().stream().forEach(y -> {
+			x.getRequests().forEach(y -> {
 				y.setFinishDate(LocalDate.now().plusDays(1));
 				y.setStatus(RequestStatus.CANCELED);
 				this.requestRepository.save(y);
 			});
 
-			this.taskRepository.findByFlatId(x.getId()).stream().forEach(y -> {
-				this.taskRepository.deleteById(y.getId());
-			});
+			this.taskRepository.findByFlatId(x.getId()).forEach(y -> this.taskRepository.deleteById(y.getId()));
 
 			x.setTenants(null);
 
@@ -144,18 +141,18 @@ public class PersonService {
 			tenant.setFlat(null);
 		}
 
-		tenant.getRequests().stream().forEach(x -> {
+		tenant.getRequests().forEach(x -> {
 			x.setFinishDate(LocalDate.now().plusDays(1));
 			x.setStatus(RequestStatus.CANCELED);
 			this.requestRepository.save(x);
 		});
 
-		this.taskRepository.findByParticipant(tenant.getUsername()).stream().forEach(x -> {
-			if (tenant.equals(x.getAsignee())) {
+		this.taskRepository.findByParticipant(tenant.getUsername()).forEach(x -> {
+            if (x.getCreator().equals(tenant)) {
+                this.taskRepository.deleteById(x.getId());
+            } else if (x.getAsignee().equals(tenant)) {
 				x.setAsignee(null);
 				this.taskRepository.save(x);
-			} else if (tenant.equals(x.getCreator())) {
-				this.taskRepository.deleteById(x.getId());
 			}
 		});
 	}

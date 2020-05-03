@@ -120,7 +120,7 @@ public class PersonController {
 	}
 
 	@PostMapping("/users/new")
-	public String registerUser(final ModelMap model, @Valid final PersonForm user, final BindingResult result) throws DataAccessException, IOException {
+	public String registerUser(final ModelMap model, @Valid final PersonForm user, final BindingResult result) throws IOException {
 		if (result.hasErrors()) {
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else {
@@ -157,7 +157,7 @@ public class PersonController {
 	}
 
 	@PostMapping("/users/{username}/edit")
-	public String updateUserProfile(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username, final Principal principal) throws DataAccessException {
+	public String updateUserProfile(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username, final Principal principal) {
 		if (result.hasErrors()) {
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else if (!username.equals(principal.getName())) {
@@ -189,7 +189,7 @@ public class PersonController {
 	}
 
 	@PostMapping("/users/{username}/editPassword")
-	public String updatePassword(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username, final Principal principal) throws DataAccessException {
+	public String updatePassword(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username, final Principal principal) {
 		if (result.hasErrors()) {
 			return PersonController.USERS_UPDATE_PASSWORD;
 		} else if (!username.equals(principal.getName())) {

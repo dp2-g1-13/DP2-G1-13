@@ -7,11 +7,11 @@ import java.util.Collection;
 
 public interface TenantReviewRepository {
 
-    Collection<TenantReview> findAll() throws DataAccessException;
+    Collection<TenantReview> findAll();
 
-    TenantReview findById(int id) throws DataAccessException;
+    TenantReview findById(int id);
 
-    void deleteById(int id) throws DataAccessException;
+    void deleteById(int id);
 
-    void save(TenantReview tenantReview) throws DataAccessException;
+    void save(TenantReview tenantReview);
 }

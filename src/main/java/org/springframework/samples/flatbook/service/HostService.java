@@ -4,7 +4,6 @@ package org.springframework.samples.flatbook.service;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.repository.HostRepository;
 import org.springframework.stereotype.Service;
@@ -22,21 +21,21 @@ public class HostService {
 	}
 
 	@Transactional(readOnly = true)
-	public Host findHostById(final String username) throws DataAccessException {
+	public Host findHostById(final String username) {
 		return this.hostRepository.findByUsername(username);
 	}
 
 	@Transactional(readOnly = true)
-	public Collection<Host> findAllHosts() throws DataAccessException {
+	public Collection<Host> findAllHosts() {
 		return this.hostRepository.findAll();
 	}
 
-	public Host findHostByFlatId(final int flatId) throws DataAccessException {
+	public Host findHostByFlatId(final int flatId) {
 		return this.hostRepository.findByFlatId(flatId);
 	}
 
-	@Transactional(readOnly = true)
-	public Host findHostOfFlatByRequestId(final int requestId) throws DataAccessException {
-		return this.hostRepository.findHostOfFlatByRequestId(requestId);
-	}
+//	@Transactional(readOnly = true)
+//	public Host findHostOfFlatByRequestId(final int requestId) {
+//		return this.hostRepository.findHostOfFlatByRequestId(requestId);
+//	}
 }

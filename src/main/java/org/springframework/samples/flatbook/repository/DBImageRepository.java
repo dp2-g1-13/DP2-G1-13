@@ -15,15 +15,15 @@ public interface DBImageRepository {
      * @param id the id to search for
      * @return the Image if found
      */
-    DBImage findById(int id) throws DataAccessException;
+    DBImage findById(int id);
 
     /**
      * Save an <code>Image</code> to the data store, either inserting or updating it.
      * @param image the Image to save
      */
-    void save(DBImage image) throws DataAccessException;
+    void save(DBImage image);
 
-    void delete(DBImage image) throws DataAccessException;
+    void delete(DBImage image);
 
-    Set<DBImage> findManyByFlatId(int id) throws DataAccessException;
+    Set<DBImage> findManyByFlatId(int id);
 }

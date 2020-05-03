@@ -7,11 +7,11 @@ import java.util.Collection;
 
 public interface FlatReviewRepository {
 
-    Collection<FlatReview> findAll() throws DataAccessException;
+    Collection<FlatReview> findAll();
 
-    FlatReview findById(int id) throws DataAccessException;
-    
-    void deleteById(int id) throws DataAccessException;
-    
-    void save(FlatReview flatReview) throws DataAccessException;
+    FlatReview findById(int id);
+
+    void deleteById(int id);
+
+    void save(FlatReview flatReview);
 }

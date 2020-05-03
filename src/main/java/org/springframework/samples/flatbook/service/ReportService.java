@@ -4,7 +4,6 @@ package org.springframework.samples.flatbook.service;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Report;
 import org.springframework.samples.flatbook.repository.ReportRepository;
@@ -23,12 +22,12 @@ public class ReportService {
 	}
 
 	@Transactional(readOnly = true)
-	public Report findReportById(final int reportId) throws DataAccessException {
+	public Report findReportById(final int reportId) {
 		return this.reportRepository.findById(reportId);
 	}
 
 	@Transactional
-	public void saveReport(final Report report) throws DataAccessException {
+	public void saveReport(final Report report) {
 		this.reportRepository.save(report);
 	}
 

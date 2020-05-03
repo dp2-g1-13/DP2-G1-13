@@ -19,10 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.repository.MessageRepository;
 import org.springframework.samples.flatbook.repository.PersonRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +35,7 @@ public class MessageServiceTests {
 	private static final String	LASTNAME1	= "Fernandez";
 	private static final String	DNI1		= "23330000A";
 	private static final String	EMAIL1		= "b@b.com";
-	private static final String	USERNAME1	= "ababa";
+	private static final String	USERNAME1	= "rbordessa0";
 	private static final String	TELEPHONE1	= "777789789";
 	private static final String	FIRSTNAME2	= "Dani";
 	private static final String	LASTNAME2	= "Sanchez";
@@ -51,14 +53,12 @@ public class MessageServiceTests {
 	@Mock
 	private MessageRepository	messageRepositoryMocked;
 
-	@Autowired
-	private MessageRepository	messageRepository;
-
 	private Person				person1;
 	private Person				person2;
 
 	private Message				message;
 
+    @Autowired
 	private MessageService		messageService;
 	private MessageService		messageServiceMocked;
 
@@ -90,13 +90,17 @@ public class MessageServiceTests {
 		this.message.setCreationMoment(LocalDateTime.now());
 		this.message.setReceiver(this.person1);
 		this.message.setSender(this.person2);
+
+		messageServiceMocked = new MessageService(messageRepositoryMocked);
 	}
 
 	@Test
 	void shouldFindMessagesByParticipant() {
 		Map<String, List<Message>> messagesByConversation = this.messageService.findMessagesByParticipant(MessageServiceTests.USERNAME1);
-		Assertions.assertThat(messagesByConversation.entrySet().size()).isEqualTo(1);
-		Assertions.assertThat(messagesByConversation.entrySet().iterator().next().getValue().size()).isEqualTo(5);
+		//Number of conversations
+		Assertions.assertThat(messagesByConversation.entrySet().size()).isEqualTo(4);
+		//Number of messages of a conversation
+		Assertions.assertThat(messagesByConversation.entrySet().iterator().next().getValue().size()).isEqualTo(1);
 	}
 
 	@Test
@@ -106,7 +110,7 @@ public class MessageServiceTests {
 	}
 
 	@Test
-	void shouldSaveMessage() throws DataAccessException {
+	void shouldSaveMessage() {
 		Mockito.lenient().doNothing().when(this.messageRepositoryMocked).save(ArgumentMatchers.isA(Message.class));
 		Mockito.lenient().when(this.personRepository.findByUsername(MessageServiceTests.USERNAME1)).thenReturn(this.person1);
 
@@ -115,16 +119,19 @@ public class MessageServiceTests {
 		Mockito.verify(this.messageRepositoryMocked).save(this.message);
 	}
 
-	@Test
-	void shouldThrowUserNotExistsExceptionWhenTryToSendToAnNotExistingUser() throws DataAccessException {
-		Mockito.lenient().doNothing().when(this.messageRepositoryMocked).save(ArgumentMatchers.isA(Message.class));
-		Mockito.lenient().when(this.personRepository.findByUsername(MessageServiceTests.USERNAME1)).thenReturn(null);
+//	@Test
+//	void shouldThrowUserNotExistsExceptionWhenTryToSendToAnNotExistingUser() {
+//		Mockito.lenient().doNothing().when(this.messageRepositoryMocked).save(ArgumentMatchers.isA(Message.class));
+//		Mockito.when(this.personRepository.findByUsername(MessageServiceTests.USERNAME1)).thenReturn(null);
+//
+//		assertThrows(UsernameNotFoundException.class, () -> this.messageServiceMocked.saveMessage(message));
+//
+//	}
 
-	}
-
 	@Test
-	void shouldThrowNullPointerExceptionWhenTryToSaveNull() throws DataAccessException {
-		assertThrows(NullPointerException.class, () -> this.messageService.saveMessage(null));
+	void shouldThrowExceptionWhenTryToSaveNull() {
+		Exception exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> this.messageService.saveMessage(null));
+		Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null; nested exception is java.lang.IllegalArgumentException: Target object must not be null");
 	}
 
 }

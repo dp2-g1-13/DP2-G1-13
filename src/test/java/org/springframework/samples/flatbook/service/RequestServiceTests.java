@@ -1,5 +1,6 @@
 package org.springframework.samples.flatbook.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.isA;
@@ -51,7 +52,7 @@ public class RequestServiceTests {
         request.setStatus(RequestStatus.PENDING);
         request.setCreationDate(LocalDateTime.now());
         request.setStartDate(LocalDate.of(10000, 1, 1));
-        request.setStartDate(LocalDate.of(10000, 12, 1));
+        request.setFinishDate(LocalDate.of(10000, 12, 1));
     }
 
     @BeforeEach
@@ -61,39 +62,39 @@ public class RequestServiceTests {
 
     @Test
     void shouldFindRequestsByTenantUsername() {
-        Set<Request> requests = this.requestService.findRequestsByTenantUsername("tenant1");
-        assertThat(requests.size()).isEqualTo(2);
+        Set<Request> requests = this.requestService.findRequestsByTenantUsername("rdunleavy0");
+        Assertions.assertThat(requests.size()).isEqualTo(1);
 
-        requests = this.requestService.findRequestsByTenantUsername("tenant2");
-        assertThat(requests.size()).isEqualTo(1);
+        requests = this.requestService.findRequestsByTenantUsername("dballchin1");
+        Assertions.assertThat(requests.size()).isEqualTo(1);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"host1", ""})
     void shouldNotFindRequestsByTenantUsername(String username) {
         Set<Request> requests = this.requestService.findRequestsByTenantUsername(username);
-        assertThat(requests.isEmpty()).isTrue();
+        Assertions.assertThat(requests.isEmpty()).isTrue();
     }
 
     @ParameterizedTest
     @CsvSource({
-        "tenant1, 1",
-        "tenant2, 1"
+        "creuble0, 1",
+        "hcorday1, 2"
     })
-    void shouldAssertThatThereIsRequestOfTenantByAdvertisementId(String username, int advertisementId) {
-        Boolean b = this.requestService.isThereRequestOfTenantByAdvertisementId(username, advertisementId);
-        assertThat(b).isTrue();
+    void shouldAssertThatThereIsRequestOfTenantByFlatId(String username, int flatId) {
+        Boolean b = this.requestService.isThereRequestOfTenantByFlatId(username, flatId);
+        Assertions.assertThat(b).isTrue();
     }
 
     @ParameterizedTest
     @CsvSource({
-        "tenant1, 2",
+        "rdunleavy0, 2",
         "host1, 1",
         "'', 3",
     })
-    void shouldAssertThatThereIsNotRequestOfTenantByAdvertisementId(String username, int advertisementId) {
-        Boolean b = this.requestService.isThereRequestOfTenantByAdvertisementId(username, advertisementId);
-        assertThat(b).isFalse();
+    void shouldAssertThatThereIsNotRequestOfTenantByFlatId(String username, int flatId) {
+        Boolean b = this.requestService.isThereRequestOfTenantByFlatId(username, flatId);
+        Assertions.assertThat(b).isFalse();
     }
 
     @Test
@@ -101,9 +102,9 @@ public class RequestServiceTests {
         when(this.mockedRequestRepository.findById(1)).thenReturn(request);
 
         Request request = this.requestServiceMockito.findRequestById(1);
-        assertThat(request.getId()).isEqualTo(1);
-        assertThat(request.getDescription()).isEqualTo("Sample description");
-        assertThat(request.getStatus()).isEqualTo(RequestStatus.PENDING);
+        assertThat(request).hasId(1);
+        assertThat(request).hasDescription("Sample description");
+        assertThat(request).hasStatus(RequestStatus.PENDING);
 
         verify(this.mockedRequestRepository).findById(1);
     }
@@ -111,7 +112,7 @@ public class RequestServiceTests {
     @Test
     void shouldNotFindRequestById() {
         Request request = this.requestServiceMockito.findRequestById(100);
-        assertThat(request).isNull();
+        Assertions.assertThat(request).isNull();
 
         verify(this.mockedRequestRepository).findById(anyInt());
     }
@@ -129,7 +130,7 @@ public class RequestServiceTests {
         doThrow(new IllegalArgumentException("Target object must not be null")).when(this.mockedRequestRepository).save(isNull());
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> this.requestServiceMockito.saveRequest(null));
-        assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
         verify(this.mockedRequestRepository).save(null);
     }
 

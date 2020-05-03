@@ -12,6 +12,10 @@ import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.repository.AuthoritiesRepository;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
 @ExtendWith(MockitoExtension.class)
 public class AuthoritiesServiceTests {
 
@@ -21,6 +25,7 @@ public class AuthoritiesServiceTests {
 	private AuthoritiesRepository	authoritiesRepository;
 
 	private Authorities				authority;
+	private Set<Authorities>        authorities;
 
 	private AuthoritiesService		authoritiesService;
 
@@ -28,8 +33,16 @@ public class AuthoritiesServiceTests {
 	@BeforeEach
 	void setupMock() {
 		this.authority = new Authorities(AuthoritiesServiceTests.USERNAME, AuthoritiesType.HOST);
+		this.authorities = Collections.singleton(authority);
 		this.authoritiesService = new AuthoritiesService(this.authoritiesRepository);
 	}
+
+	@Test
+    void shouldFindAllAuthorities() {
+	    Mockito.when(this.authoritiesRepository.findAll()).thenReturn(authorities);
+	    Collection<Authorities> authorities = this.authoritiesService.findAll();
+	    Assertions.assertThat(authorities).hasSize(1);
+    }
 
 	@Test
 	void shouldFindAuthoritiesByUsername() {

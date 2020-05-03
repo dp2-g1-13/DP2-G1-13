@@ -8,12 +8,12 @@ import org.springframework.samples.flatbook.model.Message;
 
 public interface MessageRepository {
 
-	Collection<Message> findAll() throws DataAccessException;
+	Collection<Message> findAll();
 
-	Message findById(int id) throws DataAccessException;
+	Message findById(int id);
 
-	void save(Message tenant) throws DataAccessException;
+	void save(Message tenant);
 
-	Collection<Message> findByParticipant(String username) throws DataAccessException;
+	Collection<Message> findByParticipant(String username);
 
 }

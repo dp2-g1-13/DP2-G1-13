@@ -8,10 +8,10 @@ import org.springframework.samples.flatbook.model.Authorities;
 
 public interface AuthoritiesRepository {
 
-	Collection<Authorities> findAll() throws DataAccessException;
+	Collection<Authorities> findAll();
 
-	Authorities findById(String username) throws DataAccessException;
+	Authorities findById(String username);
 
-	void save(Authorities authorities) throws DataAccessException;
+	void save(Authorities authorities);
 
 }

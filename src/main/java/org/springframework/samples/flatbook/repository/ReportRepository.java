@@ -9,13 +9,13 @@ import org.springframework.samples.flatbook.model.Report;
 
 public interface ReportRepository {
 
-	Collection<Report> findAll() throws DataAccessException;
+	Collection<Report> findAll();
 
-	Report findById(int id) throws DataAccessException;
+	Report findById(int id);
 
-	void deleteById(int id) throws DataAccessException;
+	void deleteById(int id);
 
-	void save(Report report) throws DataAccessException;
+	void save(Report report);
 
-	Collection<Report> findByReceiver(Person receiver) throws DataAccessException;
+	Collection<Report> findByReceiver(Person receiver);
 }

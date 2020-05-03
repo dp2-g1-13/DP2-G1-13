@@ -20,25 +20,21 @@ public interface SpringDataFlatRepository extends FlatRepository, Repository<Fla
 
 	@Override
 	@Query("SELECT f FROM Flat f join f.flatReviews fr WHERE fr.id = ?1")
-	Flat findByReviewId(Integer reviewId) throws DataAccessException;
+	Flat findByReviewId(Integer reviewId);
 
 	@Override
 	@Query("SELECT f FROM Flat f join f.flatReviews r group by f order by avg(r.rate) desc")
-	Page<Flat> topBestReviewedFlats(Pageable pageable) throws DataAccessException;
+	Page<Flat> topBestReviewedFlats(Pageable pageable);
 
 	@Override
 	@Query("SELECT f FROM Flat f join f.flatReviews r group by f order by avg(r.rate) asc")
-	Page<Flat> topWorstReviewedFlats(Pageable pageable) throws DataAccessException;
+	Page<Flat> topWorstReviewedFlats(Pageable pageable);
 
 	@Override
 	@Query("SELECT count(f) FROM Flat f")
-	Integer numberOfFlats() throws DataAccessException;
-
-	@Override
-	@Query("SELECT 1.0*count(*)/(select count(fl) from Flat fl) FROM Advertisement a join Flat f on a.flat=f")
-	Double ratioOfFlatsWithAdvertisement() throws DataAccessException;
+	Integer numberOfFlats();
 
 	@Override
 	@Query("SELECT adv FROM Flat adv JOIN adv.requests req WHERE req.id = :request_id")
-	Flat findFlatWithRequestId(@Param("request_id") int requestId) throws DataAccessException;
+	Flat findFlatWithRequestId(@Param("request_id") int requestId);
 }

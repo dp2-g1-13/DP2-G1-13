@@ -15,11 +15,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.repository.HostRepository;
 import org.springframework.stereotype.Service;
+
+import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
@@ -32,6 +33,7 @@ public class HostServiceTests {
 	private static final String	USERNAME_1	= "ababa";
 	private static final String	TELEPHONE_1	= "777789789";
 	private static final String	PASSWORD	= "HOst__Pa77S";
+	private static final Integer FLAT_ID    =  1;
 
 	@Mock
 	private HostRepository	hostRepositoryMocked;
@@ -69,19 +71,35 @@ public class HostServiceTests {
 	void shouldFindHostById() {
 		when(this.hostRepositoryMocked.findByUsername(USERNAME_1)).thenReturn(this.host);
 		Host hostById = this.hostServiceMocked.findHostById(USERNAME_1);
-		Assertions.assertThat(hostById).hasNoNullFieldsOrProperties();
-		Assertions.assertThat(hostById).hasFieldOrPropertyWithValue("username", USERNAME_1);
+		assertThat(hostById).hasNoNullFieldsOrProperties();
+		assertThat(hostById).hasUsername(USERNAME_1);
 	}
 
 	@Test
 	void shouldNotFindHost() {
 		Host hostById = this.hostServiceMocked.findHostById(USERNAME_1);
-		Assertions.assertThat(hostById).isNull();
+		assertThat(hostById).isNull();
 	}
 
 	@Test
-	void shouldFindAllHosts() throws DataAccessException {
+	void shouldFindAllHosts() {
 		Collection<Host> hosts = this.hostService.findAllHosts();
-		Assertions.assertThat(hosts).hasSize(5);
+		Assertions.assertThat(hosts).hasSize(15);
+		Assertions.assertThat(hosts).extracting(Host::getUsername)
+            .containsExactlyInAnyOrder("rbordessa0", "fricart1", "dframmingham2", "negre3", "glikly4", "kcrinkley5", "cstealey6", "rjurries7", "vcasero8", "ochillistone9", "nnaullsa", "jdavieb", "bputleyc", "efarnalld", "mmcgaheye");
 	}
+
+	@Test
+    void shouldFindHostByFlatId() {
+	    Host host = this.hostService.findHostByFlatId(FLAT_ID);
+	    assertThat(host).hasUsername("rbordessa0");
+	    assertThat(host).hasEmail("rbordessa0@wired.com");
+	    assertThat(host).hasDni("21910859W");
+    }
+
+    @Test
+    void shouldNotFindHostByFlatId() {
+	    Host host = this.hostService.findHostByFlatId(0);
+	    assertThat(host).isNull();
+    }
 }

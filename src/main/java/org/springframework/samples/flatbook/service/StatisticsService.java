@@ -49,7 +49,7 @@ public class StatisticsService {
 		statistics.setNumberOfAdvertisements(this.advertisementRepository.numberOfAdvertisements());
 		statistics.setNumberOfFlats(this.flatRepository.numberOfFlats());
 		statistics.setNumberOfUsers(this.personRepository.numberOfUsers());
-		statistics.setRatioOfFlatsWithAdvertisement(this.flatRepository.ratioOfFlatsWithAdvertisement());
+		statistics.setRatioOfFlatsWithAdvertisement((double)statistics.getNumberOfAdvertisements()/(double)statistics.getNumberOfFlats());
 		statistics.setTopThreeMostReportedUsers(this.personRepository.topMostReportedUsers(PageRequest.of(0, 3)).getContent());
 		statistics.setTopThreeWorstReviewedHosts(this.hostRepository.topWorstReviewedHosts(PageRequest.of(0, 3)).getContent());
 		statistics.setTopThreeBestReviewedHosts(this.hostRepository.topBestReviewedHosts(PageRequest.of(0, 3)).getContent());

@@ -13,6 +13,6 @@ public interface SpringDataDBImageRepository extends DBImageRepository, Reposito
 
     @Override
     @Query("SELECT flat.images FROM Flat flat WHERE flat.id = :id")
-    Set<DBImage> findManyByFlatId(@Param("id") int id) throws DataAccessException;
+    Set<DBImage> findManyByFlatId(@Param("id") int id);
 
 }

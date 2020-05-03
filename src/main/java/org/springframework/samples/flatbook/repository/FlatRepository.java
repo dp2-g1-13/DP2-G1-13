@@ -10,27 +10,25 @@ import org.springframework.samples.flatbook.model.Flat;
 
 public interface FlatRepository {
 
-	Set<Flat> findAll() throws DataAccessException;
+	Set<Flat> findAll();
 
-	Flat findById(int id) throws DataAccessException;
+	Flat findById(int id);
 
-	Set<Flat> findByHostUsername(String username) throws DataAccessException;
+	Set<Flat> findByHostUsername(String username);
 
-	void save(Flat flat) throws DataAccessException;
+	void save(Flat flat);
 
     void delete(Flat flat);
     void deleteById(int id);
 
-	Flat findByReviewId(Integer reviewId) throws DataAccessException;
+	Flat findByReviewId(Integer reviewId);
 
-	Page<Flat> topBestReviewedFlats(Pageable pageable) throws DataAccessException;
+	Page<Flat> topBestReviewedFlats(Pageable pageable);
 
-	Page<Flat> topWorstReviewedFlats(Pageable pageable) throws DataAccessException;
+	Page<Flat> topWorstReviewedFlats(Pageable pageable);
 
-	Integer numberOfFlats() throws DataAccessException;
+	Integer numberOfFlats();
 
-	Double ratioOfFlatsWithAdvertisement() throws DataAccessException;
-
-	Flat findFlatWithRequestId(int requestId) throws DataAccessException;
+	Flat findFlatWithRequestId(int requestId);
 
 }

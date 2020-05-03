@@ -10,17 +10,17 @@ import org.springframework.samples.flatbook.model.Host;
 
 public interface HostRepository {
 
-	Collection<Host> findAll() throws DataAccessException;
+	Collection<Host> findAll();
 
-	Host findByUsername(String username) throws DataAccessException;
+	Host findByUsername(String username);
 
-	Host findByFlatId(int flatId) throws DataAccessException;
+	Host findByFlatId(int flatId);
 
-	Host findHostOfFlatByRequestId(int requestId) throws DataAccessException;
+	Host findHostOfFlatByRequestId(int requestId);
 
-	void save(Host host) throws DataAccessException;
+	void save(Host host);
 
-	Page<Host> topBestReviewedHosts(Pageable pageRequest) throws DataAccessException;
+	Page<Host> topBestReviewedHosts(Pageable pageRequest);
 
-	Page<Host> topWorstReviewedHosts(Pageable pageRequest) throws DataAccessException;
+	Page<Host> topWorstReviewedHosts(Pageable pageRequest);
 }

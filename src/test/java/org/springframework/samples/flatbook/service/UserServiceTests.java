@@ -13,6 +13,8 @@ import org.springframework.samples.flatbook.model.User;
 import org.springframework.samples.flatbook.repository.UserRepository;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
+
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTests {
 
@@ -41,14 +43,16 @@ public class UserServiceTests {
 		Mockito.lenient().when(this.userRepository.findById(UserServiceTests.USERNAME)).thenReturn(this.user);
 
 		User user = this.userService.findUserById(UserServiceTests.USERNAME);
-		Assertions.assertThat(user).isEqualTo(this.user);
+		assertThat(user).isEqualTo(this.user);
+		assertThat(user).hasUsername(USERNAME);
+		assertThat(user).hasPassword(PASSWORD);
 	}
 
 	@Test
 	void shouldReturnNullIfNotFindAnyUser() {
 		Mockito.lenient().when(this.userRepository.findById(UserServiceTests.USERNAME)).thenReturn(null);
 
-		Assertions.assertThat(this.userService.findUserById(UserServiceTests.USERNAME)).isNull();
+		assertThat(this.userService.findUserById(UserServiceTests.USERNAME)).isNull();
 	}
 
 	@Test

@@ -1,5 +1,6 @@
 package org.springframework.samples.flatbook.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
@@ -51,14 +52,14 @@ public class DBImageServiceTests {
     @Test
     void shouldFindImagesByFlatId() {
         Set<DBImage> images = this.imageService.getImagesByFlatId(1);
-        assertThat(images).isNotEmpty();
-        assertThat(images.size()).isEqualTo(6);
+        Assertions.assertThat(images).isNotEmpty();
+        Assertions.assertThat(images.size()).isEqualTo(6);
     }
 
     @Test
     void shouldNotFindImagesByFlatId() {
-        Set<DBImage> images = this.imageService.getImagesByFlatId(10);
-        assertThat(images).isEmpty();
+        Set<DBImage> images = this.imageService.getImagesByFlatId(0);
+        Assertions.assertThat(images).isEmpty();
     }
 
     @Test
@@ -66,15 +67,16 @@ public class DBImageServiceTests {
         when(this.mockedImageRepository.findById(1)).thenReturn(image);
         DBImage image = this.imageServiceMockito.getImageById(1);
         assertThat(image).isNotNull();
-        assertThat(image.getId()).isEqualTo(1);
-        assertThat(image.getFilename()).isEqualTo("image.jpg");
-        assertThat(image.getFileType()).isEqualTo("image/jpg");
+        Assertions.assertThat(image.getId()).isEqualTo(1);
+        assertThat(image).hasId(1);
+        assertThat(image).hasFilename("image.jpg");
+        assertThat(image).hasFileType("image/jpg");
     }
 
     @Test
     void shouldNotFindById() {
         DBImage image = this.imageServiceMockito.getImageById(10);
-        assertThat(image).isNull();
+        Assertions.assertThat(image).isNull();
     }
 
     @Test
@@ -90,7 +92,7 @@ public class DBImageServiceTests {
         doThrow(new IllegalArgumentException("Entity must not be null!")).when(this.mockedImageRepository).delete(isNull());
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> this.imageServiceMockito.deleteImage(null));
-        assertThat(exception.getMessage()).isEqualTo("Entity must not be null!");
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Entity must not be null!");
         verify(this.mockedImageRepository).delete(null);
     }
 }

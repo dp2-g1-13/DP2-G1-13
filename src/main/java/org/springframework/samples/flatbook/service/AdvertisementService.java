@@ -22,37 +22,37 @@ public class AdvertisementService {
 	}
 
 	@Transactional(readOnly = true)
-	public Advertisement findAdvertisementById(final int id) throws DataAccessException {
+	public Advertisement findAdvertisementById(final int id) {
 		return this.advertisementRepository.findById(id);
 	}
 
 	@Transactional(readOnly = true)
-	public Boolean isAdvertisementWithFlatId(final int id) throws DataAccessException {
+	public Boolean isAdvertisementWithFlatId(final int id) {
 		return this.advertisementRepository.isAdvertisementWithFlatId(id);
 	}
 
 	@Transactional(readOnly = true)
-	public Advertisement findAdvertisementWithFlatId(final int id) throws DataAccessException {
+	public Advertisement findAdvertisementWithFlatId(final int id) {
 		return this.advertisementRepository.findAdvertisementWithFlatId(id);
 	}
 
 	@Transactional(readOnly = true)
-	public Set<Advertisement> findAllAdvertisements() throws DataAccessException {
+	public Set<Advertisement> findAllAdvertisements() {
 		return this.advertisementRepository.findAll();
 	}
 
 	@Transactional
-	public void saveAdvertisement(final Advertisement advertisement) throws DataAccessException {
+	public void saveAdvertisement(final Advertisement advertisement) {
 		this.advertisementRepository.save(advertisement);
 	}
 
 	@Transactional
-	public void deleteAdvertisement(final Advertisement advertisement) throws DataAccessException {
+	public void deleteAdvertisement(final Advertisement advertisement) {
 		this.advertisementRepository.delete(advertisement);
 	}
 
 	@Transactional
-	public Set<Advertisement> findAdvertisementsByHost(final String host) throws DataAccessException {
+	public Set<Advertisement> findAdvertisementsByHost(final String host) {
 		return this.advertisementRepository.findByHost(host);
 	}
 }

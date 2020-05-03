@@ -13,9 +13,9 @@ public interface SpringDataPersonRepository extends PersonRepository, Repository
 
 	@Override
 	@Query("SELECT p FROM Person p join Report r on r.receiver=p where p.enabled=true group by p order by count(r.id) desc")
-	Page<Person> topMostReportedUsers(Pageable pageableRequest) throws DataAccessException;
+	Page<Person> topMostReportedUsers(Pageable pageableRequest);
 
 	@Override
 	@Query("SELECT count(f) FROM Person f")
-	Integer numberOfUsers() throws DataAccessException;
+	Integer numberOfUsers();
 }

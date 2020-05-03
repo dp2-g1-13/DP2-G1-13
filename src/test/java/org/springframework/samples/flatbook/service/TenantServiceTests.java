@@ -16,11 +16,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.repository.TenantRepository;
 import org.springframework.stereotype.Service;
+
+import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
@@ -85,26 +86,65 @@ public class TenantServiceTests {
 	void shouldFindTenantById() {
 		when(this.tenantRepositoryMocked.findByUsername(USERNAME_1)).thenReturn(this.tenant);
 		Tenant tenantById = this.tenantServiceMocked.findTenantById(USERNAME_1);
-		Assertions.assertThat(tenantById).hasNoNullFieldsOrProperties();
-		Assertions.assertThat(tenantById).hasFieldOrPropertyWithValue("username", USERNAME_1);
+		assertThat(tenantById).hasUsername(USERNAME_1);
+		assertThat(tenantById).hasDni(DNI_1);
+		assertThat(tenantById).hasEmail(EMAIL_1);
 	}
 
 	@Test
 	void shouldNotFindTenant() {
 		Tenant tenantById = this.tenantServiceMocked.findTenantById(USERNAME_1);
-		Assertions.assertThat(tenantById).isNull();
+		assertThat(tenantById).isNull();
 	}
 
 	@Test
-	void shouldSaveTenant() throws DataAccessException {
+	void shouldSaveTenant() {
 		Mockito.lenient().doNothing().when(this.tenantRepositoryMocked).save(ArgumentMatchers.isA(Tenant.class));
 		this.tenantServiceMocked.saveTenant(this.tenant2);
 		Mockito.verify(this.tenantRepositoryMocked).save(this.tenant2);
 	}
 
 	@Test
-	void shouldFindAllTenants() throws DataAccessException {
+	void shouldFindAllTenants() {
 		Collection<Tenant> tenants = this.tenantService.findAllTenants();
-		Assertions.assertThat(tenants).hasSize(7);
+		Assertions.assertThat(tenants).hasSize(135);
 	}
+
+	@Test
+    void shouldFindTenantByRequestId() {
+	    Mockito.when(this.tenantRepositoryMocked.findByRequestId(ArgumentMatchers.anyInt())).thenReturn(tenant2);
+
+	    Tenant tenant = this.tenantServiceMocked.findTenantByRequestId(2);
+	    assertThat(tenant).isEqualTo(tenant2);
+	    assertThat(tenant).hasUsername(USERNAME_2);
+	    assertThat(tenant).hasDni(DNI_1);
+	    assertThat(tenant).hasFirstName(FIRSTNAME_1);
+    }
+
+    @Test
+    void shouldNotFindTenantByRequestId() {
+        Mockito.when(this.tenantRepositoryMocked.findByRequestId(ArgumentMatchers.anyInt())).thenReturn(null);
+
+        Tenant tenant = this.tenantServiceMocked.findTenantByRequestId(5);
+        assertThat(tenant).isNull();
+    }
+
+    @Test
+    void shouldFindTenantByReviewId() {
+        Mockito.when(this.tenantRepositoryMocked.findByReviewId(ArgumentMatchers.anyInt())).thenReturn(tenant);
+
+        Tenant tenant = this.tenantServiceMocked.findTenantByReviewId(1);
+        assertThat(tenant).isEqualTo(this.tenant);
+        assertThat(tenant).hasUsername(USERNAME_1);
+        assertThat(tenant).hasDni(DNI_1);
+        assertThat(tenant).hasFirstName(FIRSTNAME_1);
+    }
+
+    @Test
+    void shouldNotFindTenantByReviewId() {
+        Mockito.when(this.tenantRepositoryMocked.findByReviewId(ArgumentMatchers.anyInt())).thenReturn(null);
+
+        Tenant tenant = this.tenantServiceMocked.findTenantByReviewId(5);
+        assertThat(tenant).isNull();
+    }
 }

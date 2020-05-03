@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.repository.MessageRepository;
 import org.springframework.stereotype.Service;
@@ -27,12 +26,12 @@ public class MessageService {
 	}
 
 	@Transactional
-	public void saveMessage(final Message message) throws DataAccessException {
+	public void saveMessage(final Message message) {
 		this.messageRepository.save(message);
 	}
 
 	@Transactional(readOnly = true)
-	public Map<String, List<Message>> findMessagesByParticipant(final String username) throws DataAccessException {
+	public Map<String, List<Message>> findMessagesByParticipant(final String username) {
 		Map<String, List<Message>> map = new HashMap<>();
 
 		for (Message message : this.messageRepository.findByParticipant(username)) {
@@ -43,7 +42,7 @@ public class MessageService {
 			}
 
 			if (!map.containsKey(otherUsername)) {
-				map.put(otherUsername, new ArrayList<Message>());
+				map.put(otherUsername, new ArrayList<>());
 			}
 
 			map.get(otherUsername).add(message);

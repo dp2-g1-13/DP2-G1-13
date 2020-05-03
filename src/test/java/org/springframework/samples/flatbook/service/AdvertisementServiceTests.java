@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.springframework.samples.flatbook.util.assertj.AdvertisementAssert.assertThat;
+import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
@@ -92,13 +92,13 @@ public class AdvertisementServiceTests {
         Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(1);
         assertThat(adv).hasId(1);
 //        assertThat(adv.getRequests().size()).isEqualTo(?);
-        assertThat(adv).hasPricePerMonth(850.9);
-        assertThat(adv).hasTitle("Beautiful flat in San Bernardo");
+        assertThat(adv).hasPricePerMonth(98.);
+        assertThat(adv).hasTitle("Advertisement 1");
     }
 
     @Test
     void shouldNotFindAdvertisementWithFlatIdNotInDatabase() {
-        Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(10);
+        Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(0);
         assertThat(adv).isNull();
     }
 
@@ -110,16 +110,16 @@ public class AdvertisementServiceTests {
 
     @Test
     void shouldCheckThereIsNotAdvertisementWithFlatId() {
-        Boolean b = this.advertisementService.isAdvertisementWithFlatId(20);
+        Boolean b = this.advertisementService.isAdvertisementWithFlatId(0);
         Assertions.assertThat(b).isFalse();
     }
 
     @Test
     void shouldFindAdvertisementsByHost() {
-        Set<Advertisement> advertisements = this.advertisementService.findAdvertisementsByHost("host1");
-        Assertions.assertThat(advertisements).hasSize(2);
+        Set<Advertisement> advertisements = this.advertisementService.findAdvertisementsByHost("rbordessa0");
+        Assertions.assertThat(advertisements).hasSize(3);
         Assertions.assertThat(advertisements).extracting(Advertisement::getTitle)
-            .containsExactlyInAnyOrder("Beautiful flat in San Bernardo", "Beautiful apartment in Encarnación-Regina");
+            .containsExactlyInAnyOrder("Advertisement 1", "Advertisement 16", "Advertisement 31");
     }
     @Test
     void shouldNotFindAdvertisementsByHost() {
@@ -142,7 +142,7 @@ public class AdvertisementServiceTests {
         assertThat(advertisement).hasId(1);
         assertThat(advertisement).hasTitle("Sample title");
         assertThat(advertisement).hasPricePerMonth(100.50);
-        FlatAssert.assertThat(advertisement.getFlat()).isNotNull();
+        assertThat(advertisement.getFlat()).isNotNull();
     }
 
     @Test

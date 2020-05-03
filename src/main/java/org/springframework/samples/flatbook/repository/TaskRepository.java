@@ -9,16 +9,16 @@ import org.springframework.samples.flatbook.model.Task;
 
 public interface TaskRepository {
 
-	Collection<Task> findAll() throws DataAccessException;
+	Collection<Task> findAll();
 
-	Task findById(int id) throws DataAccessException;
+	Task findById(int id);
 
-	void deleteById(int id) throws DataAccessException;
+	void deleteById(int id);
 
-	void save(Task task) throws DataAccessException;
+	void save(Task task);
 
-	Set<Task> findByFlatId(int id) throws DataAccessException;
+	Set<Task> findByFlatId(int id);
 
-	Set<Task> findByParticipant(String username) throws DataAccessException;
+	Set<Task> findByParticipant(String username);
 
 }

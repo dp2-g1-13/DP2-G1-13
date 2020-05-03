@@ -21,6 +21,8 @@ import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.repository.FlatReviewRepository;
 import org.springframework.stereotype.Service;
 
+import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
+
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 public class FlatReviewServiceTests {
@@ -87,25 +89,25 @@ public class FlatReviewServiceTests {
 	void shouldFindFlatReviewById() {
 		when(this.flatReviewRepositoryMocked.findById(ID)).thenReturn(this.flatReview);
 		FlatReview flatReviewById = this.flatReviewServiceMocked.findFlatReviewById(ID);
-		Assertions.assertThat(flatReviewById).hasNoNullFieldsOrPropertiesExcept("modifiedDate");
-		Assertions.assertThat(flatReviewById).hasFieldOrPropertyWithValue("id", 1);
+		assertThat(flatReviewById).hasNoNullFieldsOrPropertiesExcept("modifiedDate");
+		assertThat(flatReviewById).hasId(1);
 	}
 
 	@Test
 	void shouldNotFindFlatReview() {
 		FlatReview flatReviewById = this.flatReviewServiceMocked.findFlatReviewById(ID2);
-		Assertions.assertThat(flatReviewById).isNull();
+		assertThat(flatReviewById).isNull();
 	}
 
 	@Test
-	void shouldSaveFlatReview() throws DataAccessException {
+	void shouldSaveFlatReview() {
 		Mockito.lenient().doNothing().when(this.flatReviewRepositoryMocked).save(ArgumentMatchers.isA(FlatReview.class));
 		this.flatReviewServiceMocked.saveFlatReview(this.flatReview2);
 		Mockito.verify(this.flatReviewRepositoryMocked).save(this.flatReview2);
 	}
 
 	@Test
-	void shouldDeleteFlatReview() throws DataAccessException {
+	void shouldDeleteFlatReview() {
 		this.flatReviewService.deleteFlatReviewById(ID);
 		FlatReview fr = this.flatReviewService.findFlatReviewById(ID);
 		Assertions.assertThat(fr).isNull();

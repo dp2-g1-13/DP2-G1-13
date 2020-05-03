@@ -8,24 +8,24 @@ import org.springframework.samples.flatbook.model.Request;
 
 public interface RequestRepository {
 
-	Request findById(int id) throws DataAccessException;
+	Request findById(int id);
 
-	Set<Request> findManyByTenantUsername(String username) throws DataAccessException;
+	Set<Request> findManyByTenantUsername(String username);
 
-	Boolean isThereRequestOfTenantByFlatId(String tenantUser, int advId) throws DataAccessException;
+	Boolean isThereRequestOfTenantByFlatId(String tenantUser, int advId);
 
-	void save(Request request) throws DataAccessException;
+	void save(Request request);
 
 	void delete(Request request);
 
-	Double ratioOfAcceptedRequests() throws DataAccessException;
+	Double ratioOfAcceptedRequests();
 
-	Double ratioOfRejectedRequests() throws DataAccessException;
+	Double ratioOfRejectedRequests();
 
-	Double ratioOfCanceledRequests() throws DataAccessException;
+	Double ratioOfCanceledRequests();
 
-	Double ratioOfFinishedRequests() throws DataAccessException;
+	Double ratioOfFinishedRequests();
 
-	Integer numberOfRequests() throws DataAccessException;
+	Integer numberOfRequests();
 
 }

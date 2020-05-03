@@ -14,17 +14,17 @@ public interface SpringDataHostRepository extends HostRepository, Repository<Hos
 
 	@Override
 	@Query("SELECT host FROM Host host JOIN host.flats f WHERE f.id = :flat_id")
-	Host findByFlatId(@Param("flat_id") int flatId) throws DataAccessException;
+	Host findByFlatId(@Param("flat_id") int flatId);
 
 	@Override
 	@Query("SELECT h FROM Host h JOIN h.flats f JOIN f.requests req WHERE req.id = :request_id and h.enabled=true")
-	Host findHostOfFlatByRequestId(@Param("request_id") int requestId) throws DataAccessException;
+	Host findHostOfFlatByRequestId(@Param("request_id") int requestId);
 
 	@Override
 	@Query("SELECT h FROM Host h join h.flats f join f.flatReviews r where h.enabled=true group by h order by avg(r.rate) desc")
-	Page<Host> topBestReviewedHosts(Pageable pageRequest) throws DataAccessException;
+	Page<Host> topBestReviewedHosts(Pageable pageRequest);
 
 	@Override
 	@Query("SELECT h FROM Host h join h.flats f join f.flatReviews r where h.enabled=true group by h order by avg(r.rate) asc")
-	Page<Host> topWorstReviewedHosts(Pageable pageRequest) throws DataAccessException;
+	Page<Host> topWorstReviewedHosts(Pageable pageRequest);
 }

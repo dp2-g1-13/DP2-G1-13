@@ -4,22 +4,26 @@ import java.time.LocalDate;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.TenantReview;
 import org.springframework.samples.flatbook.repository.TenantReviewRepository;
 import org.springframework.stereotype.Service;
+
+import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
@@ -37,6 +41,7 @@ public class TenantReviewServiceTests {
 	private static final Integer RATE = 5;
 	private static final Integer ID		= 1;
 	private static final Integer ID2		= 2;
+	private static final Integer TENANT_REVIEW_ID = 91;
 
 	@Mock
 	private TenantReviewRepository	tenantReviewRepositoryMocked;
@@ -87,27 +92,37 @@ public class TenantReviewServiceTests {
 	void shouldFindTenantReviewById() {
 		when(this.tenantReviewRepositoryMocked.findById(ID)).thenReturn(this.tenantReview);
 		TenantReview tenantReviewById = this.tenantReviewServiceMocked.findTenantReviewById(ID);
-		Assertions.assertThat(tenantReviewById).hasNoNullFieldsOrPropertiesExcept("modifiedDate");
-		Assertions.assertThat(tenantReviewById).hasFieldOrPropertyWithValue("id", 1);
+		assertThat(tenantReviewById).hasNoNullFieldsOrPropertiesExcept("modifiedDate");
+		assertThat(tenantReviewById).hasId(1);
+		assertThat(tenantReviewById).hasDescription(DESCRIPTION);
+		assertThat(tenantReviewById).hasRate(RATE);
+		assertThat(tenantReviewById).hasCreator(creator);
 	}
 
 	@Test
 	void shouldNotFindTenantReview() {
 		TenantReview tenantReviewById = this.tenantReviewServiceMocked.findTenantReviewById(ID);
-		Assertions.assertThat(tenantReviewById).isNull();
+		assertThat(tenantReviewById).isNull();
 	}
 
 	@Test
-	void shouldSaveTenantReview() throws DataAccessException {
+	void shouldSaveTenantReview() {
 		Mockito.lenient().doNothing().when(this.tenantReviewRepositoryMocked).save(ArgumentMatchers.isA(TenantReview.class));
 		this.tenantReviewServiceMocked.saveTenantReview(this.tenantReview2);
 		Mockito.verify(this.tenantReviewRepositoryMocked).save(this.tenantReview2);
 	}
 
 	@Test
-	void shouldDeleteTenantReview() throws DataAccessException {
-		this.tenantReviewService.deleteTenantReviewById(ID2);
-		TenantReview tr = this.tenantReviewService.findTenantReviewById(ID2);
+	void shouldDeleteTenantReview() {
+		this.tenantReviewService.deleteTenantReviewById(TENANT_REVIEW_ID);
+		TenantReview tr = this.tenantReviewService.findTenantReviewById(TENANT_REVIEW_ID);
 		Assertions.assertThat(tr).isNull();
 	}
+
+    @Test
+    @DisplayName("Should throw an exception when trying to dele a review that is not a tenant review")
+    void shouldThrowExceptionWhenTryingToDeleteReviewThatIsNotATenantReview() {
+	    Exception exception = assertThrows(EmptyResultDataAccessException.class, () -> this.tenantReviewService.deleteTenantReviewById(ID));
+	    Assertions.assertThat(exception.getMessage()).isEqualTo("No class org.springframework.samples.flatbook.model.TenantReview entity with id " + ID + " exists!");
+    }
 }
