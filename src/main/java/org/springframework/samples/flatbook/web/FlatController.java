@@ -29,7 +29,7 @@ import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.RequestService;
 import org.springframework.samples.flatbook.service.TenantService;
-import org.springframework.samples.flatbook.web.apis.GeocodeAPI;
+import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.core.Authentication;
@@ -54,16 +54,18 @@ public class FlatController {
 	private final PersonService			personService;
 	private final HostService			hostService;
 	private final AdvertisementService	advertisementService;
+	private final GeocodeAPIService		geocodeAPIService;
 
 
 	@Autowired
 	public FlatController(final FlatService flatService, final DBImageService dbImageService, final PersonService personService, final HostService hostService, final AdvertisementService advertisementService, final TenantService tenantService,
-		final FlatReviewService flatReviewService, final RequestService requestService) {
+		final FlatReviewService flatReviewService, final RequestService requestService, final GeocodeAPIService geocodeAPIService) {
 		this.flatService = flatService;
 		this.dbImageService = dbImageService;
 		this.personService = personService;
 		this.hostService = hostService;
 		this.advertisementService = advertisementService;
+		this.geocodeAPIService = geocodeAPIService;
 	}
 
 	@InitBinder
@@ -95,7 +97,7 @@ public class FlatController {
 				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 			}
 			Address address = flat.getAddress();
-			GeocodeResponse geocode = GeocodeAPI.getGeocodeData(address.getAddress() + ", " + address.getCity());
+			GeocodeResponse geocode = this.geocodeAPIService.getGeocodeData(address.getAddress() + ", " + address.getCity());
 			if (geocode.getStatus().equals("ZERO_RESULTS")) {
 				result.rejectValue("address.address", "", "The address does not exist. Try again.");
 				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;

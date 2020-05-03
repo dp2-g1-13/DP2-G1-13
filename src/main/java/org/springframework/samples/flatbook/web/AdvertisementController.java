@@ -30,7 +30,7 @@ import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.RequestService;
-import org.springframework.samples.flatbook.web.apis.GeocodeAPI;
+import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,16 +54,19 @@ public class AdvertisementController {
 	private HostService				hostService;
 	private RequestService			requestService;
 	private PersonService			personService;
+	private GeocodeAPIService		geocodeAPIService;
 
 
 	@Autowired
-	public AdvertisementController(final AdvertisementService advertisementService, final DBImageService dbImageService, final FlatService flatService, final HostService hostService, final RequestService requestService, final PersonService personService) {
+	public AdvertisementController(final AdvertisementService advertisementService, final DBImageService dbImageService, final FlatService flatService, final HostService hostService, final RequestService requestService, final PersonService personService,
+		final GeocodeAPIService geocodeAPIService) {
 		this.advertisementService = advertisementService;
 		this.dbImageService = dbImageService;
 		this.flatService = flatService;
 		this.hostService = hostService;
 		this.requestService = requestService;
 		this.personService = personService;
+		this.geocodeAPIService = geocodeAPIService;
 	}
 
 	@GetMapping(value = "/flats/{flatId}/advertisements/new")
@@ -183,7 +186,7 @@ public class AdvertisementController {
 			return "welcome";
 		}
 
-		GeocodeResponse geocode = GeocodeAPI.getGeocodeData(address.getCity() + (address.getPostalCode() != null ? address.getPostalCode() : ""));
+		GeocodeResponse geocode = this.geocodeAPIService.getGeocodeData(address.getCity() + (address.getPostalCode() != null ? address.getPostalCode() : ""));
 		if (geocode.getStatus().equals("ZERO_RESULTS")) {
 			result.rejectValue("city", "", "The address does not exist. Try again.");
 			return "welcome";

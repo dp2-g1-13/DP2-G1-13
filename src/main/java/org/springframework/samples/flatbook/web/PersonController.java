@@ -24,10 +24,10 @@ import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.samples.flatbook.service.UserService;
+import org.springframework.samples.flatbook.service.apis.MailjetAPIService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
-import org.springframework.samples.flatbook.web.apis.MailjetAPI;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.PasswordValidator;
 import org.springframework.samples.flatbook.web.validators.PersonAuthorityValidator;
@@ -81,15 +81,19 @@ public class PersonController {
 
 	UserService					userService;
 
+	MailjetAPIService			mailjetAPIService;
+
 
 	@Autowired
-	public PersonController(final PersonService personService, final AuthoritiesService authoritiesService, final TenantService tenantService, final AdvertisementService advertisementService, final UserService userService) {
+	public PersonController(final PersonService personService, final AuthoritiesService authoritiesService, final TenantService tenantService, final AdvertisementService advertisementService, final UserService userService,
+		final MailjetAPIService mailjetAPIService) {
 		super();
 		this.personService = personService;
 		this.authoritiesService = authoritiesService;
 		this.tenantService = tenantService;
 		this.advertisementService = advertisementService;
 		this.userService = userService;
+		this.mailjetAPIService = mailjetAPIService;
 	}
 
 	@ModelAttribute("types")
@@ -123,7 +127,7 @@ public class PersonController {
 			try {
 				user.setSaveType(SaveType.NEW);
 				this.personService.saveUser(user);
-				MailjetAPI.sendSimpleMessage(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword());
+				this.mailjetAPIService.sendSimpleMessage(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword());
 				return "redirect:/login";
 			} catch (DuplicatedUsernameException e) {
 				result.rejectValue("username", PersonController.USERNAME_DUPLICATED, PersonController.USERNAME_DUPLICATED);

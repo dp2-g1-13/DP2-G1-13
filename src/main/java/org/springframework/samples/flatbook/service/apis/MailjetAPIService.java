@@ -1,16 +1,14 @@
-package org.springframework.samples.flatbook.web.apis;
+package org.springframework.samples.flatbook.service.apis;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-public class MailjetAPI {
-
-    private MailjetAPI() {
-        throw new UnsupportedOperationException();
-    }
+@Service
+public class MailjetAPIService {
 
     private static final String		MAILJET_ENDPOINT					= "https://api.mailjet.com/v3.1/send";
 
@@ -18,7 +16,7 @@ public class MailjetAPI {
 
     private static final String		SECRET_KEY							= "eacb3b578fe8fed88b7bfd1d6ad3234b";
 
-    public static void sendSimpleMessage(final String name, final String email, final String username, final String password) {
+    public void sendSimpleMessage(final String name, final String email, final String username, final String password) {
         String body = "{\"Messages\":"
             + "[{\"HTMLPart\":\"<h3>Welcome to FlatBook, " + name + ".</h3><br>Thanks for using our service, enjoy it pisha!"
             + "<br>Your username: "+ username +"<br>Your password: "+ password +"<br>Dont share it!\","
