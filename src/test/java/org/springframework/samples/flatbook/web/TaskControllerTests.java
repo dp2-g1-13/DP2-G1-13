@@ -11,6 +11,7 @@ import org.springframework.samples.flatbook.configuration.SecurityConfiguration;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.TaskStatus;
 import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.web.formatters.FlatFormatter;
 import org.springframework.samples.flatbook.web.formatters.TenantFormatter;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -27,7 +28,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = TaskController.class,
-includeFilters = {@ComponentScan.Filter(value = TenantFormatter.class, type = FilterType.ASSIGNABLE_TYPE)},
+includeFilters = {@ComponentScan.Filter(value = TenantFormatter.class, type = FilterType.ASSIGNABLE_TYPE),
+		@ComponentScan.Filter(value = FlatFormatter.class, type = FilterType.ASSIGNABLE_TYPE)},
 excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration= SecurityConfiguration.class)
 public class TaskControllerTests {
@@ -81,15 +83,16 @@ public class TaskControllerTests {
         task.setTitle("title");
         task.setDescription("description");
         task.setStatus(status);
-
+        task.setFlat(flat);
+        
         Tenant notAllowed = new Tenant();
         notAllowed.setUsername(TEST_NOTALLOWED_USERNAME);
 
-        given(this.flatService.findTenantsById(TEST_FLAT_ID)).willReturn(flat.getTenants());
         given(this.tenantService.findTenantById(TEST_CREATOR_USERNAME)).willReturn(creator);
         given(this.tenantService.findTenantById(TEST_ASIGNEE_USERNAME)).willReturn(asignee);
         given(this.tenantService.findTenantById(TEST_NOTALLOWED_USERNAME)).willReturn(notAllowed);
         given(this.taskService.findTaskById(TEST_TASK_ID)).willReturn(task);
+        given(this.flatService.findFlatById(TEST_FLAT_ID)).willReturn(flat);
     }
 
     @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
@@ -98,7 +101,8 @@ public class TaskControllerTests {
         mockMvc.perform(get("/tasks/new"))
             .andExpect(status().isOk())
             .andExpect(view().name("tasks/createOrUpdateTaskForm"))
-            .andExpect(model().attributeExists("task"));
+            .andExpect(model().attributeExists("task"))
+        	.andExpect(model().attributeExists("roommates"));
     }
 
     @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
@@ -107,6 +111,7 @@ public class TaskControllerTests {
         mockMvc.perform(post("/tasks/new")
             .with(csrf())
             .param("asignee", TEST_ASIGNEE_USERNAME)
+            .param("flat", TEST_FLAT_ID.toString())
         	.param("creationDate", "01/01/2005")
         	.param("creator", TEST_CREATOR_USERNAME)
         	.param("description", "description")
@@ -129,6 +134,7 @@ public class TaskControllerTests {
             .andExpect(model().attributeHasFieldErrors("task", "title"))
             .andExpect(model().attributeHasFieldErrors("task", "creator"))
             .andExpect(model().attributeHasFieldErrors("task", "creationDate"))
+            .andExpect(model().attributeHasFieldErrors("task", "flat"))
             .andExpect(view().name("tasks/createOrUpdateTaskForm"));
     }
 
@@ -140,6 +146,7 @@ public class TaskControllerTests {
             .with(csrf())
             .param("asignee", TEST_ASIGNEE_USERNAME)
         	.param("creationDate", "01/01/2005")
+        	.param("flat", TEST_FLAT_ID.toString())
         	.param("creator", TEST_NOTALLOWED_USERNAME)
         	.param("description", "description")
         	.param("status", "TODO")
@@ -172,6 +179,7 @@ public class TaskControllerTests {
             .andExpect(model().attribute("task", hasProperty("asignee", is(asignee))))
             .andExpect(model().attribute("task", hasProperty("creationDate", is(LocalDate.now()))))
             .andExpect(model().attribute("task", hasProperty("status", is(TaskStatus.TODO))))
+            .andExpect(model().attribute("task", hasProperty("flat", is(this.flatService.findFlatById(TEST_FLAT_ID)))))
             .andExpect(view().name("tasks/createOrUpdateTaskForm"));
     }
 
@@ -183,6 +191,7 @@ public class TaskControllerTests {
             .param("title", "updated title")
             .param("description", "updated description")
             .param("asignee", TEST_ASIGNEE_USERNAME)
+            .param("flat", TEST_FLAT_ID.toString())
         	.param("creationDate", "01/01/2005")
         	.param("creator", TEST_CREATOR_USERNAME)
         	.param("status", "TODO"))
@@ -192,14 +201,14 @@ public class TaskControllerTests {
     @WithMockUser(value = TEST_CREATOR_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessTaskRemovalSucess() throws Exception {
-        mockMvc.perform(get("/tasks/{taskId}/remove", TEST_TASK_ID))
+        mockMvc.perform(get("/tasks/{taskId}/delete", TEST_TASK_ID))
             .andExpect(status().is3xxRedirection());
     }
 
     @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessTaskRemovalNotAllowed() throws Exception {
-        mockMvc.perform(get("/tasks/{taskId}/remove", TEST_TASK_ID))
+        mockMvc.perform(get("/tasks/{taskId}/delete", TEST_TASK_ID))
             .andExpect(status().is2xxSuccessful())
             .andExpect(view().name("exception"));
     }

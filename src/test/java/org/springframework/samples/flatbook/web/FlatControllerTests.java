@@ -11,7 +11,9 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.samples.flatbook.configuration.SecurityConfiguration;
 import org.springframework.samples.flatbook.model.*;
+import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -28,7 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = FlatController.class,
     includeFilters = {@ComponentScan.Filter(value = MultipartToDBImageConverter.class, type = FilterType.ASSIGNABLE_TYPE),
-        @ComponentScan.Filter(value = FlatValidator.class, type = FilterType.ASSIGNABLE_TYPE)},
+        @ComponentScan.Filter(value = FlatValidator.class, type = FilterType.ASSIGNABLE_TYPE),
+        @ComponentScan.Filter(value = ReviewUtils.class, type = FilterType.ASSIGNABLE_TYPE)},
     excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class),
     excludeAutoConfiguration= SecurityConfiguration.class)
 class FlatControllerTests {
@@ -40,11 +43,17 @@ class FlatControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private FlatController flatController;
-
     @MockBean
     private FlatService flatService;
+    
+    @MockBean
+    private FlatReviewService flatReviewService;
+    
+    @MockBean
+    private RequestService requestService;
+    
+    @MockBean
+    private TenantService tenantService;
 
     @MockBean
     private DBImageService dbImageService;
@@ -54,6 +63,9 @@ class FlatControllerTests {
 
     @MockBean
     private HostService hostService;
+    
+    @MockBean
+    private AuthoritiesService authoritiesService;
 
     @MockBean
     private AdvertisementService advertisementService;
@@ -78,6 +90,7 @@ class FlatControllerTests {
         images.add(new DBImage());
         images.add(new DBImage());
 
+        Set<FlatReview> fr = new HashSet<>();
         Flat flat = new Flat();
         flat.setId(TEST_FLAT_ID);
         flat.setDescription("this is a sample description with more than 30 chars");
@@ -87,6 +100,7 @@ class FlatControllerTests {
         flat.setAvailableServices("Wifi and cable TV");
         flat.setAddress(address);
         flat.setImages(images);
+        flat.setFlatReviews(fr);
 
         Set<Flat> flatsOfHost = new HashSet<>();
         flatsOfHost.add(flat);
@@ -101,6 +115,7 @@ class FlatControllerTests {
         given(this.dbImageService.getImagesByFlatId(TEST_FLAT_ID)).willReturn(images);
         given(this.hostService.findHostByFlatId(TEST_FLAT_ID)).willReturn(host);
         given(this.advertisementService.isAdvertisementWithFlatId(TEST_FLAT_ID)).willReturn(false);
+        given(this.authoritiesService.findAuthorityById(TEST_PERSON_USERNAME)).willReturn(AuthoritiesType.HOST);
         willAnswer(invocation -> {
             DBImage arg0 = invocation.getArgument(0);
             flat.deleteImage(arg0);
@@ -308,12 +323,26 @@ class FlatControllerTests {
     @WithMockUser(value = "spring", roles = {"HOST"})
     @Test
     void testShowFlatsOfHost() throws Exception {
-        mockMvc.perform(get("/flats/my-flats"))
+        mockMvc.perform(get("/flats/list"))
             .andExpect(status().isOk())
             .andExpect(model().attributeExists("flats"))
             .andExpect(model().attributeExists("advIds"))
             .andExpect(view().name("flats/flatsOfHost"));
 
     }
-
+    
+    @WithMockUser(value = "spring", roles = {"HOST"})
+    @Test
+    void testProcessFlatRemovalSucess() throws Exception {
+        mockMvc.perform(get("/flats/{flatId}/delete", TEST_FLAT_ID))
+            .andExpect(status().is3xxRedirection());
+    }
+    
+    @WithMockUser(value = "spring-wrong", roles = {"HOST"})
+    @Test
+    void testProcessFlatRemovalThrowExceptionWithWrongHost() throws Exception {
+        mockMvc.perform(get("/flats/{flatId}/delete", TEST_FLAT_ID))
+        	.andExpect(status().is2xxSuccessful())
+        	.andExpect(view().name("exception"));
+    }
 }
