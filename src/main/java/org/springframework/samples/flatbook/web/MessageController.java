@@ -33,7 +33,7 @@ public class MessageController {
 
 	private static final String	USERS_MESSAGES_CONVERSATION			= "users/messages/conversation";
 
-	private MessageService		messageServiceTests;
+	private MessageService		messageService;
 
 	private PersonService		personService;
 
@@ -41,7 +41,7 @@ public class MessageController {
 	@Autowired
 	public MessageController(final MessageService messageService, final PersonService personService) {
 		super();
-		this.messageServiceTests = messageService;
+		this.messageService = messageService;
 		this.personService = personService;
 	}
 
@@ -55,7 +55,7 @@ public class MessageController {
 
 	@GetMapping("/list")
 	public String messageList(final ModelMap model, final Principal principal) {
-		model.put("messages", this.messageServiceTests.findMessagesByParticipant(principal.getName()));
+		model.put("messages", this.messageService.findMessagesByParticipant(principal.getName()));
 		return MessageController.USERS_MESSAGES_CONVERSATION_LIST;
 	}
 
@@ -65,7 +65,7 @@ public class MessageController {
 		this.validateReceiveAndSender(user, principal.getName());
 
 		((Message) model.getAttribute("message")).setReceiver(this.personService.findUserById(username));
-		List<Message> messages = this.messageServiceTests.findMessagesByParticipant(principal.getName()).get(username);
+		List<Message> messages = this.messageService.findMessagesByParticipant(principal.getName()).get(username);
 		if (messages == null) {
 			messages = new ArrayList<>();
 		} else {
@@ -82,13 +82,14 @@ public class MessageController {
 		this.validateReceiveAndSender(user, principal.getName());
 
 		if (result.hasErrors()) {
-			return MessageController.REDIRECT_MESSAGES_USERNAME;
+			this.chargeConversation(model, principal, username);
+			return MessageController.USERS_MESSAGES_CONVERSATION;
 		} else {
 			this.chargeConversation(model, principal, username);
 			message.setCreationMoment(LocalDateTime.now());
 			message.setSender(this.personService.findUserById(principal.getName()));
 			message.setReceiver(user);
-			this.messageServiceTests.saveMessage(message);
+			this.messageService.saveMessage(message);
 			return MessageController.REDIRECT_MESSAGES_USERNAME;
 		}
 	}
