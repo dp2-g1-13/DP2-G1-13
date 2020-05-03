@@ -98,7 +98,7 @@ public class MessageServiceTests {
 	void shouldFindMessagesByParticipant() {
 		Map<String, List<Message>> messagesByConversation = this.messageService.findMessagesByParticipant(MessageServiceTests.USERNAME1);
 		//Number of conversations
-		Assertions.assertThat(messagesByConversation.entrySet().size()).isEqualTo(4);
+		Assertions.assertThat(messagesByConversation.entrySet().size()).isEqualTo(7);
 		//Number of messages of a conversation
 		Assertions.assertThat(messagesByConversation.entrySet().iterator().next().getValue().size()).isEqualTo(1);
 	}

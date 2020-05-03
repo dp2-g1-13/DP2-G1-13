@@ -34,8 +34,4 @@ public class HostService {
 		return this.hostRepository.findByFlatId(flatId);
 	}
 
-//	@Transactional(readOnly = true)
-//	public Host findHostOfFlatByRequestId(final int requestId) {
-//		return this.hostRepository.findHostOfFlatByRequestId(requestId);
-//	}
 }

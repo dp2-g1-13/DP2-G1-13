@@ -1,10 +1,6 @@
-
 package org.springframework.samples.flatbook.web;
 
-import java.security.Principal;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.StatisticsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -19,12 +15,12 @@ public class StatisticsController {
 
 
 	@Autowired
-	public StatisticsController(final StatisticsService statisticsService, final AuthoritiesService authoritiesService) {
+	public StatisticsController(final StatisticsService statisticsService) {
 		this.statisticsService = statisticsService;
 	}
 
 	@GetMapping("/statistics")
-	public String welcome(final ModelMap model, final Principal principal) {
+	public String getStatistics(final ModelMap model) {
 		model.put("statistics", this.statisticsService.findStatistics());
 		return StatisticsController.STATISTICS_LIST;
 	}

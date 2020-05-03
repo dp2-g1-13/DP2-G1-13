@@ -17,7 +17,6 @@ import org.springframework.samples.flatbook.repository.*;
 import org.springframework.samples.flatbook.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
