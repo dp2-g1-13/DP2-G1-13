@@ -1,6 +1,7 @@
 package org.springframework.samples.flatbook.web;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +13,22 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.samples.flatbook.configuration.SecurityConfiguration;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
+import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
+import org.springframework.samples.flatbook.model.pojos.GeocodeResult;
+import org.springframework.samples.flatbook.model.pojos.Geometry;
+import org.springframework.samples.flatbook.model.pojos.Location;
 import org.springframework.samples.flatbook.service.*;
+import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
@@ -39,6 +48,11 @@ class FlatControllerTests {
     private static final Integer TEST_FLAT_ID = 1;
     private static final String TEST_PERSON_USERNAME = "spring";
     private static final Integer TEST_IMAGE_ID = 1;
+    private static final String TEST_CITY_FLAT = "Seville";
+    private static final String TEST_COUNTRY_FLAT = "Spain";
+    private static final String TEST_POSTAL_CODE_FLAT = "41010";
+    private static final double LATITUDE = 37.3822261;
+	private static final double LONGITUDE = -6.0123468;
 
     @Autowired
     private MockMvc mockMvc;
@@ -69,6 +83,9 @@ class FlatControllerTests {
 
     @MockBean
     private AdvertisementService advertisementService;
+    
+    @MockBean
+    private GeocodeAPIService geocodeAPIService;
 
     @BeforeEach
     void setup() {
@@ -79,7 +96,22 @@ class FlatControllerTests {
         address.setPostalCode("41011");
         address.setCity("Sevilla");
         address.setCountry("Spain");
+        address.setLatitude(LATITUDE);
+        address.setLongitude(LONGITUDE);
 
+        GeocodeResponse response = new GeocodeResponse();
+        List<GeocodeResult> resultList = new ArrayList<>();
+        GeocodeResult result = new GeocodeResult();
+        Geometry geometry = new Geometry();
+        Location location = new Location();
+        location.setLat(address.getLatitude());
+        location.setLng(address.getLongitude());
+        geometry.setLocation(location);
+        result.setGeometry(geometry);
+        resultList.add(result);
+        response.setResults(resultList);
+        response.setStatus("OK");
+        
         DBImage image = new DBImage();
         image.setId(TEST_IMAGE_ID);
         images.add(image);
@@ -121,6 +153,11 @@ class FlatControllerTests {
             flat.deleteImage(arg0);
             return flat;
         }).given(this.dbImageService).deleteImage(image);
+        try {
+			BDDMockito.given(this.geocodeAPIService.getGeocodeData(address.getAddress() + ", " + address.getCity())).willReturn(response);
+			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_CITY_FLAT + ", " + TEST_COUNTRY_FLAT + TEST_POSTAL_CODE_FLAT)).willReturn(response);
+		} catch (UnsupportedEncodingException e) {
+		}
     }
 
     @WithMockUser(value = "spring", roles = {"HOST"})
