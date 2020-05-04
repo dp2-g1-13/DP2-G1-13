@@ -13,7 +13,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
 import org.springframework.samples.flatbook.repository.AdvertisementRepository;
-import org.springframework.samples.flatbook.util.assertj.FlatAssert;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.User;

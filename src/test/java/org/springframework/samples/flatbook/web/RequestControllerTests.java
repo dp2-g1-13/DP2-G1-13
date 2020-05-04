@@ -51,9 +51,6 @@ public class RequestControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private RequestController requestController;
-
     @MockBean
     private RequestService requestService;
 

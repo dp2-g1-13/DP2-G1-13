@@ -4,7 +4,7 @@ package org.springframework.samples.flatbook.service;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
+
 import org.springframework.samples.flatbook.model.Advertisement;
 import org.springframework.samples.flatbook.repository.AdvertisementRepository;
 import org.springframework.stereotype.Service;

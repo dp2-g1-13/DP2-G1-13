@@ -3,7 +3,6 @@ package org.springframework.samples.flatbook.service;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Report;
 import org.springframework.samples.flatbook.model.Tenant;

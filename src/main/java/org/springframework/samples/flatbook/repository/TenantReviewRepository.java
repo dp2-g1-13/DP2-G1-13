@@ -1,6 +1,6 @@
 package org.springframework.samples.flatbook.repository;
 
-import org.springframework.dao.DataAccessException;
+
 import org.springframework.samples.flatbook.model.TenantReview;
 
 import java.util.Collection;

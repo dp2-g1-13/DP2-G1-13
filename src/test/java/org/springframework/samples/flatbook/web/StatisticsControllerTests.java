@@ -33,9 +33,6 @@ public class StatisticsControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private StatisticsController statisticsController;
-
     @MockBean
     private StatisticsService statisticsService;
 

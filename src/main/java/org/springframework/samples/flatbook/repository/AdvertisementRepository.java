@@ -3,7 +3,7 @@ package org.springframework.samples.flatbook.repository;
 
 import java.util.Set;
 
-import org.springframework.dao.DataAccessException;
+
 import org.springframework.samples.flatbook.model.Advertisement;
 
 public interface AdvertisementRepository {

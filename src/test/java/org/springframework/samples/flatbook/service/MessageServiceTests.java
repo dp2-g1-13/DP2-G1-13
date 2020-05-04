@@ -18,13 +18,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.repository.MessageRepository;
 import org.springframework.samples.flatbook.repository.PersonRepository;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @ExtendWith(MockitoExtension.class)
