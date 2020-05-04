@@ -369,7 +369,7 @@ public class ReviewControllerTests {
       	.andExpect(view().name("exception"));
     }
     
-    @WithMockUser(value = TEST_NOTALLOWED_USERNAME, roles = {"TENANT"})
+    @WithMockUser(value = TEST_OTHER_CREATOR_USERNAME, roles = {"TENANT"})
     @Test
     void testProcessFlatReviewRemovalThrowExceptionBadFlatReviewId() throws Exception {
       mockMvc.perform(get("/reviews/{reviewId}/delete", TEST_BAD_FLAT_ID))
