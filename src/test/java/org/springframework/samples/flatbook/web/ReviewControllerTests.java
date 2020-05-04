@@ -14,7 +14,6 @@ import org.springframework.samples.flatbook.model.enums.ReviewType;
 import org.springframework.samples.flatbook.service.*;
 import org.springframework.samples.flatbook.web.formatters.PersonFormatter;
 import org.springframework.samples.flatbook.web.formatters.ReviewFormatter;
-import org.springframework.samples.flatbook.web.formatters.TenantFormatter;
 import org.springframework.samples.flatbook.web.utils.ReviewUtils;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
