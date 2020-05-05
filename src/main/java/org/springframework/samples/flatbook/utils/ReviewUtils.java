@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.web.utils;
+package org.springframework.samples.flatbook.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Flat;

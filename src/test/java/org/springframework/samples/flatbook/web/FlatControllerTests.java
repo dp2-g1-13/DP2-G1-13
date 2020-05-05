@@ -19,7 +19,7 @@ import org.springframework.samples.flatbook.model.pojos.Geometry;
 import org.springframework.samples.flatbook.model.pojos.Location;
 import org.springframework.samples.flatbook.service.*;
 import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
-import org.springframework.samples.flatbook.web.utils.ReviewUtils;
+import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;

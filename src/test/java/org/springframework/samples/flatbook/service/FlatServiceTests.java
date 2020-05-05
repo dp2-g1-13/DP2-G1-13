@@ -14,7 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.repository.*;
-import org.springframework.samples.flatbook.util.EntityUtils;
+import org.springframework.samples.flatbook.utils.EntityUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
