@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.samples.flatbook.util;
+package org.springframework.samples.flatbook.utils;
 
 import java.util.Collection;
 

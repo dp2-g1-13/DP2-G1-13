@@ -42,7 +42,7 @@ import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.RequestService;
 import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
-import org.springframework.samples.flatbook.web.utils.ReviewUtils;
+import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;

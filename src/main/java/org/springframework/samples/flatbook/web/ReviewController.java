@@ -22,7 +22,7 @@ import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.TenantReviewService;
 import org.springframework.samples.flatbook.service.TenantService;
-import org.springframework.samples.flatbook.web.utils.ReviewUtils;
+import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
