@@ -107,7 +107,7 @@ public class TenantServiceTests {
 	@Test
 	void shouldFindAllTenants() {
 		Collection<Tenant> tenants = this.tenantService.findAllTenants();
-		Assertions.assertThat(tenants).hasSize(135);
+		Assertions.assertThat(tenants).hasSize(136);
 	}
 
 	@Test

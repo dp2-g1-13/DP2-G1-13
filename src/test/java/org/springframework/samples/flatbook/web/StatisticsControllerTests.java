@@ -115,6 +115,15 @@ public class StatisticsControllerTests {
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("ratioOfRejectedRequests", Matchers.is(0.125d))))
 			.andExpect(
 				MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("ratioOfFlatsWithAdvertisement", Matchers.is(5d / 7d))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeBestReviewedFlats", Matchers.hasSize(3))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeBestReviewedHosts", Matchers.hasSize(3))))
+			.andExpect(
+				MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeBestReviewedTenants", Matchers.hasSize(3))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeMostReportedUsers", Matchers.hasSize(3))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeWorstReviewedFlats", Matchers.hasSize(3))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeWorstReviewedHosts", Matchers.hasSize(3))))
+			.andExpect(
+				MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeWorstReviewedTenants", Matchers.hasSize(3))))
 			.andExpect(MockMvcResultMatchers.view().name("statistics/statisticsList"));
 	}
 }
