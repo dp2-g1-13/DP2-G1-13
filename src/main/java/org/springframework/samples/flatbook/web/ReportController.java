@@ -51,7 +51,7 @@ public class ReportController {
 	public String initCreationForm(final Map<String, Object> model, final Principal principal, @PathVariable("userId") final String userId) {
 		Person reported = this.personService.findUserById(userId);
 		Person creator = this.personService.findUserById(principal.getName());
-		if (reported != null) {
+		if (reported != null && !reported.equals(creator)) {
 			Report r = new Report();
 			r.setCreationDate(LocalDate.now());
 			r.setReceiver(reported);
@@ -65,10 +65,11 @@ public class ReportController {
 	}
 
 	@PostMapping(value = "/reports/{userId}/new")
-	public String processCreationForm(@Valid final Report r, final BindingResult result, final Principal principal, @PathVariable("userId") final String userId) {
+	public String processCreationForm(@Valid final Report r, final BindingResult result, final Principal principal,
+		@PathVariable("userId") final String userId) {
 		Person reported = this.personService.findUserById(userId);
 		Person creator = this.personService.findUserById(principal.getName());
-		if (reported != null) {
+		if (reported != null && !reported.equals(creator)) {
 			if (result.hasErrors()) {
 				return ReportController.VIEWS_REPORTS_CREATE_OR_UPDATE_FORM;
 			} else {
@@ -84,16 +85,18 @@ public class ReportController {
 
 	@GetMapping(value = "/reports/list")
 	public String initList(final ModelMap model, final Principal principal) {
-		model.put("reports", this.reportService.findAllReports().stream().sorted(Comparator.comparing(Report::getCreationDate).reversed()).collect(Collectors.toList()));
+		model.put("reports", this.reportService.findAllReports().stream().sorted(Comparator.comparing(Report::getCreationDate).reversed())
+			.collect(Collectors.toList()));
 		return ReportController.REPORTS_LIST;
 	}
 
 	@GetMapping(value = "/reports/{userId}/list")
 	public String initUserList(final ModelMap model, final Principal principal, @PathVariable("userId") final String userId) {
 		Person reported = this.personService.findUserById(userId);
-		if (reported != null) {
+		if (reported != null && !reported.equals(this.personService.findUserById(principal.getName()))) {
 			model.put("username", userId);
-			model.put("reports", this.reportService.findReportsByReceiver(reported).stream().sorted(Comparator.comparing(Report::getCreationDate).reversed()).collect(Collectors.toList()));
+			model.put("reports", this.reportService.findReportsByReceiver(reported).stream()
+				.sorted(Comparator.comparing(Report::getCreationDate).reversed()).collect(Collectors.toList()));
 			return ReportController.REPORTS_LIST;
 		} else {
 			throw new IllegalArgumentException("Bad user id.");
@@ -102,7 +105,8 @@ public class ReportController {
 	}
 
 	@GetMapping(value = "/reports/{reportId}/delete")
-	public String deleteReport(final HttpServletRequest request, @Valid final Report r, final BindingResult result, final Principal principal, @PathVariable("reportId") final int reportId) {
+	public String deleteReport(final HttpServletRequest request, @Valid final Report r, final BindingResult result, final Principal principal,
+		@PathVariable("reportId") final int reportId) {
 		Report report = this.reportService.findReportById(reportId);
 		if (report != null) {
 			this.reportService.deleteReportById(report.getId());
