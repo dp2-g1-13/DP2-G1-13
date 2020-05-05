@@ -938,7 +938,8 @@ insert into users (dtype, username, password, enabled, first_name, last_name, em
 insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Tenant', 'mgeraudy16', 'Is-Dp2-G1-13', true, 'Marcile', 'Geraudy', 'mgeraudy16@globo.com', '15329878A', '868437962', null);
 insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Tenant', 'hhalton17', 'Is-Dp2-G1-13', true, 'Holly', 'Halton', 'hhalton17@boston.com', '48600065M', '803080890', null);
 insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Tenant', 'itendahl18', 'Is-Dp2-G1-13', true, 'Inglebert', 'Tendahl', 'itendahl18@constantcontact.com', '58950486K', '537399244', null);
-insert into authorities (username, authority) values ('', 'TENANT');
+insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Tenant', 'itendahl1a8', 'Is-Dp2-G1-13', false, 'Ingleabert', 'Tenadahl', 'itendahal18@constantcontact.com', '58930486K', '337399244', null);
+insert into authorities (username, authority) values ('itendahl1a8', 'TENANT');
 insert into authorities (username, authority) values ('rdunleavy0', 'TENANT');
 insert into authorities (username, authority) values ('dballchin1', 'TENANT');
 insert into authorities (username, authority) values ('owinslade2', 'TENANT');

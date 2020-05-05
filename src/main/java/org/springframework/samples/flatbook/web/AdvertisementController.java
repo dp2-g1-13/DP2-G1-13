@@ -21,6 +21,7 @@ import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Tenant;
+import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
 import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.model.pojos.Location;
@@ -58,7 +59,8 @@ public class AdvertisementController {
 
 
 	@Autowired
-	public AdvertisementController(final AdvertisementService advertisementService, final DBImageService dbImageService, final FlatService flatService, final HostService hostService, final RequestService requestService, final PersonService personService,
+	public AdvertisementController(final AdvertisementService advertisementService, final DBImageService dbImageService,
+		final FlatService flatService, final HostService hostService, final RequestService requestService, final PersonService personService,
 		final GeocodeAPIService geocodeAPIService) {
 		this.advertisementService = advertisementService;
 		this.dbImageService = dbImageService;
@@ -83,7 +85,8 @@ public class AdvertisementController {
 	}
 
 	@PostMapping(value = "/flats/{flatId}/advertisements/new")
-	public String processCreationForm(final ModelMap model, @Valid final AdvertisementForm adv, final BindingResult result, @PathVariable("flatId") final int flatId) {
+	public String processCreationForm(final ModelMap model, @Valid final AdvertisementForm adv, final BindingResult result,
+		@PathVariable("flatId") final int flatId) {
 		if (result.hasErrors()) {
 			return AdvertisementController.VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
 		} else {
@@ -114,7 +117,8 @@ public class AdvertisementController {
 	}
 
 	@PostMapping(value = "/advertisements/{advertisementId}/edit")
-	public String processUpdateForm(@Valid final AdvertisementForm adv, final BindingResult result, @PathVariable("advertisementId") final int advertisementId, final Map<String, Object> model) {
+	public String processUpdateForm(@Valid final AdvertisementForm adv, final BindingResult result,
+		@PathVariable("advertisementId") final int advertisementId, final Map<String, Object> model) {
 		if (result.hasErrors()) {
 			return AdvertisementController.VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM;
 		} else {
@@ -166,13 +170,15 @@ public class AdvertisementController {
 		reviews.sort(Comparator.comparing(FlatReview::getCreationDate).reversed());
 		mav.addObject("reviews", reviews);
 		mav.addObject("flatId", advertisement.getFlat().getId());
-		mav.addObject("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewAFlat(principal.getName(), advertisement.getFlat().getId()));
+		mav.addObject("canCreateReview",
+			principal != null && ReviewUtils.isAllowedToReviewAFlat(principal.getName(), advertisement.getFlat().getId()));
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ROLE_ANONYMOUS"))) {
 			Person person = this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
 			if (person instanceof Tenant) {
-				mav.addObject("requestMade", this.requestService.isThereRequestOfTenantByFlatId(person.getUsername(), advertisement.getFlat().getId()));
+				mav.addObject("requestMade",
+					this.requestService.isThereRequestOfTenantByFlatId(person.getUsername(), advertisement.getFlat().getId()));
 				mav.addObject("hasFlat", ((Tenant) person).getFlat() != null);
 			}
 		}
@@ -180,13 +186,15 @@ public class AdvertisementController {
 	}
 
 	@GetMapping(value = "/advertisements")
-	public String processFindForm(final Address address, final BindingResult result, final Map<String, Object> model) throws UnsupportedEncodingException {
+	public String processFindForm(final Address address, final BindingResult result, final Map<String, Object> model)
+		throws UnsupportedEncodingException {
 		if (address.getCity() == null || address.getCity().equals("")) {
 			result.rejectValue("city", "cityNotNull", "The field 'city' can't be null.");
 			return "welcome";
 		}
 
-		GeocodeResponse geocode = this.geocodeAPIService.getGeocodeData(address.getCity() + (address.getPostalCode() != null ? address.getPostalCode() : ""));
+		GeocodeResponse geocode = this.geocodeAPIService
+			.getGeocodeData(address.getCity() + (address.getPostalCode() != null ? address.getPostalCode() : ""));
 		if (geocode.getStatus().equals("ZERO_RESULTS")) {
 			result.rejectValue("city", "", "The address does not exist. Try again.");
 			return "welcome";
@@ -198,8 +206,11 @@ public class AdvertisementController {
 		Location location = geocode.getResults().get(0).getGeometry().getLocation();
 
 		List<Advertisement> results = this.advertisementService.findAllAdvertisements().stream()
-			.filter(x -> this.hostService.findHostByFlatId(x.getId()).isEnabled() && this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
-			.sorted(Comparator.comparing(x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()))).collect(Collectors.toList());
+			.filter(x -> this.hostService.findHostByFlatId(x.getId()).isEnabled() && this.haversineFormula(x.getFlat().getAddress().getLatitude(),
+				x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
+			.sorted(Comparator.comparing(x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(),
+				location.getLat(), location.getLng())))
+			.collect(Collectors.toList());
 
 		if (results.isEmpty()) {
 			result.rejectValue("postalCode", "advNotFound", "Not found.");
@@ -215,7 +226,7 @@ public class AdvertisementController {
 	public Boolean validateHost(final int flatId) {
 		Boolean userIsHost = true;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
+		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals(AuthoritiesType.ADMIN.toString()))) {
 			String username = ((User) auth.getPrincipal()).getUsername();
 			Host host = this.hostService.findHostByFlatId(flatId);
 			userIsHost = username.equals(host.getUsername()) && host.isEnabled();

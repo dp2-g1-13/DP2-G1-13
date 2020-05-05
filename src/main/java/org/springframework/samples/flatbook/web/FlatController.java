@@ -20,6 +20,7 @@ import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.model.Host;
+import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.DBImageService;
@@ -58,7 +59,8 @@ public class FlatController {
 
 
 	@Autowired
-	public FlatController(final FlatService flatService, final DBImageService dbImageService, final PersonService personService, final HostService hostService, final AdvertisementService advertisementService, final TenantService tenantService,
+	public FlatController(final FlatService flatService, final DBImageService dbImageService, final PersonService personService,
+		final HostService hostService, final AdvertisementService advertisementService, final TenantService tenantService,
 		final FlatReviewService flatReviewService, final RequestService requestService, final GeocodeAPIService geocodeAPIService) {
 		this.flatService = flatService;
 		this.dbImageService = dbImageService;
@@ -131,7 +133,8 @@ public class FlatController {
 	}
 
 	@PostMapping(value = "/flats/{flatId}/edit")
-	public String processUpdateForm(@Valid final Flat flat, final BindingResult result, @PathVariable("flatId") final int flatId, final Map<String, Object> model) {
+	public String processUpdateForm(@Valid final Flat flat, final BindingResult result, @PathVariable("flatId") final int flatId,
+		final Map<String, Object> model) {
 		if (result.hasErrors()) {
 			return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 		} else {
@@ -140,7 +143,8 @@ public class FlatController {
 				model.put("exception", e);
 				return "exception";
 			}
-			Set<DBImage> newImages = flat.getImages().stream().filter(x -> !x.getFileType().equals("application/octet-stream")).collect(Collectors.toSet());
+			Set<DBImage> newImages = flat.getImages().stream().filter(x -> !x.getFileType().equals("application/octet-stream"))
+				.collect(Collectors.toSet());
 			Flat oldFlat = this.flatService.findFlatById(flatId);
 			if (oldFlat.getImages().size() + newImages.size() < 6) {
 				result.rejectValue("images", "", "a minimum of 6 images is required.");
@@ -157,7 +161,8 @@ public class FlatController {
 	}
 
 	@GetMapping(value = "/flats/{flatId}/images/{imageId}/delete")
-	public String processDeleteImage(@PathVariable("flatId") final int flatId, @PathVariable("imageId") final int imageId, final Map<String, Object> model) {
+	public String processDeleteImage(@PathVariable("flatId") final int flatId, @PathVariable("imageId") final int imageId,
+		final Map<String, Object> model) {
 		if (!this.validateHost(flatId)) {
 			RuntimeException e = new RuntimeException("Illegal access");
 			model.put("exception", e);
@@ -230,7 +235,7 @@ public class FlatController {
 	public boolean validateHost(final int flatId) {
 		Boolean userIsHost = true;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
+		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals(AuthoritiesType.ADMIN.toString()))) {
 			String username = ((User) auth.getPrincipal()).getUsername();
 			String hostUsername = this.hostService.findHostByFlatId(flatId).getUsername();
 			userIsHost = username.equals(hostUsername);
@@ -241,7 +246,7 @@ public class FlatController {
 	private boolean validateTenant(final int flatId) {
 		boolean userIsTenantOfFlat = true;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ADMIN"))) {
+		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals(AuthoritiesType.ADMIN.toString()))) {
 			String username = ((User) auth.getPrincipal()).getUsername();
 			Flat flat = this.flatService.findFlatById(flatId);
 			userIsTenantOfFlat = flat.getTenants().stream().anyMatch(x -> x.getUsername().equals(username));
