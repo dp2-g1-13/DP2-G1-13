@@ -23,7 +23,7 @@ public class WelcomeControllerE2ETests {
 	private MockMvc mockMvc;
 
 
-	@WithMockUser(value = "spring", roles = {})
+	@WithMockUser(username = "spring", authorities = {})
 	@Test
 	void testInitSearchForm() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/")).andExpect(MockMvcResultMatchers.model().attributeExists("address"))
