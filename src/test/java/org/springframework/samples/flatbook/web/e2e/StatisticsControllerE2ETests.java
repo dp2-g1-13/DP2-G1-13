@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-mysql.properties")
-public class StatisticsControllerE2ETest {
+public class StatisticsControllerE2ETests {
 
 	@Autowired
 	private MockMvc				mockMvc;
@@ -27,8 +27,8 @@ public class StatisticsControllerE2ETest {
 	private static final String	TENANT_USER	= "TENANT";
 
 
-	@WithMockUser(username = StatisticsControllerE2ETest.ADMIN_USER, authorities = {
-		StatisticsControllerE2ETest.ADMIN_USER
+	@WithMockUser(username = StatisticsControllerE2ETests.ADMIN_USER, authorities = {
+		StatisticsControllerE2ETests.ADMIN_USER
 	})
 	@Test
 	void testGetStatistics() throws Exception {
@@ -60,8 +60,8 @@ public class StatisticsControllerE2ETest {
 			.andExpect(MockMvcResultMatchers.view().name("statistics/statisticsList"));
 	}
 
-	@WithMockUser(username = StatisticsControllerE2ETest.TENANT_USER, authorities = {
-		StatisticsControllerE2ETest.TENANT_USER
+	@WithMockUser(username = StatisticsControllerE2ETests.TENANT_USER, authorities = {
+		StatisticsControllerE2ETests.TENANT_USER
 	})
 	@Test
 	void testGetStatisticsForbbidenForNotAdmin() throws Exception {

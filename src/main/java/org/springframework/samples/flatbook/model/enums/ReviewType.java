@@ -2,7 +2,7 @@
 package org.springframework.samples.flatbook.model.enums;
 
 public enum ReviewType {
-	TENANT_REVIEW("tenantReview"), FLAT_REVIEW("flatReview");
+	TENANT_REVIEW("TenantReview"), FLAT_REVIEW("FlatReview");
 
 	private final String type;
 

@@ -1349,8 +1349,6 @@ insert into users_requests (tenant_username, requests_id) values ('mgeraudy16', 
 insert into users_requests (tenant_username, requests_id) values ('hhalton17', 134);
 insert into users_requests (tenant_username, requests_id) values ('itendahl18', 135);
 
-insert into reviews (dtype, id, description, creation_date, modified_date, rate, creator_username, flat_id) values ('FlatReview', 1, 'Ut at dolor quis odio consequat varius.', '2020-05-06', null, '5', 'rdunleavy0', 1);
-insert into reviews (dtype, id, description, creation_date, modified_date, rate, creator_username, flat_id) values ('FlatReview', 2, 'Pellentesque at nulla.', '2020-05-12', null, '5', 'dballchin1', 1);
 insert into reviews (dtype, id, description, creation_date, modified_date, rate, creator_username, flat_id) values ('FlatReview', 3, 'Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.', '2020-02-10', null, '5', 'owinslade2', 2);
 insert into reviews (dtype, id, description, creation_date, modified_date, rate, creator_username, flat_id) values ('FlatReview', 4, 'Duis ac nibh.', '2020-01-05', null, '5', 'dlippiett3', 2);
 insert into reviews (dtype, id, description, creation_date, modified_date, rate, creator_username, flat_id) values ('FlatReview', 5, 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa.', '2020-03-02', null, '5', 'mkennifick4', 3);
