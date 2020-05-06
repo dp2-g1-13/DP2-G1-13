@@ -541,7 +541,7 @@ class PersonControllerTests {
 		PersonControllerTests.ADMIN_USER
 	})
 	@Test
-	void testUnBanUserList() throws Exception {
+	void testUnBanUser() throws Exception {
 		this.host.setEnabled(false);
 		BDDMockito.given(this.personService.findUserById(PersonControllerTests.USERNAME)).willReturn(this.host);
 

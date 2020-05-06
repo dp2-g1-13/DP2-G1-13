@@ -37,7 +37,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				.antMatchers("/resources/**","/webjars/**","/h2-console/**").permitAll()
 				.antMatchers(HttpMethod.GET, "/","/oups").permitAll()
-				.antMatchers("/users/new").permitAll()
+				.antMatchers("/users/new").not().hasAnyAuthority(AuthoritiesType.HOST.toString(), AuthoritiesType.ADMIN.toString(), AuthoritiesType.TENANT.toString())
 				.antMatchers("/users/list").hasAnyAuthority(AuthoritiesType.ADMIN.toString())
 				.antMatchers("/users/{username:[0-9a-zA-Z]{5,}}").permitAll()
 				.antMatchers("/users/{username:[0-9a-zA-Z]{5,}}/unban").hasAnyAuthority(AuthoritiesType.ADMIN.toString())

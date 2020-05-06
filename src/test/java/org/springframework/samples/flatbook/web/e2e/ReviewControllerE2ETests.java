@@ -288,4 +288,43 @@ public class ReviewControllerE2ETests {
 			.andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
 			.andExpect(MockMvcResultMatchers.view().name("exception"));
 	}
+
+	@WithMockUser(username = ReviewControllerE2ETests.ADMIN_USER, authorities = {
+		ReviewControllerE2ETests.ADMIN_USER
+	})
+	@Test
+	@Order(20)
+	void testProcessCreationFormReviewForbbidenForAdmin() throws Exception {
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/reviews/new")).andExpect(MockMvcResultMatchers.status().isForbidden());
+	}
+
+	@WithMockUser(username = ReviewControllerE2ETests.ADMIN_USER, authorities = {
+		ReviewControllerE2ETests.ADMIN_USER
+	})
+	@Test
+	@Order(21)
+	void testInitUpdateFormReviewForbbidenForAdmin() throws Exception {
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/reviews/{reviewId}/edit", ReviewControllerE2ETests.TEST_TENANTREVIEW_ID))
+			.andExpect(MockMvcResultMatchers.status().isForbidden());
+	}
+
+	@WithMockUser(username = ReviewControllerE2ETests.ADMIN_USER, authorities = {
+		ReviewControllerE2ETests.ADMIN_USER
+	})
+	@Test
+	@Order(22)
+	void testProcessUpdateFormReviewForbbidenForAdmin() throws Exception {
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/reviews/{reviewId}/edit", ReviewControllerE2ETests.TEST_TENANTREVIEW_ID))
+			.andExpect(MockMvcResultMatchers.status().isForbidden());
+	}
+
+	@WithMockUser(username = ReviewControllerE2ETests.ADMIN_USER, authorities = {
+		ReviewControllerE2ETests.ADMIN_USER
+	})
+	@Test
+	@Order(23)
+	void testProcessDeleteFormReviewForbbidenForAdmin() throws Exception {
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/reviews/{reviewId}/delete", ReviewControllerE2ETests.TEST_TENANTREVIEW_ID))
+			.andExpect(MockMvcResultMatchers.status().isForbidden());
+	}
 }

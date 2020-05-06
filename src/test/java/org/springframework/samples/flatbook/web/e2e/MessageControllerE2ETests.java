@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-mysql.properties")
-class MessageControllerE2ETest {
+class MessageControllerE2ETests {
 
 	@Autowired
 	private MockMvc				mockMvc;
@@ -34,7 +34,7 @@ class MessageControllerE2ETest {
 	private static final String	ADMIN_USER	= "ADMIN";
 
 
-	@WithMockUser(username = MessageControllerE2ETest.USERNAME1, authorities = MessageControllerE2ETest.TENANT_USER)
+	@WithMockUser(username = MessageControllerE2ETests.USERNAME1, authorities = MessageControllerE2ETests.TENANT_USER)
 	@Test
 	void testInitConversationList() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/messages/list")).andExpect(MockMvcResultMatchers.status().isOk())
@@ -42,87 +42,87 @@ class MessageControllerE2ETest {
 			.andExpect(MockMvcResultMatchers.model().attributeExists("message")).andExpect(MockMvcResultMatchers.model().attributeExists("messages"));
 	}
 
-	@WithMockUser(username = MessageControllerE2ETest.ADMIN_USER, authorities = MessageControllerE2ETest.ADMIN_USER)
+	@WithMockUser(username = MessageControllerE2ETests.ADMIN_USER, authorities = MessageControllerE2ETests.ADMIN_USER)
 	@Test
 	void testInitConversationListForbiddenForAdmin() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/messages/list")).andExpect(MockMvcResultMatchers.status().isForbidden());
 	}
 
-	@WithMockUser(username = MessageControllerE2ETest.USERNAME1, authorities = MessageControllerE2ETest.TENANT_USER)
+	@WithMockUser(username = MessageControllerE2ETests.USERNAME1, authorities = MessageControllerE2ETests.TENANT_USER)
 	@Test
 	void testInitConversation() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/messages/{username}", MessageControllerE2ETest.USERNAME2))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/messages/{username}", MessageControllerE2ETests.USERNAME2))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.view().name("users/messages/conversation"))
 			.andExpect(MockMvcResultMatchers.model().attributeExists("message")).andExpect(MockMvcResultMatchers.model().attributeExists("messages"));
 	}
 
-	@WithMockUser(username = MessageControllerE2ETest.ADMIN_USER, authorities = MessageControllerE2ETest.ADMIN_USER)
+	@WithMockUser(username = MessageControllerE2ETests.ADMIN_USER, authorities = MessageControllerE2ETests.ADMIN_USER)
 	@Test
 	void testInitConversationForbiddenForAdmin() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.get("/messages/{username}", MessageControllerE2ETest.USERNAME2))
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/messages/{username}", MessageControllerE2ETests.USERNAME2))
 			.andExpect(MockMvcResultMatchers.status().isForbidden());
 	}
 
-	@WithMockUser(username = MessageControllerE2ETest.USERNAME1, authorities = MessageControllerE2ETest.TENANT_USER)
+	@WithMockUser(username = MessageControllerE2ETests.USERNAME1, authorities = MessageControllerE2ETests.TENANT_USER)
 	@Test
 	void testProcessSendFormSuccessInConversation() throws Exception {
 
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETest.USERNAME2)
-				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("body", MessageControllerE2ETest.BODY)
+			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETests.USERNAME2)
+				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("body", MessageControllerE2ETests.BODY)
 				.param("creationMoment", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-				.param("receiver.username", MessageControllerE2ETest.USERNAME2).param("sender.username", MessageControllerE2ETest.USERNAME1))
+				.param("receiver.username", MessageControllerE2ETests.USERNAME2).param("sender.username", MessageControllerE2ETests.USERNAME1))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
 
-	@WithMockUser(username = MessageControllerE2ETest.ADMIN_USER, authorities = MessageControllerE2ETest.ADMIN_USER)
+	@WithMockUser(username = MessageControllerE2ETests.ADMIN_USER, authorities = MessageControllerE2ETests.ADMIN_USER)
 	@Test
 	void testProcessSendFormForbiddenForAdmin() throws Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETest.USERNAME2))
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETests.USERNAME2))
 			.andExpect(MockMvcResultMatchers.status().isForbidden());
 	}
 
-	@WithMockUser(username = MessageControllerE2ETest.USERNAME1, authorities = MessageControllerE2ETest.TENANT_USER)
+	@WithMockUser(username = MessageControllerE2ETests.USERNAME1, authorities = MessageControllerE2ETests.TENANT_USER)
 	@Test
 	void testProcessSendFormWithCantReceiveYourOwnMessageException() throws Exception {
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETest.USERNAME1)
-				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("body", MessageControllerE2ETest.BODY)
+			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETests.USERNAME1)
+				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("body", MessageControllerE2ETests.BODY)
 				.param("creationMoment", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-				.param("receiver.username", MessageControllerE2ETest.USERNAME1).param("sender.username", MessageControllerE2ETest.USERNAME1))
+				.param("receiver.username", MessageControllerE2ETests.USERNAME1).param("sender.username", MessageControllerE2ETests.USERNAME1))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
-	@WithMockUser(username = MessageControllerE2ETest.USERNAME1, authorities = MessageControllerE2ETest.TENANT_USER)
+	@WithMockUser(username = MessageControllerE2ETests.USERNAME1, authorities = MessageControllerE2ETests.TENANT_USER)
 	@Test
 	void testProcessSendFormWithUserNotExistsException() throws Exception {
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETest.ADMIN_USER)
-				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("body", MessageControllerE2ETest.BODY)
+			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETests.ADMIN_USER)
+				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("body", MessageControllerE2ETests.BODY)
 				.param("creationMoment", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-				.param("receiver.username", MessageControllerE2ETest.ADMIN_USER).param("sender.username", MessageControllerE2ETest.USERNAME1))
+				.param("receiver.username", MessageControllerE2ETests.ADMIN_USER).param("sender.username", MessageControllerE2ETests.USERNAME1))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
-	@WithMockUser(username = MessageControllerE2ETest.USERNAME1, authorities = MessageControllerE2ETest.TENANT_USER)
+	@WithMockUser(username = MessageControllerE2ETests.USERNAME1, authorities = MessageControllerE2ETests.TENANT_USER)
 	@Test
 	void testProcessSendFormWithUserIsBanned() throws Exception {
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETest.USER_BANNED)
-				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("body", MessageControllerE2ETest.BODY)
+			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETests.USER_BANNED)
+				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("body", MessageControllerE2ETests.BODY)
 				.param("creationMoment", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-				.param("receiver.username", MessageControllerE2ETest.USER_BANNED).param("sender.username", MessageControllerE2ETest.USERNAME1))
+				.param("receiver.username", MessageControllerE2ETests.USER_BANNED).param("sender.username", MessageControllerE2ETests.USERNAME1))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
-	@WithMockUser(username = MessageControllerE2ETest.USERNAME1, authorities = MessageControllerE2ETest.TENANT_USER)
+	@WithMockUser(username = MessageControllerE2ETests.USERNAME1, authorities = MessageControllerE2ETests.TENANT_USER)
 	@Test
 	void testProcessSendFormWithErrors() throws Exception {
 		this.mockMvc
-			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETest.USERNAME2)
+			.perform(MockMvcRequestBuilders.post("/messages/{username}/new", MessageControllerE2ETests.USERNAME2)
 				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("body", "")
 				.param("creationMoment", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-				.param("receiver.username", MessageControllerE2ETest.USERNAME2).param("sender.username", MessageControllerE2ETest.USERNAME1))
+				.param("receiver.username", MessageControllerE2ETests.USERNAME2).param("sender.username", MessageControllerE2ETests.USERNAME1))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
