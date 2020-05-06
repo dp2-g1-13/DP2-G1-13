@@ -19,9 +19,9 @@ public class MailjetAPIService {
     public void sendSimpleMessage(final String name, final String email, final String username, final String password) {
         String body = "{\"Messages\":"
             + "[{\"HTMLPart\":\"<h3>Welcome to FlatBook, " + name + ".</h3><br>Thanks for using our service, enjoy it pisha!"
-            + "<br>Your username: "+ username +"<br>Your password: "+ password +"<br>Dont share it!\","
+            + "<br>Your username: "+ username +"<br>Your password: "+ password +"<br>Don't share it!\","
             + "\"TextPart\":\"Welcome to FlatBook, " + name + ". Thanks for using our service, enjoy it pisha!"
-            + " Your username: "+ username +" Your password: "+ password +" Dont share it!\","
+            + " Your username: "+ username +" Your password: "+ password +" Don't share it!\","
             + "\"From\":{\"Email\":\"flatbookus@gmail.com\","
             + "\"Name\":\"FlatBook\"},"
             + "\"To\":[{\"Email\":\"" + email + "\","
