@@ -44,7 +44,8 @@ public class ReviewController {
 
 
 	@Autowired
-	public ReviewController(final FlatService flatService, final FlatReviewService flatReviewService, final TenantService tenantService, final HostService hostService, final AuthoritiesService authoritiesService, final PersonService personService,
+	public ReviewController(final FlatService flatService, final FlatReviewService flatReviewService, final TenantService tenantService,
+		final HostService hostService, final AuthoritiesService authoritiesService, final PersonService personService,
 		final TenantReviewService tenantReviewService) {
 		this.flatReviewService = flatReviewService;
 		this.tenantService = tenantService;
@@ -54,7 +55,9 @@ public class ReviewController {
 	}
 
 	@GetMapping(value = "/reviews/new")
-	public String initCreationForm(final Map<String, Object> model, final Principal principal, @RequestParam(name = "flatId", required = false) final Integer flatId, @RequestParam(name = "tenantId", required = false) final String tenantId) {
+	public String initCreationForm(final Map<String, Object> model, final Principal principal,
+		@RequestParam(name = "flatId", required = false) final Integer flatId,
+		@RequestParam(name = "tenantId", required = false) final String tenantId) {
 		Person user = this.personService.findUserById(principal.getName());
 		ReviewType type = this.getReviewType(flatId, tenantId, user);
 
@@ -75,7 +78,8 @@ public class ReviewController {
 	@PostMapping(value = "/reviews/new")
 	public String processCreationForm(@Valid final ReviewForm review, final BindingResult result, final Principal principal) {
 		Person user = this.personService.findUserById(principal.getName());
-		ReviewType type = this.getReviewType(review.getType().equals(ReviewType.FLAT_REVIEW) ? Integer.parseInt(review.getReviewed()) : null, review.getType().equals(ReviewType.TENANT_REVIEW) ? review.getReviewed() : null, user);
+		ReviewType type = this.getReviewType(review.getType().equals(ReviewType.FLAT_REVIEW) ? Integer.parseInt(review.getReviewed()) : null,
+			review.getType().equals(ReviewType.TENANT_REVIEW) ? review.getReviewed() : null, user);
 
 		if (type == null) {
 			throw new IllegalArgumentException("Illegal access.");
@@ -121,7 +125,8 @@ public class ReviewController {
 	}
 
 	@PostMapping(value = "reviews/{reviewId}/edit")
-	public String processUpdateForm(@Valid final ReviewForm review, final BindingResult result, @PathVariable("reviewId") final int reviewId, final ModelMap model, final Principal principal) {
+	public String processUpdateForm(@Valid final ReviewForm review, final BindingResult result, @PathVariable("reviewId") final int reviewId,
+		final ModelMap model, final Principal principal) {
 		Person creator = this.personService.findUserById(principal.getName());
 		ReviewForm reviewFormDb = this.getReviewFormByReviewId(reviewId);
 
@@ -154,7 +159,7 @@ public class ReviewController {
 	}
 
 	@GetMapping(value = "/reviews/{reviewId}/delete")
-	public String processFlatReviewDelete(@PathVariable("reviewId") final int reviewId, final Principal principal) {
+	public String processReviewDelete(@PathVariable("reviewId") final int reviewId, final Principal principal) {
 		Person creator = this.personService.findUserById(principal.getName());
 		ReviewForm reviewFormDb = this.getReviewFormByReviewId(reviewId);
 

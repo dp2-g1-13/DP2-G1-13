@@ -38,14 +38,28 @@ public class StatisticsControllerE2ETests {
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("numberOfFlats", Matchers.is(45))))
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("numberOfAdvertisements", Matchers.is(45))))
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("numberOfUsers", Matchers.is(151))))
-			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("ratioOfAcceptedRequests", Matchers.closeTo(2 / 3.0,  0.01))))
-			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("ratioOfCanceledRequests", Matchers.closeTo(4 / 90.0, 0.01))))
-			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("ratioOfFinishedRequests", Matchers.closeTo(0.0,  0.01))))
-			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("ratioOfRejectedRequests", Matchers.closeTo(2 / 90.0,  0.01))))
-			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("ratioOfFlatsWithAdvertisement", Matchers.closeTo(1.0,  0.01))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics",
+				Matchers.hasProperty("ratioOfAcceptedRequests", Matchers.closeTo(2 / 3.0, 0.01))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics",
+				Matchers.hasProperty("ratioOfCanceledRequests", Matchers.closeTo(4 / 90.0, 0.01))))
+			.andExpect(
+				MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("ratioOfFinishedRequests", Matchers.closeTo(0.0, 0.01))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics",
+				Matchers.hasProperty("ratioOfRejectedRequests", Matchers.closeTo(2 / 90.0, 0.01))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics",
+				Matchers.hasProperty("ratioOfFlatsWithAdvertisement", Matchers.closeTo(1.0, 0.01))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeBestReviewedFlats", Matchers.hasSize(3))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeBestReviewedHosts", Matchers.hasSize(3))))
+			.andExpect(
+				MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeBestReviewedTenants", Matchers.hasSize(3))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeMostReportedUsers", Matchers.hasSize(3))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeWorstReviewedFlats", Matchers.hasSize(3))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeWorstReviewedHosts", Matchers.hasSize(3))))
+			.andExpect(
+				MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeWorstReviewedTenants", Matchers.hasSize(3))))
 			.andExpect(MockMvcResultMatchers.view().name("statistics/statisticsList"));
 	}
-	
+
 	@WithMockUser(username = StatisticsControllerE2ETests.TENANT_USER, authorities = {
 		StatisticsControllerE2ETests.TENANT_USER
 	})
