@@ -107,8 +107,8 @@ public class RequestController {
 
 	@GetMapping("/flats/{flatId}/requests/{requestId}/accept")
 	public String processAcceptRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
-		if (this.validateHostAcceptingOrRejectingRequest(flatId)) {
-			Request request = this.requestService.findRequestById(requestId);
+        Request request = this.requestService.findRequestById(requestId);
+		if (this.validateHostAcceptingOrRejectingRequest(flatId) && request.getStatus().equals(RequestStatus.PENDING)) {
 			request.setStatus(RequestStatus.ACCEPTED);
 			Flat flat = this.flatService.findFlatById(flatId);
 			Tenant tenant = this.tenantService.findTenantByRequestId(requestId);
@@ -123,8 +123,8 @@ public class RequestController {
 
 	@GetMapping("/flats/{flatId}/requests/{requestId}/reject")
 	public String processRejectRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
-		if (this.validateHostAcceptingOrRejectingRequest(flatId)) {
-			Request request = this.requestService.findRequestById(requestId);
+        Request request = this.requestService.findRequestById(requestId);
+		if (this.validateHostAcceptingOrRejectingRequest(flatId) && request.getStatus().equals(RequestStatus.PENDING)) {
 			request.setStatus(RequestStatus.REJECTED);
 			this.requestService.saveRequest(request);
 		} else {
