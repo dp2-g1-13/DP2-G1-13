@@ -17,7 +17,7 @@ import lombok.extern.java.Log;
 
 @Log
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SignUpDefinitions extends AbstractStep {
+public class SigningUpDefinitions extends AbstractStep {
 
 	@LocalServerPort
 	private int port;

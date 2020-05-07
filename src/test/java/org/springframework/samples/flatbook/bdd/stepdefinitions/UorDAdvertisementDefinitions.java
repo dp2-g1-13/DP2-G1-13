@@ -1,7 +1,6 @@
 package org.springframework.samples.flatbook.bdd.stepdefinitions;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -25,7 +24,7 @@ public class UorDAdvertisementDefinitions extends AbstractStep {
 	}
 	
 	public static void IGoToMyFlatsPage(WebDriver driver) throws Exception {		
-		driver.findElement(By.xpath("//li[2]/a")).click();
+		driver.findElement(By.xpath("//div[@id='main-navbar']/ul/li[2]/a/span[2]")).click();
 	}
 	
 	@And("I edit the first flat advertisement description to {string}")
@@ -34,8 +33,8 @@ public class UorDAdvertisementDefinitions extends AbstractStep {
 	}
 	
 	public static void IEditTheFirstFlatAdvert(String desc, WebDriver driver) throws Exception {
-		driver.findElement(By.xpath("//div[2]/div[2]/a")).click();
-	    driver.findElement(By.xpath("//div/div/div/a")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'See advertisement')]")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'Edit advertisement')]")).click();
 	    driver.findElement(By.id("description")).clear();
 	    driver.findElement(By.id("description")).sendKeys(desc);
 	    driver.findElement(By.xpath("//button[@type='submit']")).click();
@@ -47,8 +46,8 @@ public class UorDAdvertisementDefinitions extends AbstractStep {
 	}
 	
 	public static void IDeleteTheFirstFlatAdvertisement(WebDriver driver) throws Exception {
-		driver.findElement(By.xpath("//div[2]/div[2]/a")).click();
-	    driver.findElement(By.xpath("//div[2]/a")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'See advertisement')]")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'Delete advertisement')]")).click();
 	}
 	
 	@Then("The edited description text {string} appears")
@@ -58,6 +57,16 @@ public class UorDAdvertisementDefinitions extends AbstractStep {
 	}
 	
 	public static void FindEditedContent(String desc, WebDriver driver) throws Exception {
-		assertEquals(desc, driver.findElement(By.xpath("//td")).getText());
+		assertEquals(desc, driver.findElement(By.xpath("//td[contains(text(),'"+desc+"')]")).getText());
+	}
+	
+	@Then("The see advertisement button doesnt exists")
+	public void FindExacly2SeeAdvButtons() throws Exception {
+		FindExacly2SeeAdvButtons(getDriver());
+		stopDriver();
+	}
+	
+	public static void FindExacly2SeeAdvButtons(WebDriver driver) throws Exception {
+		assertEquals(2, driver.findElements(By.xpath("//a[contains(text(),'See advertisement')]")).size());
 	}
 }

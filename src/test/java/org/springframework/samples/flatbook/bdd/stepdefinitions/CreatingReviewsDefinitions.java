@@ -1,7 +1,6 @@
 package org.springframework.samples.flatbook.bdd.stepdefinitions;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -25,18 +24,18 @@ public class CreatingReviewsDefinitions extends AbstractStep {
 	}
 	
 	public static void IGoToMyFlatPage(WebDriver driver) throws Exception {		
-		driver.findElement(By.xpath("//ul[2]/li/a")).click();
-	    driver.findElement(By.xpath("//li[3]/div/div/div/p/a")).click();
-	    driver.findElement(By.xpath("//div/div/div/a")).click();
+	    driver.findElement(By.xpath("//div[@id='main-navbar']/ul[2]/li/a/strong")).click();
+	    driver.findElement(By.xpath("//a[contains(text(),'My User Page')]")).click();
+	    driver.findElement(By.xpath("//a[contains(text(),'My flat')]")).click();
 	}
 	
-	@And("I go to my roomate user page")
-	public void IGoToMyRoomateUserPage() throws Exception {
-		IGoToMyRoomateUserPage(getDriver());
+	@And("I go to my roomate {string} user page")
+	public void IGoToMyRoomateUserPage(String username) throws Exception {
+		IGoToMyRoomateUserPage(username, getDriver());
 	}
 	
-	public static void IGoToMyRoomateUserPage(WebDriver driver) throws Exception {
-		driver.findElement(By.xpath("//div[4]/div/div[2]/ul/li[2]/a")).click();
+	public static void IGoToMyRoomateUserPage(String username, WebDriver driver) throws Exception {
+		driver.findElement(By.xpath("//a[contains(text(),'"+username+"')]")).click();
 	}
 	
 	@And("I make a review of him")
@@ -45,7 +44,7 @@ public class CreatingReviewsDefinitions extends AbstractStep {
 	}
 	
 	public static void IMakeAReview(WebDriver driver) throws Exception {
-		driver.findElement(By.xpath("//div[2]/div/a")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'New Review')]")).click();
 	    driver.findElement(By.id("description")).clear();
 	    driver.findElement(By.id("description")).sendKeys("Test review");
 	    driver.findElement(By.id("rate")).clear();
@@ -59,7 +58,7 @@ public class CreatingReviewsDefinitions extends AbstractStep {
 	}
 	
 	public static void IMakeAReviewOfFlat(WebDriver driver) throws Exception {
-		driver.findElement(By.xpath("//div[2]/div/div/a")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'New Review')]")).click();
 	    driver.findElement(By.id("description")).clear();
 	    driver.findElement(By.id("description")).sendKeys("Test review");
 	    driver.findElement(By.id("rate")).clear();
@@ -86,28 +85,19 @@ public class CreatingReviewsDefinitions extends AbstractStep {
 	}
 	
 	public static void IGoToFirstFlatPage(WebDriver driver) throws Exception {		
-		driver.findElement(By.xpath("//div[2]/div/div[2]/a")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'See details')]")).click();
 	}
 	
-	@And("I try to make a review of the first tenant")
-	public void ITryToReviewFirstTenantOfFlat() throws Exception {	
-		ITryToReviewFirstTenantOfFlat("false", getDriver());		
+	@And("I try to make a review of the tenant {string}")
+	public void ITryToReviewTenantOfFlat(String username) throws Exception {	
+		ITryToReviewTenantOfFlat(username, getDriver());		
 	}
 	
-	@And("I try to make a review of the first tenant logged")
-	public void ITryToReviewFirstTenantOfFlatLogged() throws Exception {	
-		ITryToReviewFirstTenantOfFlat("true", getDriver());		
+	public static void ITryToReviewTenantOfFlat(String username, WebDriver driver) throws Exception {
+		driver.findElement(By.xpath("//a[contains(text(),'"+username+"')]")).click();
 	}
 	
-	public static void ITryToReviewFirstTenantOfFlat(String logged, WebDriver driver) throws Exception {
-		if(logged.equals("true")) {
-			driver.findElement(By.xpath("//div[5]/div/div[2]/ul/li/a")).click();
-		}else {
-			driver.findElement(By.xpath("//div[4]/div/div[2]/ul/li/a")).click();
-		}
-	}
-	
-	@Then("The {string} button doesnt exist")
+	@Then("The {string} button doesnt exists")
 	public void NewReviewButtonDoesntExists(String button) throws Exception {
 		NewReviewButtonDoesntExists(button, getDriver());
 		stopDriver();

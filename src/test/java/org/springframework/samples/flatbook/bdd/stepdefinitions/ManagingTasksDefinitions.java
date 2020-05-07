@@ -7,12 +7,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.boot.web.server.LocalServerPort;
 
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import lombok.extern.java.Log;
 
 @Log
-public class TaskManagementDefinitions extends AbstractStep {
+public class ManagingTasksDefinitions extends AbstractStep {
 
 	@LocalServerPort
 	private int port;
@@ -32,9 +31,9 @@ public class TaskManagementDefinitions extends AbstractStep {
 	    driver.findElement(By.id("description")).clear();
 	    driver.findElement(By.id("description")).sendKeys("This is a new task for a test");
 	    driver.findElement(By.xpath("//button[@type='submit']")).click();
-	    assertEquals("Test task", driver.findElement(By.xpath("//td")).getText());
-	    assertEquals("This is a new task for a test", driver.findElement(By.xpath("//td[2]")).getText());
-	    assertEquals("anund5", driver.findElement(By.xpath("//tr[3]/td")).getText());
+	    assertEquals("Test task", driver.findElement(By.xpath("//td[contains(text(),'Test task')]")).getText());
+	    assertEquals("This is a new task for a test", driver.findElement(By.xpath("//td[contains(text(),'This is a new task for a test')]")).getText());
+	    assertEquals("anund5", driver.findElement(By.xpath("//td[contains(text(),'anund5')]")).getText());
 	}
 	
 	@Then("I edit a task")
@@ -48,7 +47,7 @@ public class TaskManagementDefinitions extends AbstractStep {
 	    new Select(driver.findElement(By.xpath("//select[@id='status']"))).selectByVisibleText("INPROGRESS");
 	    driver.findElement(By.xpath("//option[@value='INPROGRESS']")).click();
 	    driver.findElement(By.xpath("//button[@type='submit']")).click();
-	    assertEquals("In Progress", driver.findElement(By.xpath("//tr[2]/td[2]")).getText());
+	    assertEquals("In Progress", driver.findElement(By.xpath("//td[contains(text(),'In Progress')]")).getText());
 	}
 	
 	@Then("I delete a task")

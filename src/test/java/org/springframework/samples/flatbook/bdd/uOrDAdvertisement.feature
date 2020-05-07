@@ -13,7 +13,7 @@ Feature: Updating or deleting advertisements (UH 6)
     When I do login as user "fricart1"
     And I go to my flats page
     And I delete the first flat advertisement
-    Then The "See advertisement" button doesnt exists 	
+    Then The see advertisement button doesnt exists	
 
   Scenario: Fail advertisement edition or deletion because the advertisement is not mine (Negative)
     Given I am not logged in the system
@@ -21,4 +21,4 @@ Feature: Updating or deleting advertisements (UH 6)
     When I do look for a flat in "Sevilla"
     And I go to the first flat page
     Then The "Edit advertisement" button doesnt exists
-    And Then The "Delete advertisement" button doesnt exists
+    Then The "Delete advertisement" button doesnt exists

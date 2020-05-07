@@ -18,7 +18,7 @@ public class ReportingUsersDefinitions extends AbstractStep {
 	
 	//Positive cases:
 	
-	@Then("I can report him")
+	@Then("I report him")
 	public void reportUser() throws Exception {
 		reportUser(getDriver(), port);
 		stopDriver();
@@ -34,12 +34,8 @@ public class ReportingUsersDefinitions extends AbstractStep {
 	
 	//Negative case:
 	
-	@And("I try to report the first tenant")
-	public void ITryToReportFirstTenantOfFlat() throws Exception {	
-		ITryToReportFirstTenantOfFlat(getDriver());		
-	}
-	
-	public static void ITryToReportFirstTenantOfFlat(WebDriver driver) throws Exception {
-		driver.findElement(By.xpath("//div[4]/div/div[2]/ul/li/a")).click();
+	@And("I try to report the tenant {string}")
+	public void ITryToReportFirstTenantOfFlat(String username) throws Exception {	
+		CreatingReviewsDefinitions.IGoToMyRoomateUserPage(username, getDriver());		
 	}
 }

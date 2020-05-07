@@ -12,7 +12,7 @@ import io.cucumber.java.en.Then;
 import lombok.extern.java.Log;
 
 @Log
-public class StatisticsDefinitions extends AbstractStep {
+public class ShowingStatisticsDefinitions extends AbstractStep {
 
 	@LocalServerPort
 	private int port;

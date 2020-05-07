@@ -1,7 +1,6 @@
 package org.springframework.samples.flatbook.bdd.stepdefinitions;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -12,7 +11,7 @@ import io.cucumber.java.en.Then;
 import lombok.extern.java.Log;
 
 @Log
-public class taskListDefinitions extends AbstractStep {
+public class ListingTasksDefinitions extends AbstractStep {
 
 	@LocalServerPort
 	private int port;
@@ -25,9 +24,9 @@ public class taskListDefinitions extends AbstractStep {
 	}
 	
 	public static void IGoToMyTasksPage(WebDriver driver) throws Exception {		
-		driver.findElement(By.xpath("//ul[2]/li/a")).click();
-	    driver.findElement(By.xpath("//li[3]/div/div/div/p/a")).click();
-	    driver.findElement(By.xpath("//div/a[2]")).click();
+		driver.findElement(By.xpath("//div[@id='main-navbar']/ul[2]/li/a/strong")).click();
+	    driver.findElement(By.xpath("//a[contains(text(),'My User Page')]")).click();
+	    driver.findElement(By.xpath("//a[contains(text(),'My tasks')]")).click();
 	}
 	
 	@Then("The tasks of my flat appears")
@@ -38,9 +37,9 @@ public class taskListDefinitions extends AbstractStep {
 	
 	public static void FindTasks(WebDriver driver) throws Exception {
 		assertEquals("Nunc rhoncus dui vel sem.", driver.findElement(By.xpath("//td")).getText());
-	    assertEquals("dballchin1", driver.findElement(By.xpath("//tr[3]/td")).getText());
-	    assertEquals("In sagittis dui vel nisl.", driver.findElement(By.xpath("//div[2]/div/div/table/tbody/tr/td")).getText());
-	    assertEquals("rdunleavy0", driver.findElement(By.xpath("//div[2]/div/div/table/tbody/tr[3]/td")).getText());
+		assertEquals("dballchin1", driver.findElement(By.xpath("//td[contains(text(),'dballchin1')]")).getText());
+		assertEquals("In sagittis dui vel nisl.", driver.findElement(By.xpath("//td[contains(text(),'In sagittis dui vel nisl.')]")).getText());
+		assertEquals("rdunleavy0", driver.findElement(By.xpath("//td[contains(text(),'rdunleavy0')]")).getText());
 	}
 	
 	//Negative case:
@@ -51,7 +50,7 @@ public class taskListDefinitions extends AbstractStep {
 	}
 	
 	public static void IGoToMyUserPage(WebDriver driver) throws Exception {		
-		driver.findElement(By.xpath("//ul[2]/li/a")).click();
-	    driver.findElement(By.xpath("//li[3]/div/div/div/p/a")).click();
+		driver.findElement(By.xpath("//div[@id='main-navbar']/ul[2]/li/a/strong")).click();
+	    driver.findElement(By.xpath("//a[contains(text(),'My User Page')]")).click();
 	}
 }

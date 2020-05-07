@@ -10,7 +10,7 @@ import io.cucumber.java.en.Then;
 import lombok.extern.java.Log;
 
 @Log
-public class tenantListOfFlatDefinitions extends AbstractStep {
+public class ListingTenantsOfFlatDefinitions extends AbstractStep {
 
 	@LocalServerPort
 	private int port;
@@ -24,11 +24,10 @@ public class tenantListOfFlatDefinitions extends AbstractStep {
 	}
 	
 	public static void NotFindAdvertButton(WebDriver driver, int port) throws Exception {
-		driver.get("http://localhost:"+port+"/advertisements/31");
-	    driver.findElement(By.xpath("(//a[contains(text(),'kwhatling1p')])[2]")).click();
+	    driver.findElement(By.xpath("//a[contains(text(),'kwhatling1p')]")).click();
 	    assertEquals("kwhatling1p", driver.findElement(By.xpath("//h2")).getText());
 	    driver.get("http://localhost:"+port+"/advertisements/31");
-	    driver.findElement(By.xpath("(//a[contains(text(),'ejuszczyk1o')])[2]")).click();
+	    driver.findElement(By.xpath("//a[contains(text(),'ejuszczyk1o')]")).click();
 	    assertEquals("ejuszczyk1o", driver.findElement(By.xpath("//h2")).getText());
 	}
 }

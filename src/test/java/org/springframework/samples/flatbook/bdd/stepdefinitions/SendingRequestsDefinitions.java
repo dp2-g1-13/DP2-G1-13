@@ -36,14 +36,14 @@ public class SendingRequestsDefinitions extends AbstractStep {
 	}
 	
 	public static void IMakeARequest(WebDriver driver) throws Exception {
-		driver.findElement(By.xpath("//div[2]/div/div[2]/a")).click();
-		driver.findElement(By.xpath("//div/div/div/a")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'See details')]")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'Make a request!')]")).click();
 	    driver.findElement(By.id("description")).clear();
 	    driver.findElement(By.id("description")).sendKeys("Test request");
 	    driver.findElement(By.id("startDate")).clear();
-	    driver.findElement(By.id("startDate")).sendKeys("12/08/2020");
+	    driver.findElement(By.id("startDate")).sendKeys("12/08/2022");
 	    driver.findElement(By.id("finishDate")).clear();
-	    driver.findElement(By.id("finishDate")).sendKeys("31/08/2020");
+	    driver.findElement(By.id("finishDate")).sendKeys("31/08/2022");
 	    driver.findElement(By.xpath("//button[@type='submit']")).click();
 	}
 	
@@ -54,9 +54,9 @@ public class SendingRequestsDefinitions extends AbstractStep {
 	}
 	
 	public static void FindTheCreatedRequest(WebDriver driver) throws Exception {
-		assertEquals("Test request", driver.findElement(By.xpath("//div[2]/div/div/table/tbody/tr/td")).getText());
-	    assertEquals("31/08/2020", driver.findElement(By.xpath("//div[2]/div/div/table/tbody/tr[4]/td")).getText());
-	    assertEquals("12/08/2020", driver.findElement(By.xpath("//div[2]/div/div/table/tbody/tr[3]/td")).getText());
+		assertEquals("Test request", driver.findElement(By.xpath("//td[contains(text(),'Test request')]")).getText());
+		assertEquals("31/08/2022", driver.findElement(By.xpath("//td[contains(text(),'31/08/2022')]")).getText());
+		assertEquals("12/08/2022", driver.findElement(By.xpath("//td[contains(text(),'12/08/2022')]")).getText());
 	}
 	
 	//Negative case:
@@ -72,7 +72,7 @@ public class SendingRequestsDefinitions extends AbstractStep {
 	}
 	
 	public static void ITryToMakeARequest(WebDriver driver) throws Exception {
-		driver.findElement(By.xpath("//div[2]/div/div[2]/a")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'See details')]")).click();
 	}
 	
 	@Then("I cannot click the request button")
@@ -81,8 +81,7 @@ public class SendingRequestsDefinitions extends AbstractStep {
 		stopDriver();
 	}
 	
-	
 	public static void CannotClickMakeRequestButton(WebDriver driver) throws Exception {
-		assertEquals("true", driver.findElement(By.xpath("//div/div/div/div/button")).getAttribute("disabled"));
+		assertEquals("true", driver.findElement(By.xpath("//button[contains(text(),'You have already made a request')]")).getAttribute("disabled"));
 	}
 }
