@@ -53,7 +53,7 @@ public class Flat extends BaseEntity {
 
 	@Valid
 	@NotNull
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<DBImage>	images;
 
 	@Valid
@@ -65,7 +65,7 @@ public class Flat extends BaseEntity {
 	private Address			address;
 
 	@Valid
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")
 	private Set<FlatReview>	flatReviews;
 

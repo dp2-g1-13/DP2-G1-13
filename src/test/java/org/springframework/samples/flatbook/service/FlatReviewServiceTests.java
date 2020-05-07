@@ -2,113 +2,76 @@ package org.springframework.samples.flatbook.service;
 
 import java.time.LocalDate;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.*;
 
-import static org.mockito.Mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.model.Tenant;
-import org.springframework.samples.flatbook.repository.FlatReviewRepository;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class FlatReviewServiceTests {
-
-	private static final String	FIRSTNAME_1	= "Ramon";
-	private static final String	LASTNAME_1	= "Fernandez";
-	private static final String	DNI_1		= "23330000A";
-	private static final String	EMAIL_1		= "b@b.com";
-	private static final String	USERNAME_1	= "ababa";
-	private static final String	TELEPHONE_1	= "777789789";
-	private static final String	PASSWORD	= "HOst__Pa77S";
 
 	private static final String	DESCRIPTION		= "description";
 	private static final Integer RATE = 5;
-	private static final Integer ID		= 1;
-	private static final Integer ID2		= 2;
+	private static final Integer ID		= 3;
+	private static final Integer ID2		= 0;
 
-	@Mock
-	private FlatReviewRepository	flatReviewRepositoryMocked;
+    @Autowired
+    private FlatReviewService		flatReviewService;
 
-	@Autowired
-	private FlatReviewRepository	flatReviewRepository;
+    @Autowired
+    private TenantService           tenantService;
 
 	private FlatReview				flatReview;
-	private FlatReview				flatReview2;
-	private Tenant				creator;
-
-	private FlatReviewService		flatReviewService;
-	private FlatReviewService		flatReviewServiceMocked;
 
 
 	@BeforeEach
-	void setupMock() {
-
-		this.creator = new Tenant();
-		this.creator.setPassword(PASSWORD);
-		this.creator.setUsername(USERNAME_1);
-		this.creator.setDni(DNI_1);
-		this.creator.setEmail(EMAIL_1);
-		this.creator.setEnabled(true);
-		this.creator.setFirstName(FIRSTNAME_1);
-		this.creator.setLastName(LASTNAME_1);
-		this.creator.setPhoneNumber(TELEPHONE_1);
-
+	void setup() {
 		this.flatReview = new FlatReview();
 		this.flatReview.setCreationDate(LocalDate.now());
-		this.flatReview.setCreator(creator);
 		this.flatReview.setDescription(DESCRIPTION);
-		this.flatReview.setId(ID);
 		this.flatReview.setRate(RATE);
-
-		this.flatReview2 = new FlatReview();
-		this.flatReview2.setCreationDate(LocalDate.now());
-		this.flatReview2.setCreator(creator);
-		this.flatReview2.setDescription(DESCRIPTION);
-		this.flatReview2.setId(ID2);
-		this.flatReview2.setRate(RATE);
-
-		this.flatReviewServiceMocked = new FlatReviewService(this.flatReviewRepositoryMocked);
-		this.flatReviewService = new FlatReviewService(this.flatReviewRepository);
 	}
 
 	@Test
 	void shouldFindFlatReviewById() {
-		when(this.flatReviewRepositoryMocked.findById(ID)).thenReturn(this.flatReview);
-		FlatReview flatReviewById = this.flatReviewServiceMocked.findFlatReviewById(ID);
+		FlatReview flatReviewById = this.flatReviewService.findFlatReviewById(ID);
 		assertThat(flatReviewById).hasNoNullFieldsOrPropertiesExcept("modifiedDate");
-		assertThat(flatReviewById).hasId(1);
+		assertThat(flatReviewById).hasId(3);
+		assertThat(flatReviewById).hasDescription("Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.");
+		assertThat(flatReviewById).hasRate(5);
 	}
 
 	@Test
 	void shouldNotFindFlatReview() {
-		FlatReview flatReviewById = this.flatReviewServiceMocked.findFlatReviewById(ID2);
+		FlatReview flatReviewById = this.flatReviewService.findFlatReviewById(ID2);
 		assertThat(flatReviewById).isNull();
 	}
 
 	@Test
 	void shouldSaveFlatReview() {
-		Mockito.lenient().doNothing().when(this.flatReviewRepositoryMocked).save(ArgumentMatchers.isA(FlatReview.class));
-		this.flatReviewServiceMocked.saveFlatReview(this.flatReview2);
-		Mockito.verify(this.flatReviewRepositoryMocked).save(this.flatReview2);
+	    Tenant creator = this.tenantService.findTenantById("rdunleavy0");
+	    flatReview.setCreator(creator);
+		this.flatReviewService.saveFlatReview(flatReview);
+		FlatReview flatReviewSaved = this.flatReviewService.findFlatReviewById(flatReview.getId());
+		assertThat(flatReviewSaved).hasRate(flatReview.getRate());
+		assertThat(flatReviewSaved).hasDescription(flatReview.getDescription());
+		assertThat(flatReviewSaved).hasCreationDate(flatReview.getCreationDate());
+		assertThat(flatReviewSaved).hasCreator(flatReview.getCreator());
+
 	}
 
 	@Test
 	void shouldDeleteFlatReview() {
 		this.flatReviewService.deleteFlatReviewById(ID);
 		FlatReview fr = this.flatReviewService.findFlatReviewById(ID);
-		Assertions.assertThat(fr).isNull();
+		assertThat(fr).isNull();
 	}
 }

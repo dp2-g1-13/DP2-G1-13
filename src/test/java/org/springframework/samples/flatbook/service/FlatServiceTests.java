@@ -4,159 +4,121 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.*;
-import org.springframework.samples.flatbook.repository.*;
 import org.springframework.samples.flatbook.utils.EntityUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @DataJpaTest(includeFilters= @ComponentScan.Filter(Service.class))
-@ExtendWith(MockitoExtension.class)
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class FlatServiceTests {
 
     @Autowired
     private FlatService flatService;
 
-    @Mock
-    private static FlatRepository flatRepository;
+    private static final int ID = 1;
+    private static final int ID_2 = 50;
+    private static final String DESCRIPTION = "This is a sample description with more than 30 characters";
+    private static final Integer NUMBER_ROOMS = 2;
+    private static final Integer NUMBER_BATHS = 2;
+    private static final Integer SQUARE_METERS = 100;
+    private static final String AVAILABLE_SERVICES = "Service 1, service 2";
 
-    @Mock
-    private static DBImageRepository dbImageRepository;
-
-    @Mock
-    private static AddressRepository addressRepository;
-
-    @Mock
-    private static TenantRepository tenantRepository;
-
-    @Mock
-    private static AdvertisementRepository advertisementRepository;
-
-    @Mock
-    private static RequestRepository		requestRepository;
-
-    @Mock
-    private static HostRepository			hostRepository;
-
-    @Mock
-    private static TaskRepository          taskRepository;
-
-    private Set<Flat> flats;
     private Flat flat1;
-    private Flat flat2;
-    private Flat flat3;
-    private Host host;
-    private Tenant tenant;
-    private Task task;
-
-    protected FlatService mockedFlatService;
 
     @BeforeEach
     void setup() {
-        mockedFlatService = new FlatService(flatRepository, dbImageRepository, addressRepository, tenantRepository, advertisementRepository, requestRepository, hostRepository, taskRepository);
-        flats = new HashSet<>();
         flat1 = new Flat();
-        flat2 = new Flat();
-        flat3 = new Flat();
 
-        DBImage dbImage1 = new DBImage();
-        DBImage dbImage2 = new DBImage();
-        DBImage dbImage3 = new DBImage();
-        dbImage1.setFilename("image1");
-        dbImage2.setFilename("image2");
-        dbImage3.setFilename("image3");
+        Address address = new Address();
+        address.setCountry("Spain");
+        address.setCity("Sevilla");
+        address.setPostalCode("41000");
+        address.setAddress("Plaza Nueva");
 
-        Set<DBImage> images1 = new HashSet<>();
-        Set<DBImage> images2 = new HashSet<>();
-        Set<DBImage> images3 = new HashSet<>();
-        images1.add(dbImage1);
-        images2.add(dbImage2);
-        images3.add(dbImage3);
+        DBImage image = new DBImage();
+        image.setFilename("a.png");
+        image.setFileType("image/png");
+        image.setData(new byte[]{1, 2, 3});
 
-        flat1.setId(1);
-        flat2.setId(2);
-        flat3.setId(3);
-        flat1.setDescription("Sample description 1");
-        flat2.setDescription("Sample description 2");
-        flat3.setDescription("Sample description 3");
-        flat1.setImages(images1);
-        flat2.setImages(images2);
-        flat3.setImages(images3);
+        DBImage image2 = new DBImage();
+        image2.setFilename("b.png");
+        image2.setFileType("image/png");
+        image2.setData(new byte[]{1, 2, 3});
 
-        Address address1 = new Address();
-        address1.setId(1);
+        DBImage image3 = new DBImage();
+        image3.setFilename("c.png");
+        image3.setFileType("image/png");
+        image3.setData(new byte[]{1, 2, 3});
 
-        Request request = new Request();
-        request.setId(1);
+        DBImage image4 = new DBImage();
+        image4.setFilename("d.png");
+        image4.setFileType("image/png");
+        image4.setData(new byte[]{1, 2, 3});
 
-        tenant = new Tenant();
-        tenant.setRequests(new HashSet<>(Collections.singletonList(request)));
+        DBImage image5 = new DBImage();
+        image5.setFilename("e.png");
+        image5.setFileType("image/png");
+        image5.setData(new byte[]{1, 2, 3});
 
-        flat1.setAddress(address1);
-        flat1.setRequests(new HashSet<>(Collections.singletonList(request)));
-        flat1.setTenants(Collections.singleton(tenant));
-        flat1.setFlatReviews(new HashSet<>());
+        DBImage image6 = new DBImage();
+        image6.setFilename("f.png");
+        image6.setFileType("image/png");
+        image6.setData(new byte[]{1, 2, 3});
 
-        flats.add(flat1);
-        flats.add(flat2);
-        flats.add(flat3);
-
-        task = new Task();
-        task.setId(1);
-
-        host = new Host();
-        host.setFlats(flats);
+        flat1.setDescription(DESCRIPTION);
+        flat1.setSquareMeters(SQUARE_METERS);
+        flat1.setNumberRooms(NUMBER_ROOMS);
+        flat1.setNumberBaths(NUMBER_BATHS);
+        flat1.setAvailableServices(AVAILABLE_SERVICES);
+        flat1.setImages(new HashSet<>(Arrays.asList(image, image2, image3, image4, image5, image6)));
+        flat1.setAddress(address);
     }
 
     @Test
     void shouldFindAllFlats() {
-        when(flatRepository.findAll()).thenReturn(flats);
+        Set<Flat> flats = this.flatService.findAllFlats();
+        Assertions.assertThat(flats.size()).isEqualTo(45);
 
-        Set<Flat> flats = this.mockedFlatService.findAllFlats();
-        Assertions.assertThat(flats.size()).isEqualTo(3);
-        Assertions.assertThat(flats).extracting(Flat::getDescription)
-            .containsExactlyInAnyOrder("Sample description 1", "Sample description 2", "Sample description 3");
-
-        Flat f1 = EntityUtils.getById(flats, Flat.class, 1);
-        Assertions.assertThat(f1.getImages().size()).isEqualTo(1);
-        assertThat(f1.getImages().iterator().next()).hasFilename("image1");
-
-        Flat f3 = EntityUtils.getById(flats, Flat.class, 3);
-        Assertions.assertThat(f3.getImages().size()).isEqualTo(1);
-        assertThat(f3.getImages().iterator().next()).hasFilename("image3");
+        Flat f1 = EntityUtils.getById(flats, Flat.class, ID);
+        assertThat(f1).hasAvailableServices("Aenean lectus. Pellentesque eget nunc.");
+        assertThat(f1).hasSquareMeters(994);
+        assertThat(f1).hasNumberBaths(1);
+        assertThat(f1).hasNumberRooms(2);
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 2, 3})
-    void shouldFindFlatWithCorrectId(int id) {
-        lenient().when(flatRepository.findById(1)).thenReturn(flat1);
-        lenient().when(flatRepository.findById(2)).thenReturn(flat2);
-        lenient().when(flatRepository.findById(3)).thenReturn(flat3);
-
-        Flat flat = this.mockedFlatService.findFlatById(id);
+    @CsvSource({
+        "1, Aenean lectus. Pellentesque eget nunc., 994, 1, 2",
+        "2, 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices.', 201, 2, 3",
+        "3, Pellentesque ultrices mattis odio. Donec vitae nisi., 957, 3, 4"
+    })
+    void shouldFindFlatWithCorrectId(int id, String availableServices, int squareMeters, int numberBaths, int numberRooms) {
+        Flat flat = this.flatService.findFlatById(id);
         assertThat(flat).hasId(id);
-        assertThat(flat.getImages().iterator().next()).hasFilename("image" + id);
+        assertThat(flat).hasAvailableServices(availableServices);
+        assertThat(flat).hasSquareMeters(squareMeters);
+        assertThat(flat).hasNumberBaths(numberBaths);
+        assertThat(flat).hasNumberRooms(numberRooms);
     }
 
     @Test
     void shouldNotFindFlat() {
-        Flat flat = this.mockedFlatService.findFlatById(50);
+        Flat flat = this.flatService.findFlatById(ID_2);
         assertThat(flat).isNull();
     }
 
@@ -189,32 +151,29 @@ public class FlatServiceTests {
 
     @Test
     void shouldAddNewFlat() {
-        doNothing().when(flatRepository).save(isA(Flat.class));
-        doNothing().when(dbImageRepository).save(isA(DBImage.class));
-
-        this.mockedFlatService.saveFlat(flat1);
-
-        verify(flatRepository).save(flat1);
-        verify(dbImageRepository).save(flat1.getImages().iterator().next());
+        this.flatService.saveFlat(flat1);
+        Flat flatSaved = this.flatService.findFlatById(flat1.getId());
+        assertThat(flatSaved).hasDescription(flat1.getDescription());
+        assertThat(flatSaved).hasSquareMeters(flat1.getSquareMeters());
+        assertThat(flatSaved).hasNumberBaths(flat1.getNumberBaths());
+        assertThat(flatSaved).hasNumberRooms(flat1.getNumberRooms());
+        assertThat(flatSaved).hasImages(flat1.getImages());
     }
 
     @Test
     @DisplayName("Should throw NullPointerException when trying to add a null flat")
-    void shouldThrowIllegalArgumentExceptionWhenTryingToAddNullFlat() {
-        doThrow(new IllegalArgumentException("Target object must not be null")).when(flatRepository).save(isNull());
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> this.mockedFlatService.saveFlat(null));
-        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
+    void shouldThrowExceptionWhenTryingToAddNullFlat() {
+        Exception exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> this.flatService.saveFlat(null));
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null; nested exception is java.lang.IllegalArgumentException: Target object must not be null");
     }
 
     @Test
     @DisplayName("Should throw NullPointerException when trying to add a null image")
-    void shouldThrowIllegalArgumentExceptionWhenTryingToAddNullImageInFlat() {
-        flat2.getImages().add(null);
-        lenient().doThrow(new IllegalArgumentException("Target object must not be null")).when(dbImageRepository).save(isNull());
+    void shouldThrowExceptionWhenTryingToAddNullImageInFlat() {
+        flat1.getImages().add(null);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> this.mockedFlatService.saveFlat(flat2));
-        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
+        Exception exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> this.flatService.saveFlat(flat1));
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null; nested exception is java.lang.IllegalArgumentException: Target object must not be null");
     }
 
     @Test
@@ -253,23 +212,16 @@ public class FlatServiceTests {
 
     @Test
     void shouldDeleteFlat() {
-        when(taskRepository.findByFlatId(1)).thenReturn(Collections.singleton(task));
-        when(hostRepository.findByFlatId(1)).thenReturn(host);
-        when(tenantRepository.findByRequestId(1)).thenReturn(tenant);
-        when(advertisementRepository.findAdvertisementWithFlatId(1)).thenReturn(new Advertisement());
-        doNothing().when(flatRepository).delete(isA(Flat.class));
-
-        this.mockedFlatService.deleteFlat(flat1);
-        verify(hostRepository).findByFlatId(1);
-        verify(tenantRepository).findByRequestId(1);
-        verify(taskRepository).findByFlatId(1);
-        verify(flatRepository).delete(flat1);
+        Flat flat = this.flatService.findFlatById(ID);
+        this.flatService.deleteFlat(flat);
+        flat = this.flatService.findFlatById(ID);
+        assertThat(flat).isNull();
     }
 
     @Test
     @DisplayName("Should throw NullPointerException when trying to delete a null flat")
     void shouldThrowNullPointerExceptionWhenTryingToDeleteNullFlat() {
-        assertThrows(NullPointerException.class, () -> this.mockedFlatService.deleteFlat(null));
+        assertThrows(NullPointerException.class, () -> this.flatService.deleteFlat(null));
     }
 
 

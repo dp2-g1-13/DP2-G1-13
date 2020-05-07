@@ -1,47 +1,40 @@
 package org.springframework.samples.flatbook.service;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
-import org.springframework.samples.flatbook.repository.AdvertisementRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DataJpaTest(includeFilters= @ComponentScan.Filter(Service.class))
-@ExtendWith(MockitoExtension.class)
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class AdvertisementServiceTests {
 
     @Autowired
     private AdvertisementService advertisementService;
 
-    @Mock
-    private AdvertisementRepository mockedAdvertisementRepository;
-
-    private AdvertisementService advertisementServiceMockito;
+    @Autowired
+    private FlatService flatService;
 
     private static Advertisement advertisement;
 
     @BeforeAll
-    static void setupMock() {
+    static void setup() {
         Address address = new Address();
         address.setCountry("Spain");
         address.setCity("Sevilla");
@@ -49,11 +42,36 @@ public class AdvertisementServiceTests {
         address.setAddress("Plaza Nueva");
 
         DBImage image = new DBImage();
-        image.setFilename("a");
-        image.setFileType("b");
+        image.setFilename("a.png");
+        image.setFileType("image/png");
         image.setData(new byte[]{1, 2, 3});
-        Set<DBImage> images = new HashSet<>();
-        images.add(image);
+
+        DBImage image2 = new DBImage();
+        image2.setFilename("b.png");
+        image2.setFileType("image/png");
+        image2.setData(new byte[]{1, 2, 3});
+
+        DBImage image3 = new DBImage();
+        image3.setFilename("c.png");
+        image3.setFileType("image/png");
+        image3.setData(new byte[]{1, 2, 3});
+
+        DBImage image4 = new DBImage();
+        image4.setFilename("d.png");
+        image4.setFileType("image/png");
+        image4.setData(new byte[]{1, 2, 3});
+
+        DBImage image5 = new DBImage();
+        image5.setFilename("e.png");
+        image5.setFileType("image/png");
+        image5.setData(new byte[]{1, 2, 3});
+
+        DBImage image6 = new DBImage();
+        image6.setFilename("f.png");
+        image6.setFileType("image/png");
+        image6.setData(new byte[]{1, 2, 3});
+
+        Set<DBImage> images = new HashSet<>(Arrays.asList(image, image2, image3, image4, image5, image6));
 
         Flat flat = new Flat();
         flat.setDescription("this is a sample description with more than 30 characters");
@@ -72,7 +90,6 @@ public class AdvertisementServiceTests {
         request.setFinishDate(LocalDate.MAX);
 
         advertisement = new Advertisement();
-        advertisement.setId(1);
         advertisement.setTitle("Sample title");
         advertisement.setDescription("Sample description");
         advertisement.setRequirements("Sample requirements");
@@ -81,39 +98,38 @@ public class AdvertisementServiceTests {
         advertisement.setFlat(flat);
     }
 
-    @BeforeEach
-    void instantiateMockService() {
-        this.advertisementServiceMockito = new AdvertisementService(mockedAdvertisementRepository);
-    }
-
     @Test
+    @Order(1)
     void shouldFindAdvertisementWithFlatId() {
         Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(1);
         assertThat(adv).hasId(1);
-//        assertThat(adv.getRequests().size()).isEqualTo(?);
         assertThat(adv).hasPricePerMonth(98.);
         assertThat(adv).hasTitle("Advertisement 1");
     }
 
     @Test
+    @Order(2)
     void shouldNotFindAdvertisementWithFlatIdNotInDatabase() {
         Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(0);
         assertThat(adv).isNull();
     }
 
     @Test
+    @Order(3)
     void shouldCheckThereIsAdvertisementWithFlatId() {
         Boolean b = this.advertisementService.isAdvertisementWithFlatId(2);
         Assertions.assertThat(b).isTrue();
     }
 
     @Test
+    @Order(4)
     void shouldCheckThereIsNotAdvertisementWithFlatId() {
         Boolean b = this.advertisementService.isAdvertisementWithFlatId(0);
         Assertions.assertThat(b).isFalse();
     }
 
     @Test
+    @Order(5)
     void shouldFindAdvertisementsByHost() {
         Set<Advertisement> advertisements = this.advertisementService.findAdvertisementsByHost("rbordessa0");
         Assertions.assertThat(advertisements).hasSize(3);
@@ -121,67 +137,70 @@ public class AdvertisementServiceTests {
             .containsExactlyInAnyOrder("Advertisement 1", "Advertisement 16", "Advertisement 31");
     }
     @Test
+    @Order(6)
     void shouldNotFindAdvertisementsByHost() {
         Set<Advertisement> advertisements = this.advertisementService.findAdvertisementsByHost("User1");
         Assertions.assertThat(advertisements).isEmpty();
     }
     @Test
+    @Order(7)
     void shouldFindAllAdvertisements() {
-        when(this.mockedAdvertisementRepository.findAll()).thenReturn(Collections.singleton(advertisement));
-        Set<Advertisement> advertisements = this.advertisementServiceMockito.findAllAdvertisements();
-        Assertions.assertThat(advertisements).hasSize(1);
-        Assertions.assertThat(advertisements).extracting(Advertisement::getTitle)
-            .containsExactly("Sample title");
+        Set<Advertisement> advertisements = this.advertisementService.findAllAdvertisements();
+        Assertions.assertThat(advertisements).hasSize(45);
     }
 
     @Test
+    @Order(8)
     void shouldFindAdvertisementById() {
-        when(this.mockedAdvertisementRepository.findById(1)).thenReturn(advertisement);
-        Advertisement advertisement = this.advertisementServiceMockito.findAdvertisementById(1);
+        Advertisement advertisement = this.advertisementService.findAdvertisementById(1);
         assertThat(advertisement).hasId(1);
-        assertThat(advertisement).hasTitle("Sample title");
-        assertThat(advertisement).hasPricePerMonth(100.50);
+        assertThat(advertisement).hasTitle("Advertisement 1");
+        assertThat(advertisement).hasDescription("Vestibulum rutrum rutrum neque. Aenean auctor gravida sem.");
+        assertThat(advertisement).hasPricePerMonth(98.);
         assertThat(advertisement.getFlat()).isNotNull();
     }
 
     @Test
+    @Order(9)
     void shouldNotFindAdvertisementById() {
-        Advertisement advertisement = this.advertisementServiceMockito.findAdvertisementById(100);
+        Advertisement advertisement = this.advertisementService.findAdvertisementById(100);
         assertThat(advertisement).isNull();
     }
 
     @Test
+    @Order(10)
     void shouldAddNewAdvertisement() {
-        doNothing().when(this.mockedAdvertisementRepository).save(isA(Advertisement.class));
-        this.advertisementServiceMockito.saveAdvertisement(advertisement);
+        flatService.saveFlat(advertisement.getFlat());
+        this.advertisementService.saveAdvertisement(advertisement);
 
-        verify(this.mockedAdvertisementRepository).save(advertisement);
+        Advertisement advertisementSaved = this.advertisementService.findAdvertisementById(advertisement.getId());
+        assertThat(advertisementSaved).isNotNull();
+        assertThat(advertisementSaved).hasTitle(advertisement.getTitle());
+        assertThat(advertisementSaved).hasPricePerMonth(advertisement.getPricePerMonth());
     }
 
     @Test
-    void shouldThrowIllegalArgumentExceptionWhenTryingToAddNullAdvertisement() {
-        doThrow(new IllegalArgumentException("Target object must not be null")).when(this.mockedAdvertisementRepository).save(isNull());
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> this.advertisementServiceMockito.saveAdvertisement(null));
-        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
-        verify(this.mockedAdvertisementRepository).save(null);
+    @Order(11)
+    void shouldThrowExceptionWhenTryingToAddNullAdvertisement() {
+        Exception exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> this.advertisementService.saveAdvertisement(null));
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null; nested exception is java.lang.IllegalArgumentException: Target object must not be null");
     }
 
     @Test
+    @Order(12)
     void shouldDeleteAdvertisement() {
-        doNothing().when(this.mockedAdvertisementRepository).delete(isA(Advertisement.class));
-        this.advertisementServiceMockito.deleteAdvertisement(advertisement);
+        int advertisementId = advertisement.getId();
+        this.advertisementService.deleteAdvertisement(advertisement);
 
-        verify(this.mockedAdvertisementRepository).delete(advertisement);
+        Advertisement advertisementDeleted = this.advertisementService.findAdvertisementById(advertisementId);
+        assertThat(advertisementDeleted).isNull();
     }
 
     @Test
-    void shouldThrowIllegalArgumentExceptionWhenTryingToDeleteNullAdvertisement() {
-        doThrow(new IllegalArgumentException("Entity must not be null!")).when(this.mockedAdvertisementRepository).delete(isNull());
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> this.advertisementServiceMockito.deleteAdvertisement(null));
-        Assertions.assertThat(exception.getMessage()).isEqualTo("Entity must not be null!");
-        verify(this.mockedAdvertisementRepository).delete(null);
+    @Order(13)
+    void shouldThrowExceptionWhenTryingToDeleteNullAdvertisement() {
+        Exception exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> this.advertisementService.deleteAdvertisement(null));
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Entity must not be null!; nested exception is java.lang.IllegalArgumentException: Entity must not be null!");
 
     }
 
