@@ -10,7 +10,7 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 @Log
-public class MailjetAPITest {
+public class MailjetAPITests {
 
     private static final String		MAILJET_ENDPOINT					= "https://api.mailjet.com/v3.1/send";
 
