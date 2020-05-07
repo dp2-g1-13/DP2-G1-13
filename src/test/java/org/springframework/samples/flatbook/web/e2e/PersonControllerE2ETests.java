@@ -16,7 +16,6 @@ import org.springframework.samples.flatbook.model.enums.SaveType;
 import org.springframework.samples.flatbook.service.apis.MailjetAPIService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -25,7 +24,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-mysql.properties")
 @TestMethodOrder(OrderAnnotation.class)
 class PersonControllerE2ETests {
 
@@ -386,8 +384,8 @@ class PersonControllerE2ETests {
 	@Order(24)
 	void testLoadUserList() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/list"))
-			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(152)))
-			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(152)))
+			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(153)))
+			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(153)))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
@@ -398,8 +396,8 @@ class PersonControllerE2ETests {
 	@Order(25)
 	void testLoadBannedUserList() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/list?show=banned"))
-			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(1)))
-			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(1)))
+			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(3)))
+			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(3)))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
@@ -410,8 +408,8 @@ class PersonControllerE2ETests {
 	@Order(26)
 	void testLoadActiveUserList() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/list?show=active"))
-			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(151)))
-			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(151)))
+			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(150)))
+			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(150)))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 

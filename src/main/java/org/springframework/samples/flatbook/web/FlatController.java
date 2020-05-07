@@ -122,9 +122,7 @@ public class FlatController {
 	@GetMapping(value = "/flats/{flatId}/edit")
 	public String initUpdateForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
 		if (!this.validateHost(flatId)) {
-			RuntimeException e = new RuntimeException("Illegal access");
-			model.put("exception", e);
-			return "exception";
+			throw new RuntimeException("Illegal access");
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		model.put("flat", flat);
@@ -139,9 +137,7 @@ public class FlatController {
 			return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 		} else {
 			if (!this.validateHost(flatId)) {
-				RuntimeException e = new RuntimeException("Illegal access");
-				model.put("exception", e);
-				return "exception";
+				throw new RuntimeException("Illegal access");
 			}
 			Set<DBImage> newImages = flat.getImages().stream().filter(x -> !x.getFileType().equals("application/octet-stream"))
 				.collect(Collectors.toSet());
@@ -164,9 +160,7 @@ public class FlatController {
 	public String processDeleteImage(@PathVariable("flatId") final int flatId, @PathVariable("imageId") final int imageId,
 		final Map<String, Object> model) {
 		if (!this.validateHost(flatId)) {
-			RuntimeException e = new RuntimeException("Illegal access");
-			model.put("exception", e);
-			return "exception";
+			throw new RuntimeException("Illegal access");
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		if (flat.getImages().size() == 6) {
@@ -232,13 +226,13 @@ public class FlatController {
 		return "redirect:/flats/list";
 	}
 
-	public boolean validateHost(final int flatId) {
+	public Boolean validateHost(final int flatId) {
 		Boolean userIsHost = true;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals(AuthoritiesType.ADMIN.toString()))) {
 			String username = ((User) auth.getPrincipal()).getUsername();
-			String hostUsername = this.hostService.findHostByFlatId(flatId).getUsername();
-			userIsHost = username.equals(hostUsername);
+			Host host = this.hostService.findHostByFlatId(flatId);
+			userIsHost = username.equals(host.getUsername()) && host.isEnabled();
 		}
 		return userIsHost;
 	}

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -17,7 +16,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-mysql.properties")
 public class StatisticsControllerE2ETests {
 
 	@Autowired
@@ -36,8 +34,8 @@ public class StatisticsControllerE2ETests {
 			.andExpect(MockMvcResultMatchers.model().attributeExists("statistics"))
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("numberOfRequests", Matchers.is(135))))
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("numberOfFlats", Matchers.is(45))))
-			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("numberOfAdvertisements", Matchers.is(45))))
-			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("numberOfUsers", Matchers.is(151))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("numberOfAdvertisements", Matchers.is(44))))
+			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("numberOfUsers", Matchers.is(152))))
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics",
 				Matchers.hasProperty("ratioOfAcceptedRequests", Matchers.closeTo(2 / 3.0, 0.01))))
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics",
@@ -47,7 +45,7 @@ public class StatisticsControllerE2ETests {
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics",
 				Matchers.hasProperty("ratioOfRejectedRequests", Matchers.closeTo(2 / 90.0, 0.01))))
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics",
-				Matchers.hasProperty("ratioOfFlatsWithAdvertisement", Matchers.closeTo(1.0, 0.01))))
+				Matchers.hasProperty("ratioOfFlatsWithAdvertisement", Matchers.closeTo(1.0, 0.1))))
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeBestReviewedFlats", Matchers.hasSize(3))))
 			.andExpect(MockMvcResultMatchers.model().attribute("statistics", Matchers.hasProperty("topThreeBestReviewedHosts", Matchers.hasSize(3))))
 			.andExpect(
