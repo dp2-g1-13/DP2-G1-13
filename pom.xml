@@ -313,8 +313,6 @@
 				<configuration>
 					<excludes>
 						<exclude>**/*UITests.java</exclude>
-						<exclude>**/*APITests.java</exclude>
-						<exclude>**/*E2ETests.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

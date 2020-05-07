@@ -386,8 +386,8 @@ class PersonControllerE2ETests {
 	@Order(24)
 	void testLoadUserList() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/list"))
-			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(152)))
-			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(152)))
+			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(153)))
+			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(153)))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
@@ -398,8 +398,8 @@ class PersonControllerE2ETests {
 	@Order(25)
 	void testLoadBannedUserList() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/list?show=banned"))
-			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(1)))
-			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(1)))
+			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(3)))
+			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(3)))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 
@@ -410,8 +410,8 @@ class PersonControllerE2ETests {
 	@Order(26)
 	void testLoadActiveUserList() throws Exception {
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/list?show=active"))
-			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(151)))
-			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(151)))
+			.andExpect(MockMvcResultMatchers.model().attribute("users", Matchers.hasSize(150)))
+			.andExpect(MockMvcResultMatchers.model().attribute("authorities", Matchers.hasSize(150)))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 	}
 

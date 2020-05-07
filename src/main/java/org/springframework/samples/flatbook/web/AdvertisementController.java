@@ -75,9 +75,7 @@ public class AdvertisementController {
 	public String initCreationForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
 		Flat flat = this.flatService.findFlatById(flatId);
 		if (flat == null || !this.validateHost(flatId) || this.advertisementService.isAdvertisementWithFlatId(flat.getId())) {
-			RuntimeException ex = new RuntimeException("Illegal access");
-			model.put("exception", ex);
-			return "exception";
+			throw new RuntimeException("Illegal access");
 		}
 		AdvertisementForm advertisement = new AdvertisementForm();
 		model.put("advertisementForm", advertisement);
@@ -92,9 +90,7 @@ public class AdvertisementController {
 		} else {
 			Flat flat = this.flatService.findFlatById(flatId);
 			if (flat == null || !this.validateHost(flatId) || this.advertisementService.isAdvertisementWithFlatId(flat.getId())) {
-				RuntimeException ex = new RuntimeException("Illegal access");
-				model.put("exception", ex);
-				return "exception";
+				throw new RuntimeException("Illegal access");
 			}
 			Advertisement advertisement = new Advertisement(adv);
 			advertisement.setFlat(flat);
@@ -107,9 +103,7 @@ public class AdvertisementController {
 	public String initUpdateForm(@PathVariable("advertisementId") final int advertisementId, final Map<String, Object> model) {
 		Advertisement adv = this.advertisementService.findAdvertisementById(advertisementId);
 		if (adv == null || !this.validateHost(adv.getFlat().getId())) {
-			RuntimeException ex = new RuntimeException("Illegal access");
-			model.put("exception", ex);
-			return "exception";
+			throw new RuntimeException("Illegal access");
 		}
 		AdvertisementForm af = new AdvertisementForm(adv);
 		model.put("advertisementForm", af);
@@ -124,9 +118,7 @@ public class AdvertisementController {
 		} else {
 			Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
 			if (advertisement == null || !this.validateHost(advertisement.getFlat().getId())) {
-				RuntimeException ex = new RuntimeException("Illegal access");
-				model.put("exception", ex);
-				return "exception";
+				throw new RuntimeException("Illegal access");
 			}
 			Advertisement newAdvertisement = new Advertisement(adv);
 			newAdvertisement.setFlat(advertisement.getFlat());
@@ -194,7 +186,7 @@ public class AdvertisementController {
 		}
 
 		GeocodeResponse geocode = this.geocodeAPIService
-			.getGeocodeData(address.getCity() + (address.getPostalCode() != null ? address.getPostalCode() : ""));
+			.getGeocodeData(address.getCity() + " " + (address.getPostalCode() != null ? address.getPostalCode() : ""));
 		if (geocode.getStatus().equals("ZERO_RESULTS")) {
 			result.rejectValue("city", "", "The address does not exist. Try again.");
 			return "welcome";
@@ -205,8 +197,8 @@ public class AdvertisementController {
 
 		Location location = geocode.getResults().get(0).getGeometry().getLocation();
 
-		List<Advertisement> results = this.advertisementService.findAllAdvertisements().stream()
-			.filter(x -> this.hostService.findHostByFlatId(x.getId()).isEnabled() && this.haversineFormula(x.getFlat().getAddress().getLatitude(),
+		List<Advertisement> results = this.advertisementService.findAllAdvertisements().stream().filter(
+			x -> this.hostService.findHostByFlatId(x.getFlat().getId()).isEnabled() && this.haversineFormula(x.getFlat().getAddress().getLatitude(),
 				x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
 			.sorted(Comparator.comparing(x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(),
 				location.getLat(), location.getLng())))
