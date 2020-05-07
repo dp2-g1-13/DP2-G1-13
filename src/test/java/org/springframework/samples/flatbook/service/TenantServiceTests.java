@@ -1,52 +1,42 @@
 package org.springframework.samples.flatbook.service;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
-import static org.mockito.Mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.Tenant;
-import org.springframework.samples.flatbook.repository.TenantRepository;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class TenantServiceTests {
 
-	private static final String	FIRSTNAME_1	= "Ramon";
-	private static final String	LASTNAME_1	= "Fernandez";
-	private static final String	DNI_1		= "23330000A";
-	private static final String	EMAIL_1		= "b@b.com";
-	private static final String	USERNAME_1	= "ababa";
-	private static final String	USERNAME_2	= "ababaas";
-	private static final String	TELEPHONE_1	= "777789789";
-	private static final String	PASSWORD	= "HOst__Pa77S";
+	private static final String	FIRSTNAME_1     = "Ramon";
+	private static final String	LASTNAME_1	    = "Fernandez";
+	private static final String	DNI_1		    = "23330000A";
+	private static final String	EMAIL_1		    = "b@b.com";
+	private static final String	TELEPHONE_1	    = "777789789";
+	private static final String	PASSWORD	    = "HOst__Pa77S";
 
-	@Mock
-	private TenantRepository	tenantRepositoryMocked;
+    private static final String	USERNAME	    = "asasa";
+    private static final String	USERNAME_TENANT = "anund5";
+    private static final String	USERNAME_WRONG	= "ababa";
+    private static final Integer ID             = 1;
+    private static final Integer ID_2           = 91;
+    private static final Integer ID_WRONG       = 0;
 
 	@Autowired
-	private TenantRepository	tenantRepository;
+    private TenantService		tenantService;
 
 	private Tenant				tenant;
-	private Tenant 			tenant2;
-
-	private TenantService		tenantService;
-	private TenantService		tenantServiceMocked;
 
 
 	@BeforeEach
@@ -54,54 +44,45 @@ public class TenantServiceTests {
 
 		this.tenant = new Tenant();
 		this.tenant.setPassword(PASSWORD);
-		this.tenant.setUsername(USERNAME_1);
+		this.tenant.setUsername(USERNAME);
 		this.tenant.setDni(DNI_1);
 		this.tenant.setEmail(EMAIL_1);
 		this.tenant.setEnabled(true);
 		this.tenant.setFirstName(FIRSTNAME_1);
 		this.tenant.setLastName(LASTNAME_1);
 		this.tenant.setPhoneNumber(TELEPHONE_1);
-		this.tenant.setFlat(new Flat());
-		this.tenant.setReviews(new HashSet<>());
-		this.tenant.setRequests(new HashSet<>());
-
-		this.tenant2 = new Tenant();
-		this.tenant2.setPassword(PASSWORD);
-		this.tenant2.setUsername(USERNAME_2);
-		this.tenant2.setDni(DNI_1);
-		this.tenant2.setEmail(EMAIL_1);
-		this.tenant2.setEnabled(true);
-		this.tenant2.setFirstName(FIRSTNAME_1);
-		this.tenant2.setLastName(LASTNAME_1);
-		this.tenant2.setPhoneNumber(TELEPHONE_1);
-		this.tenant2.setFlat(new Flat());
-		this.tenant2.setReviews(new HashSet<>());
-		this.tenant2.setRequests(new HashSet<>());
-
-		this.tenantServiceMocked = new TenantService(this.tenantRepositoryMocked);
-		this.tenantService = new TenantService(this.tenantRepository);
 	}
 
 	@Test
 	void shouldFindTenantById() {
-		when(this.tenantRepositoryMocked.findByUsername(USERNAME_1)).thenReturn(this.tenant);
-		Tenant tenantById = this.tenantServiceMocked.findTenantById(USERNAME_1);
-		assertThat(tenantById).hasUsername(USERNAME_1);
-		assertThat(tenantById).hasDni(DNI_1);
-		assertThat(tenantById).hasEmail(EMAIL_1);
+		Tenant tenantById = this.tenantService.findTenantById(USERNAME_TENANT);
+		assertThat(tenantById).hasUsername(USERNAME_TENANT);
+		assertThat(tenantById).hasFirstName("Aida");
+		assertThat(tenantById).hasLastName("Nund");
+		assertThat(tenantById).hasEmail("anund5@drupal.org");
+		assertThat(tenantById).hasDni("85937525T");
+		assertThat(tenantById).hasPhoneNumber("305277382");
+		assertThat(tenantById).hasPassword("Is-Dp2-G1-13");
+        assertThat(tenantById.getFlat()).isNotNull();
 	}
 
 	@Test
 	void shouldNotFindTenant() {
-		Tenant tenantById = this.tenantServiceMocked.findTenantById(USERNAME_1);
+		Tenant tenantById = this.tenantService.findTenantById(USERNAME_WRONG);
 		assertThat(tenantById).isNull();
 	}
 
 	@Test
 	void shouldSaveTenant() {
-		Mockito.lenient().doNothing().when(this.tenantRepositoryMocked).save(ArgumentMatchers.isA(Tenant.class));
-		this.tenantServiceMocked.saveTenant(this.tenant2);
-		Mockito.verify(this.tenantRepositoryMocked).save(this.tenant2);
+		this.tenantService.saveTenant(tenant);
+		Tenant tenantSaved = this.tenantService.findTenantById(tenant.getUsername());
+        assertThat(tenantSaved).hasFirstName(tenant.getFirstName());
+        assertThat(tenantSaved).hasLastName(tenant.getLastName());
+        assertThat(tenantSaved).hasEmail(tenant.getEmail());
+        assertThat(tenantSaved).hasDni(tenant.getDni());
+        assertThat(tenantSaved).hasPhoneNumber(tenant.getPhoneNumber());
+        assertThat(tenantSaved).hasPassword(tenant.getPassword());
+        assertThat(tenantSaved.getFlat()).isNull();
 	}
 
 	@Test
@@ -112,39 +93,39 @@ public class TenantServiceTests {
 
 	@Test
     void shouldFindTenantByRequestId() {
-	    Mockito.when(this.tenantRepositoryMocked.findByRequestId(ArgumentMatchers.anyInt())).thenReturn(tenant2);
-
-	    Tenant tenant = this.tenantServiceMocked.findTenantByRequestId(2);
-	    assertThat(tenant).isEqualTo(tenant2);
-	    assertThat(tenant).hasUsername(USERNAME_2);
-	    assertThat(tenant).hasDni(DNI_1);
-	    assertThat(tenant).hasFirstName(FIRSTNAME_1);
+	    Tenant tenant = this.tenantService.findTenantByRequestId(ID);
+        assertThat(tenant).hasUsername("rdunleavy0");
+        assertThat(tenant).hasFirstName("Rica");
+        assertThat(tenant).hasLastName("Dunleavy");
+        assertThat(tenant).hasEmail("rdunleavy0@irs.gov");
+        assertThat(tenant).hasDni("78829786J");
+        assertThat(tenant).hasPhoneNumber("030620045");
+        assertThat(tenant).hasPassword("Is-Dp2-G1-13");
+        assertThat(tenant.getFlat()).isNotNull();
     }
 
     @Test
     void shouldNotFindTenantByRequestId() {
-        Mockito.when(this.tenantRepositoryMocked.findByRequestId(ArgumentMatchers.anyInt())).thenReturn(null);
-
-        Tenant tenant = this.tenantServiceMocked.findTenantByRequestId(5);
+        Tenant tenant = this.tenantService.findTenantByRequestId(ID_WRONG);
         assertThat(tenant).isNull();
     }
 
     @Test
     void shouldFindTenantByReviewId() {
-        Mockito.when(this.tenantRepositoryMocked.findByReviewId(ArgumentMatchers.anyInt())).thenReturn(tenant);
-
-        Tenant tenant = this.tenantServiceMocked.findTenantByReviewId(1);
-        assertThat(tenant).isEqualTo(this.tenant);
-        assertThat(tenant).hasUsername(USERNAME_1);
-        assertThat(tenant).hasDni(DNI_1);
-        assertThat(tenant).hasFirstName(FIRSTNAME_1);
+        Tenant tenant = this.tenantService.findTenantByReviewId(ID_2);
+        assertThat(tenant).hasUsername("rdunleavy0");
+        assertThat(tenant).hasFirstName("Rica");
+        assertThat(tenant).hasLastName("Dunleavy");
+        assertThat(tenant).hasEmail("rdunleavy0@irs.gov");
+        assertThat(tenant).hasDni("78829786J");
+        assertThat(tenant).hasPhoneNumber("030620045");
+        assertThat(tenant).hasPassword("Is-Dp2-G1-13");
+        assertThat(tenant.getFlat()).isNotNull();
     }
 
     @Test
     void shouldNotFindTenantByReviewId() {
-        Mockito.when(this.tenantRepositoryMocked.findByReviewId(ArgumentMatchers.anyInt())).thenReturn(null);
-
-        Tenant tenant = this.tenantServiceMocked.findTenantByReviewId(5);
+        Tenant tenant = this.tenantService.findTenantByReviewId(ID_WRONG);
         assertThat(tenant).isNull();
     }
 }

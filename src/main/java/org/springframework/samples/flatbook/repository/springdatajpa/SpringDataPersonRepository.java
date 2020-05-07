@@ -12,7 +12,7 @@ import org.springframework.samples.flatbook.repository.PersonRepository;
 public interface SpringDataPersonRepository extends PersonRepository, Repository<Person, String> {
 
 	@Override
-	@Query("SELECT p FROM Person p join Report r on r.receiver=p where p.enabled=true group by p order by count(r.id) desc")
+	@Query("SELECT p FROM Person p join Report r on r.receiver=p where p.enabled=true group by p order by count(r.id) desc, p.username asc")
 	Page<Person> topMostReportedUsers(Pageable pageableRequest);
 
 	@Override

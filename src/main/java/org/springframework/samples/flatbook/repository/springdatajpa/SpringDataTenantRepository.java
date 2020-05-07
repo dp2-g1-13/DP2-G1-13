@@ -20,10 +20,10 @@ public interface SpringDataTenantRepository extends TenantRepository, Repository
 	Tenant findByReviewId(int reviewId);
 
 	@Override
-	@Query("SELECT t FROM Tenant t join t.reviews r where t.enabled=true group by t order by avg(r.rate) desc")
+	@Query("SELECT t FROM Tenant t join t.reviews r where t.enabled=true group by t order by avg(r.rate) desc, t.username asc")
 	Page<Tenant> topBestReviewedTenants(Pageable pageable);
 
 	@Override
-	@Query("SELECT t FROM Tenant t join t.reviews r where t.enabled=true group by t order by avg(r.rate) asc ")
+	@Query("SELECT t FROM Tenant t join t.reviews r where t.enabled=true group by t order by avg(r.rate) asc, t.username asc")
 	Page<Tenant> topWorstReviewedTenants(Pageable pageable);
 }

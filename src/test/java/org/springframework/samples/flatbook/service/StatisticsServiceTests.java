@@ -1,113 +1,45 @@
 package org.springframework.samples.flatbook.service;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.*;
-import org.springframework.samples.flatbook.repository.*;
+import org.springframework.stereotype.Service;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
-import java.util.Collections;
-
-@ExtendWith(MockitoExtension.class)
+@DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class StatisticsServiceTests {
 
-    @Mock
-    private PersonRepository personRepository;
-
-    @Mock
-    private HostRepository hostRepository;
-
-    @Mock
-    private TenantRepository tenantRepository;
-
-    @Mock
-    private RequestRepository requestRepository;
-
-    @Mock
-    private FlatRepository flatRepository;
-
-    @Mock
-    private AdvertisementRepository	advertisementRepository;
-
+    @Autowired
     private StatisticsService statisticsService;
 
-    private Person person;
-    private Host host;
-    private Flat flat;
-    private Tenant tenant;
-
-    @BeforeEach
-    void setupMock() {
-        this.person = new Person();
-        this.person.setUsername("user");
-        this.person.setDni("12345678A");
-        this.person.setEmail("user@mail.com");
-
-        this.tenant = new Tenant();
-        this.tenant.setUsername("tenant");
-        this.tenant.setDni("12345670B");
-        this.tenant.setEmail("tenant@mail.com");
-
-        this.host = new Host();
-        this.host.setUsername("host");
-        this.host.setDni("12345671C");
-        this.host.setEmail("host@mail.com");
-
-        this.flat = new Flat();
-        this.flat.setDescription("description");
-        this.flat.setNumberBaths(1);
-        this.flat.setNumberRooms(2);
-        this.flat.setSquareMeters(100);
-
-        this.statisticsService = new StatisticsService(personRepository, requestRepository, hostRepository, flatRepository, tenantRepository, advertisementRepository);
-    }
-
     @Test
-    void shouldFindStatistics() {
-        Mockito.when(this.requestRepository.numberOfRequests()).thenReturn(5);
-        Mockito.when(this.requestRepository.ratioOfAcceptedRequests()).thenReturn(1d/5d);
-        Mockito.when(this.requestRepository.ratioOfRejectedRequests()).thenReturn(1d/5d);
-        Mockito.when(this.requestRepository.ratioOfFinishedRequests()).thenReturn(1d/5d);
-        Mockito.when(this.requestRepository.ratioOfCanceledRequests()).thenReturn(1d/5d);
-        Mockito.when(this.advertisementRepository.numberOfAdvertisements()).thenReturn(2);
-        Mockito.when(this.flatRepository.numberOfFlats()).thenReturn(3);
-        Mockito.when(this.personRepository.numberOfUsers()).thenReturn(7);
-        Mockito.when(this.personRepository.topMostReportedUsers(ArgumentMatchers.any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(person)));
-        Mockito.when(this.hostRepository.topWorstReviewedHosts(ArgumentMatchers.any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(host)));
-        Mockito.when(this.hostRepository.topBestReviewedHosts(ArgumentMatchers.any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(host)));
-        Mockito.when(this.flatRepository.topBestReviewedFlats(ArgumentMatchers.any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(flat)));
-        Mockito.when(this.flatRepository.topWorstReviewedFlats(ArgumentMatchers.any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(flat)));
-        Mockito.when(this.tenantRepository.topBestReviewedTenants(ArgumentMatchers.any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(tenant)));
-        Mockito.when(this.tenantRepository.topWorstReviewedTenants(ArgumentMatchers.any(PageRequest.class))).thenReturn(new PageImpl<>(Collections.singletonList(tenant)));
-
+    strictfp void shouldFindStatistics() {
         Statistics statistics = this.statisticsService.findStatistics();
         assertThat(statistics).isNotNull();
-        assertThat(statistics).hasNumberOfRequests(5);
-        assertThat(statistics).hasRatioOfAcceptedRequests(0.2d);
-        assertThat(statistics).hasRatioOfRejectedRequests(0.2d);
-        assertThat(statistics).hasRatioOfFinishedRequests(0.2d);
-        assertThat(statistics).hasRatioOfCanceledRequests(0.2d);
-        assertThat(statistics).hasNumberOfAdvertisements(2);
-        assertThat(statistics).hasNumberOfFlats(3);
-        assertThat(statistics).hasNumberOfUsers(7);
-        assertThat(statistics).hasRatioOfFlatsWithAdvertisement(2d/3d);
+        assertThat(statistics).hasNumberOfRequests(135);
+        assertThat(statistics).hasRatioOfAcceptedRequests(2d/3d);
+        assertThat(statistics).hasRatioOfRejectedRequests(2d/90d);
+        assertThat(statistics).hasRatioOfFinishedRequests(0d);
+        assertThat(statistics).hasRatioOfCanceledRequests(4d/90d);
+        assertThat(statistics).hasNumberOfAdvertisements(45);
+        assertThat(statistics).hasNumberOfFlats(45);
+        assertThat(statistics).hasNumberOfUsers(151);
+        assertThat(statistics).hasRatioOfFlatsWithAdvertisement(1d);
         Assertions.assertThat(statistics.getTopThreeMostReportedUsers()).extracting(Person::getUsername)
-            .containsExactlyInAnyOrder("user");
+            .containsExactlyInAnyOrder("aarnoldi7", "ahollows1l", "cmingusn");
         Assertions.assertThat(statistics.getTopThreeBestReviewedTenants()).extracting(Tenant::getUsername)
-            .containsExactlyInAnyOrder("tenant");
+            .containsExactlyInAnyOrder("acordingly22", "afahrenbach25", "anund5");
         Assertions.assertThat(statistics.getTopThreeBestReviewedHosts()).extracting(Host::getUsername)
-            .containsExactlyInAnyOrder("host");
-        Assertions.assertThat(statistics.getTopThreeBestReviewedFlats()).extracting(Flat::getDescription)
-            .containsExactlyInAnyOrder("description");
+            .containsExactlyInAnyOrder("bputleyc", "fricart1", "glikly4");
+        Assertions.assertThat(statistics.getTopThreeBestReviewedFlats()).extracting(Flat::getAvailableServices)
+            .containsExactlyInAnyOrder("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices.",
+                "Vestibulum rutrum rutrum neque. Aenean auctor gravida sem.", "Vivamus tortor. Duis mattis egestas metus.");
 
     }
 }

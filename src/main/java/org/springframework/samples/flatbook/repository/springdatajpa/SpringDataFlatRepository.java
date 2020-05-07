@@ -23,11 +23,11 @@ public interface SpringDataFlatRepository extends FlatRepository, Repository<Fla
 	Flat findByReviewId(Integer reviewId);
 
 	@Override
-	@Query("SELECT f FROM Flat f join f.flatReviews r group by f order by avg(r.rate) desc")
+	@Query("SELECT f FROM Flat f join f.flatReviews r group by f order by avg(r.rate) desc, f.id asc")
 	Page<Flat> topBestReviewedFlats(Pageable pageable);
 
 	@Override
-	@Query("SELECT f FROM Flat f join f.flatReviews r group by f order by avg(r.rate) asc")
+	@Query("SELECT f FROM Flat f join f.flatReviews r group by f order by avg(r.rate) asc, f.id asc")
 	Page<Flat> topWorstReviewedFlats(Pageable pageable);
 
 	@Override

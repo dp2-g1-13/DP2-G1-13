@@ -1,21 +1,18 @@
 package org.springframework.samples.flatbook.service;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.Request;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
-import org.springframework.samples.flatbook.repository.RequestRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,40 +21,24 @@ import java.util.Set;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.doThrow;
 
 @DataJpaTest(includeFilters= @ComponentScan.Filter(Service.class))
-@ExtendWith(MockitoExtension.class)
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class RequestServiceTests {
 
     @Autowired
     private RequestService requestService;
 
-    @Mock
-    private RequestRepository mockedRequestRepository;
+    private Request request;
 
-    private RequestService requestServiceMockito;
-
-    private static Request request;
-
-    @BeforeAll
-    static void setupMock() {
+    @BeforeEach
+    void setup() {
         request = new Request();
-        request.setId(1);
         request.setDescription("Sample description");
         request.setStatus(RequestStatus.PENDING);
         request.setCreationDate(LocalDateTime.now());
         request.setStartDate(LocalDate.of(10000, 1, 1));
         request.setFinishDate(LocalDate.of(10000, 12, 1));
-    }
-
-    @BeforeEach
-    void instantiateMockService() {
-        this.requestServiceMockito = new RequestService(mockedRequestRepository);
     }
 
     @Test
@@ -99,39 +80,35 @@ public class RequestServiceTests {
 
     @Test
     void shouldFindRequestById() {
-        when(this.mockedRequestRepository.findById(1)).thenReturn(request);
-
-        Request request = this.requestServiceMockito.findRequestById(1);
+        Request request = this.requestService.findRequestById(1);
         assertThat(request).hasId(1);
-        assertThat(request).hasDescription("Sample description");
-        assertThat(request).hasStatus(RequestStatus.PENDING);
-
-        verify(this.mockedRequestRepository).findById(1);
+        assertThat(request).hasDescription("Mauris sit amet eros.");
+        assertThat(request).hasStartDate(LocalDate.of(2020, 3, 31));
+        assertThat(request).hasFinishDate(LocalDate.of(2020, 10, 31));
+        assertThat(request).hasStatus(RequestStatus.ACCEPTED);
     }
 
     @Test
     void shouldNotFindRequestById() {
-        Request request = this.requestServiceMockito.findRequestById(100);
+        Request request = this.requestService.findRequestById(0);
         Assertions.assertThat(request).isNull();
-
-        verify(this.mockedRequestRepository).findById(anyInt());
     }
 
     @Test
     void shouldAddNewRequest() {
-        doNothing().when(this.mockedRequestRepository).save(isA(Request.class));
-        this.requestServiceMockito.saveRequest(request);
-
-        verify(this.mockedRequestRepository).save(request);
+        this.requestService.saveRequest(request);
+        Request requestSaved = this.requestService.findRequestById(request.getId());
+        assertThat(requestSaved).hasDescription(request.getDescription());
+        assertThat(requestSaved).hasStartDate(request.getStartDate());
+        assertThat(requestSaved).hasFinishDate(request.getFinishDate());
+        assertThat(requestSaved).hasCreationDate(request.getCreationDate());
+        assertThat(requestSaved).hasStatus(request.getStatus());
     }
 
     @Test
-    void shouldThrowIllegalArgumentExceptionWhenTryingToAddNullAdvertisement() {
-        doThrow(new IllegalArgumentException("Target object must not be null")).when(this.mockedRequestRepository).save(isNull());
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> this.requestServiceMockito.saveRequest(null));
-        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null");
-        verify(this.mockedRequestRepository).save(null);
+    void shouldThrowExceptionWhenTryingToAddNullAdvertisement() {
+        Exception exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> this.requestService.saveRequest(null));
+        Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null; nested exception is java.lang.IllegalArgumentException: Target object must not be null");
     }
 
 

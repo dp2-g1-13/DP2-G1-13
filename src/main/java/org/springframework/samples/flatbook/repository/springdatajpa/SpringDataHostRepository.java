@@ -21,10 +21,10 @@ public interface SpringDataHostRepository extends HostRepository, Repository<Hos
 	Host findHostOfFlatByRequestId(@Param("request_id") int requestId);
 
 	@Override
-	@Query("SELECT h FROM Host h join h.flats f join f.flatReviews r where h.enabled=true group by h order by avg(r.rate) desc")
+	@Query("SELECT h FROM Host h join h.flats f join f.flatReviews r where h.enabled=true group by h order by avg(r.rate) desc, h.username asc")
 	Page<Host> topBestReviewedHosts(Pageable pageRequest);
 
 	@Override
-	@Query("SELECT h FROM Host h join h.flats f join f.flatReviews r where h.enabled=true group by h order by avg(r.rate) asc")
+	@Query("SELECT h FROM Host h join h.flats f join f.flatReviews r where h.enabled=true group by h order by avg(r.rate) asc, h.username asc")
 	Page<Host> topWorstReviewedHosts(Pageable pageRequest);
 }

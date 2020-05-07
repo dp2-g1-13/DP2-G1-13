@@ -4,72 +4,68 @@ package org.springframework.samples.flatbook.service;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.User;
-import org.springframework.samples.flatbook.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
+@DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class UserServiceTests {
 
-	private static final String	USERNAME	= "asasa";
-	private static final String	PASSWORD	= "HHaa__11";
+	private static final String	USERNAME	    = "credierb";
+    private static final String	USERNAME_2	    = "asasa";
+    private static final String	USERNAME_WRONG	= "ababa";
 
-	@Mock
-	private UserRepository		userRepository;
+	private static final String	PASSWORD	= "Is-Dp2-G1-13";
+
+	@Autowired
+    private UserService			userService;
 
 	private User				user;
 
-	private UserService			userService;
-
-
 	@BeforeEach
-	void setupMock() {
+	void setup() {
 		this.user = new User();
 		this.user.setPassword(UserServiceTests.PASSWORD);
-		this.user.setUsername(UserServiceTests.USERNAME);
+		this.user.setUsername(UserServiceTests.USERNAME_2);
 		this.user.setEnabled(true);
-		this.userService = new UserService(this.userRepository);
 	}
 
 	@Test
 	void shouldFindUserByUsername() {
-		Mockito.lenient().when(this.userRepository.findById(UserServiceTests.USERNAME)).thenReturn(this.user);
-
 		User user = this.userService.findUserById(UserServiceTests.USERNAME);
-		assertThat(user).isEqualTo(this.user);
 		assertThat(user).hasUsername(USERNAME);
 		assertThat(user).hasPassword(PASSWORD);
+		assertThat(user).isEnabled();
 	}
 
 	@Test
 	void shouldReturnNullIfNotFindAnyUser() {
-		Mockito.lenient().when(this.userRepository.findById(UserServiceTests.USERNAME)).thenReturn(null);
-
-		assertThat(this.userService.findUserById(UserServiceTests.USERNAME)).isNull();
+		assertThat(this.userService.findUserById(UserServiceTests.USERNAME_WRONG)).isNull();
 	}
 
 	@Test
 	void shouldSaveUser() {
-		Mockito.doNothing().when(this.userRepository).save(ArgumentMatchers.isA(User.class));
-
 		this.userService.save(this.user);
 
-		Mockito.verify(this.userRepository).save(this.user);
+		User userSaved = this.userService.findUserById(user.getUsername());
+        assertThat(userSaved).hasUsername(user.getUsername());
+        assertThat(userSaved).hasPassword(user.getPassword());
+        assertThat(userSaved).isEnabled();
 	}
 
 	@Test
 	void shouldThrowNullPointerExceptionIfTryToSaveNullUser() {
-		Mockito.doThrow(new NullPointerException("Null user")).when(this.userRepository).save(ArgumentMatchers.isNull());
-
-		Exception exception = assertThrows(NullPointerException.class, () -> this.userService.save(null));
-		Assertions.assertThat(exception.getMessage()).isEqualTo("Null user");
+		Exception exception = assertThrows(InvalidDataAccessApiUsageException.class, () -> this.userService.save(null));
+		Assertions.assertThat(exception.getMessage()).isEqualTo("Target object must not be null; nested exception is java.lang.IllegalArgumentException: Target object must not be null");
 
 	}
 
