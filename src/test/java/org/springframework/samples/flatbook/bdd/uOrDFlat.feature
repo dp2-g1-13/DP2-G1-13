@@ -10,7 +10,7 @@ Feature: Updating or deleting flats (UH 5)
 
   Scenario: Successful flat deletion (Positive)
     Given I am not logged in the system
-    When I do login as user "mmcgaheye"
+    When I do login as user "nnaullsa"
     And I go to my flats page
     And I delete the first flat
     Then The flat doesnt exists 	
