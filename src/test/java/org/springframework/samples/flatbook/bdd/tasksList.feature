@@ -7,8 +7,8 @@ Feature: Listing tasks (UH 21)
     And I go to my tasks page
     Then The tasks of my flat appears 	
 
-  Scenario: Failt task list as host (Negative)
+  Scenario: Fail task list as host (Negative)
     Given I am not logged in the system
     When I do login as user "rbordessa0"
     And I go to my user page
-    Then My tasks button doesnt appears 	
+    Then The "My tasks" button doesnt exists 	

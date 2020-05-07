@@ -20,11 +20,11 @@ Feature: Sending requests (UH 16)
     When I do login as user "rdunleavy0"
     And I do look for a flat in "Sevilla"
     And I try to make a request for live in the first flat
-    Then The request button doesn't exist
+    Then The "Make a request!" button doesnt exists
 
   Scenario: Failed request sending because I am a host (Negative)
     Given I am not logged in the system
     When I do login as user "fricart1"
     And I do look for a flat in "Sevilla"
     And I try to make a request for live in the first flat
-    Then The request button doesn't exist
+    Then The "Make a request!" button doesnt exists

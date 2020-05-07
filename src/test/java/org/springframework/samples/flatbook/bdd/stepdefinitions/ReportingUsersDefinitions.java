@@ -42,14 +42,4 @@ public class ReportingUsersDefinitions extends AbstractStep {
 	public static void ITryToReportFirstTenantOfFlat(WebDriver driver) throws Exception {
 		driver.findElement(By.xpath("//div[4]/div/div[2]/ul/li/a")).click();
 	}
-	
-	@Then("The report button doesnt exist")
-	public void NotFindReportButton() throws Exception {
-		NotFindReportButton(getDriver());
-		stopDriver();
-	}
-	
-	public static void NotFindReportButton(WebDriver driver) throws Exception {
-	    assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'Report User')]")).size());
-	}
 }

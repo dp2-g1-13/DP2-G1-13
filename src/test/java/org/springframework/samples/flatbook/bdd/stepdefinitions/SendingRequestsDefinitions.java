@@ -85,14 +85,4 @@ public class SendingRequestsDefinitions extends AbstractStep {
 	public static void CannotClickMakeRequestButton(WebDriver driver) throws Exception {
 		assertEquals("true", driver.findElement(By.xpath("//div/div/div/div/button")).getAttribute("disabled"));
 	}
-	
-	@Then("The request button doesn't exist")
-	public void RequestButtonDoesntExists() throws Exception {
-		RequestButtonDoesntExists(getDriver());
-		stopDriver();
-	}
-	
-	public static void RequestButtonDoesntExists(WebDriver driver) throws Exception {
-		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'Make a request!')]")).size());
-	}
 }
