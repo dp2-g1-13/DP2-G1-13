@@ -16,7 +16,7 @@ public class AbstractStep {
 		if(driver==null) {
 			System.setProperty("webdriver.gecko.driver", System.getenv("webdriver.gecko.driver"));
 			driver = new FirefoxDriver();		    
-		    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		    driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		}
 		return driver;
 	}	

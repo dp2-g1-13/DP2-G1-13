@@ -144,7 +144,7 @@ public class AdvertisementController {
 			throw new RuntimeException("Illegal access");
 		}
 		this.advertisementService.deleteAdvertisement(advertisement);
-		return "redirect:/";
+		return "redirect:/flats/list";
 	}
 
 	@GetMapping(value = "/advertisements/{advertisementId}")

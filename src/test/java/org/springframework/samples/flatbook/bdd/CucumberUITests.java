@@ -12,5 +12,5 @@ import org.junit.runner.RunWith;
         plugin = {"pretty",                                
                 "json:target/cucumber-reports/cucumber-report.json"}, 
         monochrome=true)
-public class CucumberUITest {
+public class CucumberUITests {
 }
