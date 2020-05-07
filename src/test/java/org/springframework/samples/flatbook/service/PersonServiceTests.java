@@ -6,77 +6,56 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
-import org.springframework.samples.flatbook.model.enums.TaskStatus;
 import org.springframework.samples.flatbook.model.mappers.PersonForm;
-import org.springframework.samples.flatbook.repository.*;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
+@DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class PersonServiceTests {
 
-	private static final String		FIRSTNAME	= "Dani";
-	private static final String		LASTNAME	= "Sanchez";
-	private static final String		DNI			= "23330000B";
-	private static final String		EMAIL		= "a@a.com";
-	private static final String		USERNAME	= "asasa";
-	private static final String		TELEPHONE	= "675789789";
-	private static final String		PASSWORD	= "HOst__Pa77S";
-
-	@Mock
-	private PersonRepository		personRepository;
-
-	@Mock
-	private AuthoritiesRepository	authoritiesRepository;
-
-	@Mock
-    private HostRepository hostRepository;
-
-    @Mock
-    private TenantRepository tenantRepository;
-
-    @Mock
-    private FlatRepository flatRepository;
-
-    @Mock
-    private TaskRepository taskRepository;
-
-    @Mock
-    private RequestRepository requestRepository;
+	private static final String		FIRSTNAME	    = "Dani";
+	private static final String		LASTNAME	    = "Sanchez";
+	private static final String		DNI			    = "23330000B";
+	private static final String		EMAIL		    = "a@a.com";
+	private static final String		USERNAME_HOST	= "negre3";
+    private static final String		USERNAME_TENANT	= "rdunleavy0";
+    private static final String		USERNAME_NEW	= "ababa";
+    private static final String		USERNAME_WRONG	= "asasa";
+	private static final String		TELEPHONE	    = "675789789";
+	private static final String		PASSWORD	    = "HOst__Pa77S";
 
 	private Person                  person;
 	private PersonForm				tenantPersonForm;
-	private Authorities				authorities;
-	private Tenant                  tenant;
 
-    private PersonForm				hostPersonForm;
-    private Host                    host;
-
-    private Flat                    flat;
-    private Set<Task>               tasks;
-
+    @Autowired
 	private PersonService			personService;
+
+    @Autowired
+    private TenantService			tenantService;
+
+    @Autowired
+    private HostService			    hostService;
 
 
 	@BeforeEach
-	void setupMock() {
+	void setup() {
 		this.person = new Person();
 		this.person.setPassword(PersonServiceTests.PASSWORD);
-		this.person.setUsername(PersonServiceTests.USERNAME);
+		this.person.setUsername(PersonServiceTests.USERNAME_NEW);
 		this.person.setDni(PersonServiceTests.DNI);
 		this.person.setEmail(PersonServiceTests.EMAIL);
 		this.person.setEnabled(true);
@@ -87,107 +66,72 @@ public class PersonServiceTests {
 		this.tenantPersonForm = new PersonForm(this.person);
 		this.tenantPersonForm.setAuthority(AuthoritiesType.TENANT);
 		this.tenantPersonForm.setSaveType(SaveType.NEW);
-
-		this.tenant = new Tenant(tenantPersonForm);
-		tenant.setRequests(Collections.singleton(new Request()));
-
-		this.authorities = new Authorities(USERNAME, AuthoritiesType.TENANT);
-
-		this.hostPersonForm = new PersonForm(this.person);
-		this.hostPersonForm.setAuthority(AuthoritiesType.HOST);
-
-		this.host = new Host(hostPersonForm);
-		host.setFlats(new HashSet<>());
-
-        flat = new Flat();
-        flat.setId(1);
-        flat.setRequests(Collections.singleton(new Request()));
-
-        Set<Tenant> tenants = new HashSet<>();
-        tenants.add(tenant);
-        flat.setTenants(tenants);
-
-        this.host.setFlats(Collections.singleton(flat));
-        tenant.setFlat(flat);
-
-        Task task1 = new Task();
-        task1.setAsignee(tenant);
-        task1.setCreationDate(LocalDate.now());
-        task1.setDescription("description");
-        task1.setCreator(new Tenant());
-        task1.setStatus(TaskStatus.TODO);
-        task1.setTitle("title");
-        task1.setId(1);
-
-        Task task2 = new Task();
-        task2.setAsignee(new Tenant());
-        task2.setCreationDate(LocalDate.now());
-        task2.setDescription("description");
-        task2.setCreator(tenant);
-        task2.setStatus(TaskStatus.TODO);
-        task2.setTitle("title");
-        task2.setId(2);
-
-        tasks = new HashSet<>(Arrays.asList(task1, task2));
-
-		this.personService = new PersonService(this.personRepository, this.authoritiesRepository, hostRepository,  tenantRepository, flatRepository,
-		taskRepository, requestRepository);
 	}
 
 	@Test
 	void shouldFindPersonByUsername() {
-		Mockito.lenient().when(this.personRepository.findByUsername(PersonServiceTests.USERNAME)).thenReturn(this.person);
-
-		Person person = this.personService.findUserById(PersonServiceTests.USERNAME);
-		assertThat(person).isEqualTo(this.person);
-	}
+		Person person = this.personService.findUserById(PersonServiceTests.USERNAME_HOST);
+        assertThat(person).hasFirstName("Noelle");
+        assertThat(person).hasLastName("Egre");
+        assertThat(person).hasEmail("negre3@auda.org.au");
+        assertThat(person).hasDni("80738030S");
+        assertThat(person).hasPhoneNumber("982110065");
+    }
 
 	@Test
 	void shouldReturnNullIfNotFindAnyPerson() {
-		Mockito.lenient().when(this.personRepository.findByUsername(PersonServiceTests.USERNAME)).thenReturn(null);
-
-		assertThat(this.personService.findUserById(PersonServiceTests.USERNAME)).isNull();
+		assertThat(this.personService.findUserById(PersonServiceTests.USERNAME_WRONG)).isNull();
 	}
 
 	@Test
     void shouldFindAllPeople() {
-	    Mockito.when(this.personRepository.findAll()).thenReturn(Collections.singleton(person));
-
 	    Collection<Person> people = this.personService.findAllUsers();
-        Assertions.assertThat(people).hasSize(1);
+        Assertions.assertThat(people).hasSize(151);
     }
 
 	@Test
 	void shouldSaveANewPerson() throws DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-		Mockito.lenient().doNothing().when(this.personRepository).save(ArgumentMatchers.isA(Person.class));
-		Mockito.lenient().doNothing().when(this.authoritiesRepository).save(ArgumentMatchers.isA(Authorities.class));
-
 		this.personService.saveUser(this.tenantPersonForm);
+		Person personSaved = this.personService.findUserById(person.getUsername());
+		assertThat(personSaved).hasFirstName(person.getFirstName());
+		assertThat(personSaved).hasLastName(person.getLastName());
+		assertThat(personSaved).hasDni(person.getDni());
+		assertThat(personSaved).hasEmail(person.getEmail());
+		assertThat(personSaved).hasPassword(person.getPassword());
 
-		Mockito.verify(this.personRepository).save(this.person);
-		Mockito.verify(this.authoritiesRepository).save(this.authorities);
 	}
 
 	@Test
 	void shouldEditATenant() throws DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-	    Mockito.when(this.tenantRepository.findByUsername(USERNAME)).thenReturn(tenant);
-		Mockito.lenient().doNothing().when(this.tenantRepository).save(ArgumentMatchers.isA(Tenant.class));
+	    PersonForm personForm = new PersonForm(this.tenantService.findTenantById(USERNAME_TENANT));
+	    personForm.setEmail("rdunleavy0@yahoo.com");
+		personForm.setSaveType(SaveType.EDIT);
+		this.personService.saveUser(personForm);
 
-		this.tenantPersonForm.setSaveType(SaveType.EDIT);
-		this.personService.saveUser(this.tenantPersonForm);
+		Person personEdited = this.personService.findUserById(USERNAME_TENANT);
 
-		Mockito.verify(this.tenantRepository).save(this.tenant);
+        assertThat(personEdited).hasFirstName(personForm.getFirstName());
+        assertThat(personEdited).hasLastName(personForm.getLastName());
+        assertThat(personEdited).hasEmail("rdunleavy0@yahoo.com");
+        assertThat(personEdited).hasDni(personForm.getDni());
+        assertThat(personEdited).hasPhoneNumber(personForm.getPhoneNumber());
+
 	}
 
     @Test
     void shouldEditAHost() throws DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-        Mockito.when(this.hostRepository.findByUsername(USERNAME)).thenReturn(host);
-        Mockito.lenient().doNothing().when(this.hostRepository).save(ArgumentMatchers.isA(Host.class));
+        PersonForm personForm = new PersonForm(this.hostService.findHostById(USERNAME_HOST));
+        personForm.setEmail("negre3@yahoo.com");
+        personForm.setSaveType(SaveType.EDIT);
+        this.personService.saveUser(personForm);
 
-        this.hostPersonForm.setSaveType(SaveType.EDIT);
-        this.personService.saveUser(this.hostPersonForm);
+        Person personEdited = this.personService.findUserById(USERNAME_HOST);
 
-        Mockito.verify(this.hostRepository).save(host);
+        assertThat(personEdited).hasFirstName(personForm.getFirstName());
+        assertThat(personEdited).hasLastName(personForm.getLastName());
+        assertThat(personEdited).hasEmail("negre3@yahoo.com");
+        assertThat(personEdited).hasDni(personForm.getDni());
+        assertThat(personEdited).hasPhoneNumber(personForm.getPhoneNumber());
     }
 
 	@Test
@@ -202,53 +146,36 @@ public class PersonServiceTests {
 		assertThrows(NullPointerException.class, () -> this.personService.saveUser(this.tenantPersonForm));
 	}
 
-//	@Test
-//	void shouldNotSaveIfTryToSaveAPersonWithoutSaveType(), DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-//		Mockito.lenient().doThrow(NullPointerException.class).when(this.personRepository).save(ArgumentMatchers.isA(Person.class));
-//
-//		this.personForm.setSaveType(null);
-//
-//		assertThrows(NullPointerException.class, () -> this.personService.saveUser(this.personForm));
-//	}
-
 	@Test
 	void shouldThrowDuplicatedUsernameExceptionIfTryToSaveANewPersonWithAExistingUsername() {
-		Mockito.lenient().when(this.personRepository.findByUsername(PersonServiceTests.USERNAME)).thenReturn(this.person);
-
+	    this.tenantPersonForm.setUsername(USERNAME_TENANT);
 		assertThrows(DuplicatedUsernameException.class, () -> this.personService.saveUser(this.tenantPersonForm));
 	}
 
 	@Test
 	void shouldThrowDuplicatedDniExceptionIfTryToSaveANewPersonWithAExistingDni() {
-		Mockito.lenient().when(this.personRepository.findByDni(PersonServiceTests.DNI)).thenReturn(this.person);
-
-		assertThrows(DuplicatedDniException.class, () -> this.personService.saveUser(this.tenantPersonForm));
+        this.tenantPersonForm.setDni("78829786J");
+	    assertThrows(DuplicatedDniException.class, () -> this.personService.saveUser(this.tenantPersonForm));
 	}
 
 	@Test
 	void shouldThrowDuplicatedEmailExceptionIfTryToSaveANewPersonWithAExistingEmail() {
-		Mockito.lenient().when(this.personRepository.findByEmail(PersonServiceTests.EMAIL)).thenReturn(this.person);
-
-		assertThrows(DuplicatedEmailException.class, () -> this.personService.saveUser(this.tenantPersonForm));
+		this.tenantPersonForm.setEmail("dballchin1@irs.gov");
+	    assertThrows(DuplicatedEmailException.class, () -> this.personService.saveUser(this.tenantPersonForm));
 	}
 
 	@Test
     void shouldBanHost() {
-	    Mockito.when(this.hostRepository.findByUsername(USERNAME)).thenReturn(host);
-	    Mockito.when(this.taskRepository.findByFlatId(1)).thenReturn(new HashSet<>());
-	    this.personService.banUser(USERNAME);
-
-	    Mockito.verify(this.flatRepository).save(flat);
+	    this.personService.banUser(USERNAME_HOST);
+	    Host hostBanned = this.hostService.findHostById(USERNAME_HOST);
+	    Assertions.assertThat(hostBanned.getFlats()).extracting(Flat::getTenants).containsExactlyInAnyOrder(null, null, null);
     }
 
     @Test
     void shouldBanTenant() {
-        Mockito.when(this.tenantRepository.findByUsername(USERNAME)).thenReturn(tenant);
-	    Mockito.when(this.taskRepository.findByParticipant(USERNAME)).thenReturn(new HashSet<>());
-	    Mockito.when(this.taskRepository.findByParticipant(USERNAME)).thenReturn(tasks);
-	    this.personService.banUser(USERNAME);
-
-	    Mockito.verify(this.flatRepository).save(flat);
+	    this.personService.banUser(USERNAME_TENANT);
+	    Tenant tenantBanned = this.tenantService.findTenantById(USERNAME_TENANT);
+	    assertThat(tenantBanned.getFlat()).isNull();
     }
 
     @Test
