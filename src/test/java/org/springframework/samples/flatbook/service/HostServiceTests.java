@@ -1,83 +1,45 @@
 package org.springframework.samples.flatbook.service;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 
-import static org.mockito.Mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.Host;
-import org.springframework.samples.flatbook.repository.HostRepository;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class HostServiceTests {
 
-	private static final String	FIRSTNAME_1	= "Ramon";
-	private static final String	LASTNAME_1	= "Fernandez";
-	private static final String	DNI_1		= "23330000A";
-	private static final String	EMAIL_1		= "b@b.com";
-	private static final String	USERNAME_1	= "ababa";
-	private static final String	TELEPHONE_1	= "777789789";
-	private static final String	PASSWORD	= "HOst__Pa77S";
-	private static final Integer FLAT_ID    =  1;
-
-	@Mock
-	private HostRepository	hostRepositoryMocked;
+	private static final String USERNAME       = "vcasero8";
+    private static final String USERNAME_WRONG = "asasa";
+    private static final Integer FLAT_ID       = 1;
 
 	@Autowired
-	private HostRepository	hostRepository;
-
-	private Host				host;
-
-	private HostService		hostService;
-	private HostService		hostServiceMocked;
-
-
-	@BeforeEach
-	void setupMock() {
-
-		Set<Flat> flats = new HashSet<>();
-
-		this.host = new Host();
-		this.host.setPassword(PASSWORD);
-		this.host.setUsername(USERNAME_1);
-		this.host.setDni(DNI_1);
-		this.host.setEmail(EMAIL_1);
-		this.host.setEnabled(true);
-		this.host.setFirstName(FIRSTNAME_1);
-		this.host.setLastName(LASTNAME_1);
-		this.host.setPhoneNumber(TELEPHONE_1);
-		this.host.setFlats(flats);
-
-		this.hostServiceMocked = new HostService(this.hostRepositoryMocked);
-		this.hostService = new HostService(this.hostRepository);
-	}
+    private HostService		hostService;
 
 	@Test
 	void shouldFindHostById() {
-		when(this.hostRepositoryMocked.findByUsername(USERNAME_1)).thenReturn(this.host);
-		Host hostById = this.hostServiceMocked.findHostById(USERNAME_1);
+		Host hostById = this.hostService.findHostById(USERNAME);
 		assertThat(hostById).hasNoNullFieldsOrProperties();
-		assertThat(hostById).hasUsername(USERNAME_1);
+		assertThat(hostById).hasUsername(USERNAME);
+		assertThat(hostById).hasFirstName("Venita");
+		assertThat(hostById).hasLastName("Casero");
+		assertThat(hostById).hasEmail("vcasero8@nasa.gov");
+		assertThat(hostById).hasDni("02454700M");
+		assertThat(hostById).hasPhoneNumber("609272633");
 	}
 
 	@Test
 	void shouldNotFindHost() {
-		Host hostById = this.hostServiceMocked.findHostById(USERNAME_1);
+		Host hostById = this.hostService.findHostById(USERNAME_WRONG);
 		assertThat(hostById).isNull();
 	}
 

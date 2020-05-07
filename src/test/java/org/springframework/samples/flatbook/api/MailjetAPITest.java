@@ -45,7 +45,7 @@ public class MailjetAPITest {
             .statusCode(200)
             .assertThat()
                 .body("Messages.Status", hasItem("success"))
-                .body("Messages.Errors", nullValue())
+                .body("Messages.Errors", hasItem(nullValue()))
             .and()
                 .time(lessThan(10L), TimeUnit.SECONDS);
     }

@@ -59,9 +59,11 @@ public class TaskController {
 	}
 
 	@PostMapping(value = "/tasks/new")
-	public String processCreationForm(final Map<String, Object> model, @Valid final Task task, final BindingResult result, final Principal principal) {
+	public String processCreationForm(final Map<String, Object> model, @Valid final Task task, final BindingResult result,
+		final Principal principal) {
 		Tenant tenant = this.tenantService.findTenantById(principal.getName());
-		if (tenant.getFlat() != null && (task.getAsignee() == null || tenant.getFlat().getTenants().contains(task.getAsignee()))) {
+		if (tenant.getFlat() != null && (task.getAsignee() == null
+			|| tenant.getFlat().getTenants().stream().anyMatch(x -> x.getUsername().equals(task.getAsignee().getUsername())))) {
 			if (result.hasErrors()) {
 				model.put("roommates", new ArrayList<>(tenant.getFlat().getTenants()));
 				return TaskController.VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
@@ -119,7 +121,8 @@ public class TaskController {
 	}
 
 	@PostMapping(value = "/tasks/{taskId}/edit")
-	public String processUpdateForm(@Valid final Task task, final BindingResult result, @PathVariable("taskId") final int taskId, final ModelMap model, final Principal principal) {
+	public String processUpdateForm(@Valid final Task task, final BindingResult result, @PathVariable("taskId") final int taskId,
+		final ModelMap model, final Principal principal) {
 		Task previusTask = this.taskService.findTaskById(taskId);
 		Tenant tenant = this.tenantService.findTenantById(principal.getName());
 		if (tenant.getFlat() != null && task != null && tenant.getFlat().equals(previusTask.getFlat())) {

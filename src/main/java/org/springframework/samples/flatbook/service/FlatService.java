@@ -28,10 +28,12 @@ public class FlatService {
 
 	private TaskRepository          taskRepository;
 
+	private FlatReviewRepository    flatReviewRepository;
+
 
 	@Autowired
 	public FlatService(final FlatRepository flatRepository, final DBImageRepository dbImageRepository, final AddressRepository addressRepository, final TenantRepository tenantRepository, final AdvertisementRepository advertisementRepository,
-		final RequestRepository requestRepository, final HostRepository hostRepository, final TaskRepository taskRepository) {
+		final RequestRepository requestRepository, final HostRepository hostRepository, final TaskRepository taskRepository, final FlatReviewRepository flatReviewRepository) {
 		this.flatRepository = flatRepository;
 		this.dbImageRepository = dbImageRepository;
 		this.addressRepository = addressRepository;
@@ -40,6 +42,7 @@ public class FlatService {
 		this.requestRepository = requestRepository;
 		this.hostRepository = hostRepository;
 		this.taskRepository = taskRepository;
+		this.flatReviewRepository = flatReviewRepository;
 	}
 
 	@Transactional(readOnly = true)
@@ -78,6 +81,8 @@ public class FlatService {
 		}
 		flat.setTenants(null);
 
+		flat.getImages().forEach(x -> this.dbImageRepository.delete(x));
+
 		Advertisement adv = this.advertisementRepository.findAdvertisementWithFlatId(flat.getId());
 		if (adv != null) {
 			this.advertisementRepository.delete(adv);
@@ -89,6 +94,9 @@ public class FlatService {
 			this.requestRepository.delete(request);
 		}
 		flat.setRequests(null);
+
+		flat.getFlatReviews().forEach(x -> this.flatReviewRepository.deleteById(x.getId()));
+		flat.setFlatReviews(null);
 
 		Host host = this.hostRepository.findByFlatId(flat.getId());
 		host.getFlats().remove(flat);
