@@ -15,7 +15,8 @@ insert into users (dtype, username, password, enabled, first_name, last_name, em
 insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Host', 'jdavieb', 'Is-Dp2-G1-13', true, 'Josias', 'Davie', 'jdavieb@nbcnews.com', '11749188L', '844829901', null);
 insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Host', 'bputleyc', 'Is-Dp2-G1-13', true, 'Barnaby', 'Putley', 'bputleyc@rambler.ru', '24738829K', '857016887', null);
 insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Host', 'efarnalld', 'Is-Dp2-G1-13', true, 'Ericha', 'Farnall', 'efarnalld@narod.ru', '70651576R', '947708783', null);
-insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Host', 'mmcgaheye', 'Is-Dp2-G1-13', true, 'Maren', 'McGahey', 'mmcgaheye@dropbox.com', '65322006L', '292751419', null);
+insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Host', 'mmcgaheye', 'Is-Dp2-G1-13', false, 'Maren', 'McGahey', 'mmcgaheye@dropbox.com', '65322006L', '292751419', null);
+insert into users (dtype, username, password, enabled, first_name, last_name, email, dni, phone_number, flat_id) values ('Host', 'mmcgahaeaye', 'Is-Dp2-G1-13', false, 'Maren', 'McGahey', 'mmcgaaaheye@dropbox.com', '65322006A', '211751419', null);
 insert into authorities (username, authority) values ('rbordessa0', 'HOST');
 insert into authorities (username, authority) values ('fricart1', 'HOST');
 insert into authorities (username, authority) values ('dframmingham2', 'HOST');
@@ -31,6 +32,7 @@ insert into authorities (username, authority) values ('jdavieb', 'HOST');
 insert into authorities (username, authority) values ('bputleyc', 'HOST');
 insert into authorities (username, authority) values ('efarnalld', 'HOST');
 insert into authorities (username, authority) values ('mmcgaheye', 'HOST');
+insert into authorities (username, authority) values ('mmcgahaeaye', 'HOST');
 
 insert into addresses (id, address, city, country, postal_code, latitude, longitude) values (1, '15 Mcguire Street', 'Donostia-San Sebastian', 'Spain', '20015', 43.3152889, -1.9514657);
 insert into addresses (id, address, city, country, postal_code, latitude, longitude) values (2, '5738 Main Street', 'Leon', 'Spain', '24010', 42.5944931, -5.6195112);
@@ -756,7 +758,6 @@ insert into flats_images (flat_id, images_id) values (45, 268);
 insert into flats_images (flat_id, images_id) values (45, 269);
 insert into flats_images (flat_id, images_id) values (45, 270);
 
-insert into advertisements (id, creation_date, description, price_per_month, requirements, title, flat_id) values (1, '2020-03-06', 'Vestibulum rutrum rutrum neque. Aenean auctor gravida sem.', '098', 'Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum.', 'Advertisement 1', 1);
 insert into advertisements (id, creation_date, description, price_per_month, requirements, title, flat_id) values (2, '2020-03-15', 'Nunc rhoncus dui vel sem. Sed sagittis.', '420', 'Curabitur gravida nisi at nibh. In hac habitasse platea dictumst.', 'Advertisement 2', 2);
 insert into advertisements (id, creation_date, description, price_per_month, requirements, title, flat_id) values (3, '2020-01-25', 'Morbi non quam nec dui luctus rutrum. Nulla tellus.', '513', 'Donec semper sapien a libero. Nam dui.', 'Advertisement 3', 3);
 insert into advertisements (id, creation_date, description, price_per_month, requirements, title, flat_id) values (4, '2020-01-04', 'Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla.', '277', 'Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.', 'Advertisement 4', 4);
