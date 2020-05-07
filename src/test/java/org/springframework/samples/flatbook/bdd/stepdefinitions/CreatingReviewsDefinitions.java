@@ -107,13 +107,13 @@ public class CreatingReviewsDefinitions extends AbstractStep {
 		}
 	}
 	
-	@Then("The new review button doesnt exist")
-	public void NewReviewButtonDoesntExists() throws Exception {
-		NewReviewButtonDoesntExists(getDriver());
+	@Then("The {string} button doesnt exist")
+	public void NewReviewButtonDoesntExists(String button) throws Exception {
+		NewReviewButtonDoesntExists(button, getDriver());
 		stopDriver();
 	}
 	
-	public static void NewReviewButtonDoesntExists(WebDriver driver) throws Exception {
-		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'New Review')]")).size());
+	public static void NewReviewButtonDoesntExists(String button, WebDriver driver) throws Exception {
+		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'"+button+"')]")).size());
 	}
 }

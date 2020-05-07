@@ -54,14 +54,4 @@ public class taskListDefinitions extends AbstractStep {
 		driver.findElement(By.xpath("//ul[2]/li/a")).click();
 	    driver.findElement(By.xpath("//li[3]/div/div/div/p/a")).click();
 	}
-	
-	@Then("My tasks button doesnt appears")
-	public void NotFindMyTasksButton() throws Exception {
-		NotFindMyTasksButton(getDriver());
-		stopDriver();
-	}
-	
-	public static void NotFindMyTasksButton(WebDriver driver) throws Exception {
-		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'My tasks')]")).size());
-	}
 }

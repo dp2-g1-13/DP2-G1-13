@@ -13,4 +13,4 @@ Scenario: Fail user report because I dont have an account (Negative)
     When I do look for a flat in "Sevilla"
     And I go to the first flat page
     And I try to report the first tenant
-    Then The report button doesnt exist
+    Then The "Report User" button doesnt exist

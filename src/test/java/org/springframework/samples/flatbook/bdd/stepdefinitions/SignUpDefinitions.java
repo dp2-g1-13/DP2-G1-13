@@ -102,6 +102,8 @@ public class SignUpDefinitions extends AbstractStep {
 		String result="Is-Dp2-G1-13";
 		if("baduser".equals(username)) {
 			result="badpass";
+		}else if("admin".equals(username)) {
+			result = "admin";
 		}
 		return result;
 	}

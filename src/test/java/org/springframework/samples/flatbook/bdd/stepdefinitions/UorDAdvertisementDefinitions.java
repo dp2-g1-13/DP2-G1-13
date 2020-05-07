@@ -60,27 +60,4 @@ public class UorDAdvertisementDefinitions extends AbstractStep {
 	public static void FindEditedContent(String desc, WebDriver driver) throws Exception {
 		assertEquals(desc, driver.findElement(By.xpath("//td")).getText());
 	}
-	
-	@Then("The advertisement button dissapears")
-	public void NotFindAdvertButton() throws Exception {
-		NotFindAdvertButton(getDriver());
-		stopDriver();
-	}
-	
-	public static void NotFindAdvertButton(WebDriver driver) throws Exception {
-		assertNotEquals("See advertisement", driver.findElement(By.xpath("//div/div/div[2]/div/div/div[2]/div[2]")).getText());
-	}
-	
-	//Negative case:
-	
-	@Then("The advertisement edit or delete button doesnt exist")
-	public void NotFindAdvertEditOrDeleteButton() throws Exception {
-		NotFindAdvertEditOrDeleteButton(getDriver());
-		stopDriver();
-	}
-	
-	public static void NotFindAdvertEditOrDeleteButton(WebDriver driver) throws Exception {
-		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'Edit advertisement')]")).size());
-		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'Delete advertisement')]")).size());
-	}
 }
