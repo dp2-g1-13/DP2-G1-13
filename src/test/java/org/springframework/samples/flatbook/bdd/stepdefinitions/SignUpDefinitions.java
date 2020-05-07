@@ -8,7 +8,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
 
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -18,7 +17,6 @@ import lombok.extern.java.Log;
 
 @Log
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext
 public class SignUpDefinitions extends AbstractStep {
 
 	@LocalServerPort

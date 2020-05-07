@@ -6,15 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
 
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import lombok.extern.java.Log;
 
 @Log
-@DirtiesContext
-public class UAdvertisementDefinitions extends AbstractStep {
+public class UorDAdvertisementDefinitions extends AbstractStep {
 
 	@LocalServerPort
 	private int port;
@@ -75,5 +73,14 @@ public class UAdvertisementDefinitions extends AbstractStep {
 	
 	//Negative case:
 	
+	@Then("The advertisement edit or delete button doesnt exist")
+	public void NotFindAdvertEditOrDeleteButton() throws Exception {
+		NotFindAdvertEditOrDeleteButton(getDriver());
+		stopDriver();
+	}
 	
+	public static void NotFindAdvertEditOrDeleteButton(WebDriver driver) throws Exception {
+		assertEquals(0, driver.findElements(By.xpath("//body/div/div/div/div/a")).size());
+		assertEquals(0, driver.findElements(By.xpath("//body/div/div/div/div[2]/a")).size());
+	}
 }

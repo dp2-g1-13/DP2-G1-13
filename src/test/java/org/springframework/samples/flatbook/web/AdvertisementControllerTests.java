@@ -378,7 +378,7 @@ public class AdvertisementControllerTests {
     void testProcessDeleteAdvertisementSuccess() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements/{advertisementId}/delete", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID))
             .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-            .andExpect(MockMvcResultMatchers.view().name("redirect:/"));
+            .andExpect(MockMvcResultMatchers.view().name("redirect:/flats/list"));
         BDDMockito.then(this.advertisementService).should().deleteAdvertisement(ArgumentMatchers.isA(Advertisement.class));
     }
 
