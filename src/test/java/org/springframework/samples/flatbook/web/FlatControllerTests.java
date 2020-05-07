@@ -187,6 +187,7 @@ class FlatControllerTests {
 
         Host host = new Host();
         host.setUsername(TEST_PERSON_USERNAME);
+        host.setEnabled(true);
 
         given(this.personService.findUserById(TEST_PERSON_USERNAME)).willReturn(host);
         given(this.flatService.findFlatById(TEST_FLAT_ID)).willReturn(flat);
@@ -211,7 +212,7 @@ class FlatControllerTests {
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(address.getAddress() + ", " + address.getCity())).willReturn(response);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_ADDRESS_NOT_EXISTS + ", " + TEST_CITY_FLAT_NOT_EXISTS)).willReturn(responseZeroResults);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_ADDRESS_NOT_EXISTS + ", " + address.getCity())).willReturn(responseError);
-			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_CITY_FLAT + ", " + TEST_COUNTRY_FLAT + TEST_POSTAL_CODE_FLAT)).willReturn(response);
+			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_CITY_FLAT + ", " + TEST_COUNTRY_FLAT + " " + TEST_POSTAL_CODE_FLAT)).willReturn(response);
         } catch (UnsupportedEncodingException e) {
 		}
     }
