@@ -1,4 +1,3 @@
-@ignore
 Feature: User Sign Up (UH 1) 
    I can sign up in the system as a tenant or host with my user name, password and personal information.
   
@@ -14,7 +13,7 @@ Feature: User Sign Up (UH 1)
     And I do login as user "testinghost"
     Then "testinghost" appears as the current user
   
-  Scenario: Login fail (Negative)
+  Scenario: Sign up fail (Negative)
   	Given I am not logged in the system
     When I try to sign up as "tenant" with user "baduser" with wrong information
     Then the sing up form is shown again

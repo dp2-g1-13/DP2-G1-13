@@ -1,7 +1,7 @@
 package org.springframework.samples.flatbook.bdd.stepdefinitions;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -93,6 +93,6 @@ public class SendingRequestsDefinitions extends AbstractStep {
 	}
 	
 	public static void RequestButtonDoesntExists(WebDriver driver) throws Exception {
-		assertFalse(driver.findElement(By.xpath("//div/div/div/a")).getText().equals("Make a request!"));
+		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'Make a request!')]")).size());
 	}
 }

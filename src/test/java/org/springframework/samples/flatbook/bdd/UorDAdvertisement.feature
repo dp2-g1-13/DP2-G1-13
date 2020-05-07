@@ -1,4 +1,3 @@
-@ignore
 Feature: Updating or deleting advertisements (UH 6) 
    I can sign up in the system as host and delete or modify my advertisements.
 

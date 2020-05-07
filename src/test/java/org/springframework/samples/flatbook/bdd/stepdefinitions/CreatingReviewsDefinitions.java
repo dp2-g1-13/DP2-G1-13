@@ -107,47 +107,13 @@ public class CreatingReviewsDefinitions extends AbstractStep {
 		}
 	}
 	
-	@Then("The review button doesnt exist")
-	public void ReviewButtonDoesntExists() throws Exception {
-		ReviewButtonDoesntExists(getDriver());
+	@Then("The new review button doesnt exist")
+	public void NewReviewButtonDoesntExists() throws Exception {
+		NewReviewButtonDoesntExists(getDriver());
 		stopDriver();
 	}
 	
-	public static void ReviewButtonDoesntExists(WebDriver driver) throws Exception {
-		assertEquals(0, driver.findElements(By.xpath("//div[2]/div/a")).size());
-	}
-	
-	@Then("The flat review button doesnt exist")
-	public void FlatReviewButtonDoesntExists() throws Exception {
-		FlatReviewButtonDoesntExists(false, getDriver());
-		stopDriver();
-	}
-	
-	@Then("The flat review button doesnt exist as logged")
-	public void FlatReviewButtonDoesntExistsAsLogged() throws Exception {
-		FlatReviewButtonDoesntExists(true, getDriver());
-		stopDriver();
-	}
-	
-	public static void FlatReviewButtonDoesntExists(Boolean logged, WebDriver driver) throws Exception {
-		if(logged) {
-			assertNotEquals("New Review", driver.findElement(By.xpath("//div/div/div[4]/div/div[2]/a")).getText());
-		}else {
-			assertEquals(0, driver.findElements(By.xpath("//div/div/div[3]/div/div[2]/a")).size());
-		}
-	}
-	
-	@Then("The {string} review button doesnt shows")
-	public void ReviewButtonDoesntShows(String type) throws Exception {
-		ReviewButtonDoesntShows(type, getDriver());
-		stopDriver();
-	}
-	
-	public static void ReviewButtonDoesntShows(String type, WebDriver driver) throws Exception {
-		if(type.equals("tenant")) {
-			assertNotEquals("New Review", driver.findElement(By.xpath("//div[2]/div/a")).getText());
-		}else {
-			assertEquals(0, driver.findElements(By.xpath("//div[2]/div/div/a")).size());
-		}
+	public static void NewReviewButtonDoesntExists(WebDriver driver) throws Exception {
+		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'New Review')]")).size());
 	}
 }

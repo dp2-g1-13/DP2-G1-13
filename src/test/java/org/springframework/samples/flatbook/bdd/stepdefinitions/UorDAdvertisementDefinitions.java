@@ -80,7 +80,7 @@ public class UorDAdvertisementDefinitions extends AbstractStep {
 	}
 	
 	public static void NotFindAdvertEditOrDeleteButton(WebDriver driver) throws Exception {
-		assertEquals(0, driver.findElements(By.xpath("//body/div/div/div/div/a")).size());
-		assertEquals(0, driver.findElements(By.xpath("//body/div/div/div/div[2]/a")).size());
+		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'Edit advertisement')]")).size());
+		assertEquals(0, driver.findElements(By.xpath("//a[contains(text(),'Delete advertisement')]")).size());
 	}
 }
