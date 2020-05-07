@@ -1,3 +1,4 @@
+@ignore
 Feature: Sending requests (UH 16) 
    I can sign up in the system as a tenant and send a lease request to a flat.
   

@@ -6,12 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import lombok.extern.java.Log;
 
 @Log
+@DirtiesContext
 public class CreatingReviewsDefinitions extends AbstractStep {
 
 	@LocalServerPort

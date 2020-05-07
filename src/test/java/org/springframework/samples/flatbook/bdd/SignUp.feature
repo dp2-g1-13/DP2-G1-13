@@ -1,3 +1,4 @@
+@ignore
 Feature: User Sign Up (UH 1) 
    I can sign up in the system as a tenant or host with my user name, password and personal information.
   
