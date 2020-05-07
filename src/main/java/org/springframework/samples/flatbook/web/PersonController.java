@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.Tenant;
+import org.springframework.samples.flatbook.model.TenantReview;
 import org.springframework.samples.flatbook.model.User;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
@@ -220,7 +221,9 @@ public class PersonController {
 			if (this.authoritiesService.findAuthorityById(username).equals(AuthoritiesType.TENANT)) {
 				Tenant tenant = this.tenantService.findTenantById(username);
 				model.put("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewATenant(principal.getName(), username));
-				model.put("reviews", tenant.getReviews().stream().filter(x -> x.getCreator().isEnabled()).collect(Collectors.toList()));
+				List<TenantReview> reviews = tenant.getReviews().stream().filter(x -> x.getCreator().isEnabled()).collect(Collectors.toList());
+				reviews.sort(Comparator.comparing(TenantReview::getCreationDate).reversed());
+				model.put("reviews", reviews);
 				model.put("tenantId", username);
 				model.put("myFlatId", tenant.getFlat() != null ? tenant.getFlat().getId() : null);
 			} else {

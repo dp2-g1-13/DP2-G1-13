@@ -370,7 +370,7 @@
 							</executions>
 							<configuration>
 								<includes>
-									<include>**/*UITest.java</include>
+									<include>**/*UITests.java</include>
 								</includes>
 							</configuration>
 						</plugin>

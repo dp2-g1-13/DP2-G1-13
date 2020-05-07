@@ -88,15 +88,18 @@ public class SignUpDefinitions extends AbstractStep {
 		loginAs(username, passwordOf(username), port, getDriver());		
 	}
 	
-	public static void loginAs(String username, String password, int port, WebDriver driver) {				
-		driver.findElement(By.id("password")).clear();
-		driver.findElement(By.id("password")).sendKeys(password);
+	public static void loginAs(String username, String password, int port, WebDriver driver) {
+		if(!driver.getCurrentUrl().equals("http://localhost:"+port+"/login")) {
+			driver.findElement(By.xpath("//div[@id='main-navbar']/ul[2]/li/a")).click();
+		}
 		driver.findElement(By.id("username")).clear();
 		driver.findElement(By.id("username")).sendKeys(username);
+		driver.findElement(By.id("password")).clear();
+		driver.findElement(By.id("password")).sendKeys(password);
 		driver.findElement(By.xpath("//button[@type='submit']")).click();
 	}
 	private static String passwordOf(String username) {
-		String result="testPASS11%%";
+		String result="Is-Dp2-G1-13";
 		if("baduser".equals(username)) {
 			result="badpass";
 		}
