@@ -1,7 +1,6 @@
 package org.springframework.samples.flatbook.bdd.stepdefinitions;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -28,18 +27,28 @@ public class ShowingStatisticsDefinitions extends AbstractStep {
 		driver.findElement(By.xpath("//span[contains(text(),'Statistics')]")).click();
 	}
 	
-	@Then("The statistics appears")
-	public void FindTheStatistics() throws Exception {
-		FindTheStatistics(getDriver());
+	@Then("The {string} statistics appears")
+	public void FindTheStatistics(String type) throws Exception {
+		FindTheStatistics(type, getDriver());
 		stopDriver();
 	}
 	
-	public static void FindTheStatistics(WebDriver driver) throws Exception {
-		assertEquals("Requests", driver.findElement(By.xpath("//h2[contains(text(),'Requests')]")).getText());
-		assertEquals("Best Reviewed Flats", driver.findElement(By.xpath("//h2[contains(text(),'Best Reviewed Flats')]")).getText());
-		assertEquals("Worst Reviewed Flats", driver.findElement(By.xpath("//h2[contains(text(),'Worst Reviewed Flats')]")).getText());
-		assertEquals("Best Reviewed Hosts", driver.findElement(By.xpath("//h2[contains(text(),'Best Reviewed Hosts')]")).getText());
-		assertEquals("Most Reported Users", driver.findElement(By.xpath("//h2[contains(text(),'Most Reported Users')]")).getText());
+	public static void FindTheStatistics(String type, WebDriver driver) throws Exception {
+		if(type.equals("requests")) {
+			assertEquals("Requests", driver.findElement(By.xpath("//h2[contains(text(),'Requests')]")).getText());
+			assertEquals("Number Of Requests", driver.findElement(By.xpath("//th[contains(text(),'Number Of Requests')]")).getText());
+		}else if(type.equals("percentage of requests")) {
+			assertEquals("Requests", driver.findElement(By.xpath("//h2[contains(text(),'Requests')]")).getText());
+			assertEquals("Ratio Of Accepted Requests", driver.findElement(By.xpath("//th[contains(text(),'Ratio Of Accepted Requests')]")).getText());
+			assertEquals("Ratio Of Rejected Requests", driver.findElement(By.xpath("//th[contains(text(),'Ratio Of Rejected Requests')]")).getText());
+		}else if(type.equals("best reviewed")) {
+			assertEquals("Users", driver.findElement(By.xpath("//h2[contains(text(),'Users')]")).getText());
+			assertEquals("Best Reviewed Tenants", driver.findElement(By.xpath("//h2[contains(text(),'Best Reviewed Tenants')]")).getText());
+			assertEquals("Best Reviewed Hosts", driver.findElement(By.xpath("//h2[contains(text(),'Best Reviewed Hosts')]")).getText());
+		}else if(type.equals("reports")) {
+			assertEquals("Users", driver.findElement(By.xpath("//h2[contains(text(),'Users')]")).getText());
+			assertEquals("Most Reported Users", driver.findElement(By.xpath("//h2[contains(text(),'Most Reported Users')]")).getText());
+		}
 	}
 	
 	//Negative case:
