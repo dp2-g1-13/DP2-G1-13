@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,7 +14,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.repository.DBImageRepository;
+import org.springframework.samples.flatbook.service.DBImageService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Set;
 
@@ -25,6 +27,7 @@ import static org.mockito.Mockito.*;
 
 @DataJpaTest(includeFilters= @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class DBImageServiceTests {
 
     @Autowired

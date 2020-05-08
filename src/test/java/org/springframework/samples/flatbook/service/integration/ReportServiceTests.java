@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -12,12 +12,16 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Report;
+import org.springframework.samples.flatbook.service.PersonService;
+import org.springframework.samples.flatbook.service.ReportService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ReportServiceTests {
 
 	private static final String	REASON		= "furry";
@@ -25,10 +29,10 @@ public class ReportServiceTests {
 	private static final Integer ID_WRONG	= 0;
 
 	@Autowired
-    private ReportService		reportService;
+    private ReportService reportService;
 
 	@Autowired
-    private PersonService       personService;
+    private PersonService personService;
 
 	private Report				report;
 

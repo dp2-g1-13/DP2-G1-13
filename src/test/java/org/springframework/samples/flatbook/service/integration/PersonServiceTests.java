@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -14,10 +14,14 @@ import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
 import org.springframework.samples.flatbook.model.mappers.PersonForm;
+import org.springframework.samples.flatbook.service.HostService;
+import org.springframework.samples.flatbook.service.PersonService;
+import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.*;
 
@@ -25,6 +29,7 @@ import static org.springframework.samples.flatbook.util.assertj.Assertions.asser
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class PersonServiceTests {
 
 	private static final String		FIRSTNAME	    = "Dani";
@@ -42,13 +47,13 @@ public class PersonServiceTests {
 	private PersonForm				tenantPersonForm;
 
     @Autowired
-	private PersonService			personService;
+	private PersonService personService;
 
     @Autowired
-    private TenantService			tenantService;
+    private TenantService tenantService;
 
     @Autowired
-    private HostService			    hostService;
+    private HostService hostService;
 
 
 	@BeforeEach
@@ -86,7 +91,7 @@ public class PersonServiceTests {
 	@Test
     void shouldFindAllPeople() {
 	    Collection<Person> people = this.personService.findAllUsers();
-        Assertions.assertThat(people).hasSize(151);
+        Assertions.assertThat(people).hasSize(152);
     }
 
 	@Test

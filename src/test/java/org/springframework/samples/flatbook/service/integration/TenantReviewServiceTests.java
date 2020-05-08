@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import java.time.LocalDate;
 
@@ -15,12 +15,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.TenantReview;
+import org.springframework.samples.flatbook.service.PersonService;
+import org.springframework.samples.flatbook.service.TenantReviewService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class TenantReviewServiceTests {
 
 	private static final String	DESCRIPTION		        = "description";
@@ -29,10 +33,10 @@ public class TenantReviewServiceTests {
     private static final Integer TENANT_REVIEW_ID_WRONG	= 2;
 
 	@Autowired
-    private TenantReviewService		tenantReviewService;
+    private TenantReviewService tenantReviewService;
 
     @Autowired
-    private PersonService		    personService;
+    private PersonService personService;
 
 	private TenantReview			tenantReview;
 

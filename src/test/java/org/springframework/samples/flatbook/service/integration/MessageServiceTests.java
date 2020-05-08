@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -17,13 +17,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.model.Person;
+import org.springframework.samples.flatbook.service.MessageService;
+import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.utils.EntityUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class MessageServiceTests {
 
     private static final String USERNAME        = "fricart1";
@@ -33,10 +37,10 @@ public class MessageServiceTests {
 	private Message				message;
 
     @Autowired
-	private MessageService		messageService;
+	private MessageService messageService;
 
     @Autowired
-    private PersonService       personService;
+    private PersonService personService;
 
 
 	@BeforeEach

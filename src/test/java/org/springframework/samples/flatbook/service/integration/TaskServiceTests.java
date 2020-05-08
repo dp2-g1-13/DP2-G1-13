@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import java.time.LocalDate;
 import java.util.Iterator;
@@ -15,12 +15,16 @@ import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.Task;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.TaskStatus;
+import org.springframework.samples.flatbook.service.FlatService;
+import org.springframework.samples.flatbook.service.TaskService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class TaskServiceTests {
 
 	private static final String	DESCRIPTION = "description";
@@ -29,10 +33,10 @@ public class TaskServiceTests {
 	private static final Integer ID_WRONG	= 0;
 
 	@Autowired
-    private TaskService		taskService;
+    private TaskService taskService;
 
     @Autowired
-    private FlatService 	flatService;
+    private FlatService flatService;
 
 	private Task				task;
 

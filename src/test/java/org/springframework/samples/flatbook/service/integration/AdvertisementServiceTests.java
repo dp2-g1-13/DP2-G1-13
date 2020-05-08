@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -8,11 +8,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.*;
-import org.springframework.samples.flatbook.model.enums.RequestStatus;
+import org.springframework.samples.flatbook.service.AdvertisementService;
+import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DataJpaTest(includeFilters= @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class AdvertisementServiceTests {
 
     @Autowired
@@ -82,13 +84,6 @@ public class AdvertisementServiceTests {
         flat.setAddress(address);
         flat.setImages(images);
 
-        Request request = new Request();
-        request.setStatus(RequestStatus.PENDING);
-        request.setDescription("This is a sample description");
-        request.setCreationDate(LocalDateTime.now());
-        request.setStartDate(LocalDate.MAX);
-        request.setFinishDate(LocalDate.MAX);
-
         advertisement = new Advertisement();
         advertisement.setTitle("Sample title");
         advertisement.setDescription("Sample description");
@@ -101,10 +96,10 @@ public class AdvertisementServiceTests {
     @Test
     @Order(1)
     void shouldFindAdvertisementWithFlatId() {
-        Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(1);
-        assertThat(adv).hasId(1);
-        assertThat(adv).hasPricePerMonth(98.);
-        assertThat(adv).hasTitle("Advertisement 1");
+        Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(2);
+        assertThat(adv).hasId(2);
+        assertThat(adv).hasPricePerMonth(420.);
+        assertThat(adv).hasTitle("Advertisement 2");
     }
 
     @Test
@@ -132,9 +127,9 @@ public class AdvertisementServiceTests {
     @Order(5)
     void shouldFindAdvertisementsByHost() {
         Set<Advertisement> advertisements = this.advertisementService.findAdvertisementsByHost("rbordessa0");
-        Assertions.assertThat(advertisements).hasSize(3);
+        Assertions.assertThat(advertisements).hasSize(2);
         Assertions.assertThat(advertisements).extracting(Advertisement::getTitle)
-            .containsExactlyInAnyOrder("Advertisement 1", "Advertisement 16", "Advertisement 31");
+            .containsExactlyInAnyOrder("Advertisement 16", "Advertisement 31");
     }
     @Test
     @Order(6)
@@ -146,17 +141,18 @@ public class AdvertisementServiceTests {
     @Order(7)
     void shouldFindAllAdvertisements() {
         Set<Advertisement> advertisements = this.advertisementService.findAllAdvertisements();
-        Assertions.assertThat(advertisements).hasSize(45);
+        Assertions.assertThat(advertisements).hasSize(44);
     }
 
     @Test
     @Order(8)
     void shouldFindAdvertisementById() {
-        Advertisement advertisement = this.advertisementService.findAdvertisementById(1);
-        assertThat(advertisement).hasId(1);
-        assertThat(advertisement).hasTitle("Advertisement 1");
-        assertThat(advertisement).hasDescription("Vestibulum rutrum rutrum neque. Aenean auctor gravida sem.");
-        assertThat(advertisement).hasPricePerMonth(98.);
+        Advertisement advertisement = this.advertisementService.findAdvertisementById(10);
+        assertThat(advertisement).hasId(10);
+        assertThat(advertisement).hasTitle("Advertisement 10");
+        assertThat(advertisement).hasDescription("Nam nulla. Integer pede justo, lacinia eget, tincidunt eget, tempus vel, pede.");
+        assertThat(advertisement).hasPricePerMonth(722.);
+        assertThat(advertisement).hasRequirements("Sed accumsan felis. Ut at dolor quis odio consequat varius.");
         assertThat(advertisement.getFlat()).isNotNull();
     }
 

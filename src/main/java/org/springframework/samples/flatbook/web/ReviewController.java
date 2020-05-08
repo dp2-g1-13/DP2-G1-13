@@ -44,9 +44,6 @@ public class ReviewController {
 	private final FlatService			flatService;
 	private final TenantReviewService	tenantReviewService;
 
-    private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
-
-
 	@Autowired
 	public ReviewController(final FlatService flatService, final FlatReviewService flatReviewService, final TenantService tenantService,
                             final PersonService personService, final TenantReviewService tenantReviewService) {
@@ -65,15 +62,6 @@ public class ReviewController {
 		ReviewType type = this.getReviewType(flatId, tenantId, user);
 
 		if (type == null) {
-
-		    logger.error("Flat id: {}, tenant id: {}, username: {}", flatId, tenantId, user.getUsername());
-		    if(flatId != null) {
-		        logger.error("Is the user {} allowed to make a tenant review to flat id {}? {}", user.getUsername(), flatId, ReviewUtils.isAllowedToReviewAFlat(user.getUsername(), flatId));
-            }
-		    if(tenantId != null) {
-                logger.error("Is the user {} allowed to make a tenant review to tenant id {}? {}", user.getUsername(), flatId, ReviewUtils.isAllowedToReviewATenant(user.getUsername(), tenantId));
-            }
-
 			throw new IllegalArgumentException("Bad query params or illegal access");
 		}
 
@@ -94,14 +82,6 @@ public class ReviewController {
 			review.getType().equals(ReviewType.TENANT_REVIEW) ? review.getReviewed() : null, user);
 
 		if (type == null) {
-
-		    logger.error("Review type: {}, reviewed: {}, user logged: {}", review.getType(), review.getReviewed(), user.getUsername());
-            if(review.getType().equals(ReviewType.FLAT_REVIEW) && review.getReviewed() != null) {
-                logger.error("Is the user {} allowed to make a tenant review to flat id {}? {}", user.getUsername(), review.getReviewed(), ReviewUtils.isAllowedToReviewAFlat(user.getUsername(), Integer.parseInt(review.getReviewed())));
-            } else if(review.getType().equals(ReviewType.TENANT_REVIEW) && review.getReviewed() != null) {
-                logger.error("Is the user {} allowed to make a tenant review to tenant id {}? {}", user.getUsername(), review.getReviewed(), ReviewUtils.isAllowedToReviewATenant(user.getUsername(), review.getReviewed()));
-            }
-
 			throw new IllegalArgumentException("Illegal access.");
 		}
 
@@ -140,17 +120,6 @@ public class ReviewController {
 			model.put("reviewForm", reviewForm);
 			return ReviewController.VIEWS_FLATREVIEWS_CREATE_OR_UPDATE_FORM;
 		} else {
-
-		    if(creator == null) {
-                logger.error("The user with username {} does not exist", principal.getName());
-            }
-		    if(reviewForm == null) {
-		        logger.error("The review with id {} does not exist", reviewId);
-            }
-		    if(creator != null && reviewForm != null && !creator.equals(reviewForm.getCreator())) {
-		        logger.error("The user logged: {}, is not the creator of the review with id {}, who is {}", creator.getUsername(), reviewId, reviewForm.getCreator().getUsername());
-            }
-
 			throw new IllegalArgumentException("Bad review id or you can not edit it.");
 		}
 	}
@@ -185,17 +154,6 @@ public class ReviewController {
 
 			}
 		} else {
-
-            if(creator == null) {
-                logger.error("The user with username {} does not exist", principal.getName());
-            }
-            if(reviewFormDb == null) {
-                logger.error("The review with id {} does not exist", reviewId);
-            }
-            if(creator != null && reviewFormDb != null && !creator.equals(reviewFormDb.getCreator())) {
-                logger.error("The user logged: {}, is not the creator of the review with id {}, who is {}", creator.getUsername(), reviewId, reviewFormDb.getCreator().getUsername());
-            }
-
 			throw new RuntimeException("You don't have access to this review!");
 		}
 	}
@@ -221,17 +179,6 @@ public class ReviewController {
 			}
 
 		} else {
-
-            if(creator == null) {
-                logger.error("The user with username {} does not exist", principal.getName());
-            }
-            if(reviewFormDb == null) {
-                logger.error("The review with id {} does not exist", reviewId);
-            }
-            if(creator != null && reviewFormDb != null && !creator.equals(reviewFormDb.getCreator())) {
-                logger.error("The user logged: {}, is not the creator of the review with id {}, who is {}", creator.getUsername(), reviewId, reviewFormDb.getCreator().getUsername());
-            }
-
 			throw new IllegalArgumentException("Bad flat review id or you are not the creator of the review.");
 		}
 	}

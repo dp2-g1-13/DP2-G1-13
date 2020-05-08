@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import java.util.Collection;
 
@@ -10,12 +10,15 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.Host;
+import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class HostServiceTests {
 
 	private static final String USERNAME       = "vcasero8";
@@ -23,7 +26,7 @@ public class HostServiceTests {
     private static final Integer FLAT_ID       = 1;
 
 	@Autowired
-    private HostService		hostService;
+    private HostService hostService;
 
 	@Test
 	void shouldFindHostById() {
@@ -46,9 +49,9 @@ public class HostServiceTests {
 	@Test
 	void shouldFindAllHosts() {
 		Collection<Host> hosts = this.hostService.findAllHosts();
-		Assertions.assertThat(hosts).hasSize(15);
+		Assertions.assertThat(hosts).hasSize(16);
 		Assertions.assertThat(hosts).extracting(Host::getUsername)
-            .containsExactlyInAnyOrder("rbordessa0", "fricart1", "dframmingham2", "negre3", "glikly4", "kcrinkley5", "cstealey6", "rjurries7", "vcasero8", "ochillistone9", "nnaullsa", "jdavieb", "bputleyc", "efarnalld", "mmcgaheye");
+            .containsExactlyInAnyOrder("rbordessa0", "fricart1", "dframmingham2", "negre3", "glikly4", "kcrinkley5", "cstealey6", "rjurries7", "vcasero8", "ochillistone9", "nnaullsa", "jdavieb", "bputleyc", "efarnalld", "mmcgaheye", "mmcgahaeaye");
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +10,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.User;
+import org.springframework.samples.flatbook.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -18,6 +20,7 @@ import static org.springframework.samples.flatbook.util.assertj.Assertions.asser
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class UserServiceTests {
 
 	private static final String	USERNAME	    = "credierb";
@@ -27,7 +30,7 @@ public class UserServiceTests {
 	private static final String	PASSWORD	= "Is-Dp2-G1-13";
 
 	@Autowired
-    private UserService			userService;
+    private UserService userService;
 
 	private User				user;
 

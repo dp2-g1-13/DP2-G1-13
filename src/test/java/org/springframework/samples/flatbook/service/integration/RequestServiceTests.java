@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +13,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.Request;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
+import org.springframework.samples.flatbook.service.RequestService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest(includeFilters= @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class RequestServiceTests {
 
     @Autowired
@@ -37,8 +40,8 @@ public class RequestServiceTests {
         request.setDescription("Sample description");
         request.setStatus(RequestStatus.PENDING);
         request.setCreationDate(LocalDateTime.now());
-        request.setStartDate(LocalDate.of(10000, 1, 1));
-        request.setFinishDate(LocalDate.of(10000, 12, 1));
+        request.setStartDate(LocalDate.of(9999, 1, 1));
+        request.setFinishDate(LocalDate.of(9999, 12, 1));
     }
 
     @Test

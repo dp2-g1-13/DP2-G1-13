@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.service;
+package org.springframework.samples.flatbook.service.integration;
 
 import java.util.Collection;
 
@@ -11,12 +11,15 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.Tenant;
+import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class TenantServiceTests {
 
 	private static final String	FIRSTNAME_1     = "Ramon";
@@ -34,7 +37,7 @@ public class TenantServiceTests {
     private static final Integer ID_WRONG       = 0;
 
 	@Autowired
-    private TenantService		tenantService;
+    private TenantService tenantService;
 
 	private Tenant				tenant;
 
