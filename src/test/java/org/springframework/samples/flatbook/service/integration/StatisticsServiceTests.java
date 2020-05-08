@@ -39,7 +39,7 @@ public class StatisticsServiceTests {
         Assertions.assertThat(statistics.getTopThreeBestReviewedTenants()).extracting(Tenant::getUsername)
             .containsExactlyInAnyOrder("acordingly22", "afahrenbach25", "anund5");
         Assertions.assertThat(statistics.getTopThreeBestReviewedHosts()).extracting(Host::getUsername)
-            .containsExactlyInAnyOrder("bputleyc", "fricart1", "glikly4");
+            .containsExactlyInAnyOrder("bputleyc", "fricart1", "jdavieb");
         Assertions.assertThat(statistics.getTopThreeBestReviewedFlats()).extracting(Flat::getAvailableServices)
             .containsExactlyInAnyOrder("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin interdum mauris non ligula pellentesque ultrices.",
                 "Vestibulum rutrum rutrum neque. Aenean auctor gravida sem.", "Vivamus tortor. Duis mattis egestas metus.");
