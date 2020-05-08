@@ -11,6 +11,7 @@ import org.springframework.samples.flatbook.repository.PersonRepository;
 import org.springframework.samples.flatbook.repository.RequestRepository;
 import org.springframework.samples.flatbook.repository.TenantRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StatisticsService {
@@ -39,6 +40,7 @@ public class StatisticsService {
 		this.advertisementRepository = advertisementRepository;
 	}
 
+	@Transactional(readOnly = true)
 	public Statistics findStatistics() {
 		Statistics statistics = new Statistics();
 		statistics.setNumberOfRequests(this.requestRepository.numberOfRequests());
