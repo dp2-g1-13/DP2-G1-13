@@ -313,6 +313,7 @@
 				<configuration>
 					<excludes>
 						<exclude>**/*UITests.java</exclude>
+						<exclude>**/*APITests.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -369,6 +370,7 @@
 							<configuration>
 								<includes>
 									<include>**/*UITests.java</include>
+									<include>**/*APITests.java</include>
 								</includes>
 							</configuration>
 						</plugin>
