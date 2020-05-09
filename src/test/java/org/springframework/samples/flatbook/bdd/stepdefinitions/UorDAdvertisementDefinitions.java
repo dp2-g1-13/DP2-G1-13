@@ -18,15 +18,6 @@ public class UorDAdvertisementDefinitions extends AbstractStep {
 	
 	//Positive cases:
 	
-	@And("I go to my flats page")
-	public void IGoToMyFlatsPage() throws Exception {	
-		IGoToMyFlatsPage(getDriver());		
-	}
-	
-	public static void IGoToMyFlatsPage(WebDriver driver) throws Exception {		
-		driver.findElement(By.xpath("//div[@id='main-navbar']/ul/li[2]/a/span[2]")).click();
-	}
-	
 	@And("I edit the first flat advertisement description to {string}")
 	public void IEditTheFirstFlatAdvert(String desc) throws Exception {
 		IEditTheFirstFlatAdvert(desc, getDriver());

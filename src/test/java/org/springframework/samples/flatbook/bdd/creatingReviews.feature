@@ -57,3 +57,8 @@ Feature: Creating reviews (UH 12)
     And I go to my flat page
     Then The "New Review" button doesnt exists
     
+  Scenario: Fail review creation because I am banned (Negative)
+    Given I am not logged in the system
+    When I do login as user "mmcgaheye"
+    Then The system says that my user is disabled
+    

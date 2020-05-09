@@ -8,7 +8,7 @@ Feature: Reporting users of the system (UH 22)
     And I go to my roomate "dballchin1" user page
     Then I report him	
     
-Scenario: Fail user report because I dont have an account (Negative)
+  Scenario: Fail user report because I dont have an account (Negative)
     Given I am not logged in the system
     When I do look for a flat in "Sevilla"
     And I go to the first flat page
