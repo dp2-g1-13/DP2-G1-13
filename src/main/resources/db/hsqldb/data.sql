@@ -220,7 +220,7 @@ INSERT INTO images (id, data, file_type, filename) VALUES(1, FILE_READ('src/main
 INSERT INTO images (id, data, file_type, filename) VALUES(2, FILE_READ('src/main/resources/static/resources/images/flats/450_1000.jpeg'), 'image/jpeg', '450_1000.jpeg');
 INSERT INTO images (id, data, file_type, filename) VALUES(3, FILE_READ('src/main/resources/static/resources/images/flats/450_1000.jpg'), 'image/jpeg', '450_1000.jpg');
 INSERT INTO images (id, data, file_type, filename) VALUES(4, FILE_READ('src/main/resources/static/resources/images/flats/30.-DLX-800x533.jpg'), 'image/jpeg', '30.-DLX-800x533.jpg');
-INSERT INTO images (id, data, file_type, filename) VALUES(5, FILE_READ('src/main/resources/static/resources/images/flats/baño.jpg'), 'image/jpg', 'baño.jpeg');
+INSERT INTO images (id, data, file_type, filename) VALUES(5, FILE_READ('src/main/resources/static/resources/images/flats/bano.jpg'), 'image/jpg', 'bano.jpeg');
 INSERT INTO images (id, data, file_type, filename) VALUES(6, FILE_READ('src/main/resources/static/resources/images/flats/h1_b.jpeg'), 'image/jpeg', 'h1_b.jpeg');
 insert into images (id, data, file_type, filename) values (7, FILE_READ('src/main/resources/static/resources/images/flats/30.-DLX-800x533.jpg'), 'image/jpg', 'image.jpg');
 insert into images (id, data, file_type, filename) values (8, FILE_READ('src/main/resources/static/resources/images/flats/30.-DLX-800x533.jpg'), 'image/jpg', 'image.jpg');
