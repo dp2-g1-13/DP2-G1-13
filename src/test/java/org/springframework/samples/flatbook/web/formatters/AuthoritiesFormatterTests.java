@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
-import org.springframework.samples.flatbook.web.formatters.AuthoritiesFormatter;
 
 @ExtendWith(MockitoExtension.class)
 class AuthoritiesFormatterTests {
@@ -34,7 +33,7 @@ class AuthoritiesFormatterTests {
 		Authorities authority = new Authorities();
 		authority.setAuthority(AuthoritiesType.TENANT);
 		String authorityName = this.authoritiesFormatter.print(authority.getAuthority(), Locale.ENGLISH);
-		Assertions.assertEquals("Tenant", authorityName);
+		Assertions.assertEquals("TENANT", authorityName);
 	}
 
 	@Test

@@ -5,9 +5,12 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!-- %@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %-->  
 
 <flatbook:layout pageName="home">
+    <jsp:attribute name="customScript">
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNGjohXXlwq4qcQE66tjVEnfXa5WqM-4c&libraries=places&language=en&callback=initAutocomplete"></script>
+    </jsp:attribute>
+    <jsp:body>
     <h2><fmt:message key="welcome"/></h2>
     <div class="row">
         <div class="col-md-12">
@@ -39,16 +42,5 @@
             </form:form>
         </div>
     </div>
-    <sec:authorize access="hasAuthority('TENANT')">
-        <c:if test="${!hasFlat}">
-            <div class="row">
-                <a role="button" class="btn btn-default btn-lg" href="${pageContext.request.contextPath}/requests/list" aria-pressed="true">See your requests</a>
-            </div>
-        </c:if>
-        <c:if test="${hasFlat}">
-            <div class="row">
-                <a role="button" class="btn btn-default btn-lg" href="${pageContext.request.contextPath}/tasks/new" aria-pressed="true">Create new task</a>
-            </div>
-        </c:if>
-    </sec:authorize>
+    </jsp:body>
 </flatbook:layout>

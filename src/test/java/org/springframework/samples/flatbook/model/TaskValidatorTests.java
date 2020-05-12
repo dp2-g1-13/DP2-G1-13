@@ -3,6 +3,7 @@ package org.springframework.samples.flatbook.model;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ public class TaskValidatorTests {
     public static LocalDate creationDate;
     public static Tenant creator;
     public static Tenant asignee;
+    public static Flat flat;
 
     private Validator createValidator() {
         LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
@@ -53,6 +55,28 @@ public class TaskValidatorTests {
         asignee.setPassword("/4A]m^ub~4e$KFAY");
         asignee.setPhoneNumber("123456788");
         asignee.setUsername("juanca");
+
+        Address address = new Address();
+        address.setCountry("Spain");
+        address.setCity("Sevilla");
+        address.setPostalCode("41000");
+        address.setAddress("Plaza Nueva");
+
+        DBImage image = new DBImage();
+        image.setFilename("a");
+        image.setFileType("b");
+        image.setData(new byte[]{1, 2, 3});
+        Set<DBImage> images = new HashSet<>();
+        images.add(image);
+
+        flat = new Flat();
+        flat.setDescription("this is a sample description with more than 30 characters");
+        flat.setSquareMeters(100);
+        flat.setNumberRooms(3);
+        flat.setNumberBaths(2);
+        flat.setAvailableServices("Wifi and TV");
+        flat.setAddress(address);
+        flat.setImages(images);
     }
 
     @Test
@@ -65,13 +89,14 @@ public class TaskValidatorTests {
         task.setCreator(creator);
         task.setDescription("test");
         task.setStatus(status);
+        task.setFlat(flat);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Task> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("title");
+        assertThat(violation.getPropertyPath().toString()).isEqualTo("title");
         assertThat(violation.getMessage()).isEqualTo("must not be blank");
     }
 
@@ -85,13 +110,14 @@ public class TaskValidatorTests {
         task.setCreator(creator);
         task.setDescription("");
         task.setStatus(status);
+        task.setFlat(flat);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Task> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("description");
+        assertThat(violation.getPropertyPath().toString()).isEqualTo("description");
         assertThat(violation.getMessage()).isEqualTo("must not be blank");
     }
 
@@ -105,13 +131,14 @@ public class TaskValidatorTests {
         task.setCreator(creator);
         task.setDescription("test");
         task.setStatus(null);
+        task.setFlat(flat);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Task> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("status");
+        assertThat(violation.getPropertyPath().toString()).isEqualTo("status");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
 
@@ -125,13 +152,14 @@ public class TaskValidatorTests {
         task.setCreator(creator);
         task.setDescription("test");
         task.setStatus(status);
+        task.setFlat(flat);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Task> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("creationDate");
+        assertThat(violation.getPropertyPath().toString()).isEqualTo("creationDate");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
 
@@ -145,13 +173,14 @@ public class TaskValidatorTests {
         task.setCreator(creator);
         task.setDescription("test");
         task.setStatus(status);
+        task.setFlat(flat);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Task> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("creationDate");
+        assertThat(violation.getPropertyPath().toString()).isEqualTo("creationDate");
         assertThat(violation.getMessage()).isEqualTo("must be a date in the past or in the present");
     }
 
@@ -165,6 +194,7 @@ public class TaskValidatorTests {
         task.setCreator(null);
         task.setDescription("test");
         task.setStatus(status);
+        task.setFlat(flat);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);
@@ -172,6 +202,27 @@ public class TaskValidatorTests {
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Task> violation = constraintViolations.iterator().next();
         assertThat(violation.getPropertyPath().toString()) .isEqualTo("creator");
+        assertThat(violation.getMessage()).isEqualTo("must not be null");
+    }
+
+    @Test
+    void shouldNotValidateWhenFlatNull() {
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
+        Task task = new Task();
+        task.setTitle("sample");
+        task.setAsignee(asignee);
+        task.setCreationDate(creationDate);
+        task.setCreator(creator);
+        task.setDescription("test");
+        task.setStatus(status);
+        task.setFlat(null);
+
+        Validator validator = createValidator();
+        Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);
+
+        assertThat(constraintViolations.size()).isEqualTo(1);
+        ConstraintViolation<Task> violation = constraintViolations.iterator().next();
+        assertThat(violation.getPropertyPath().toString()).isEqualTo("flat");
         assertThat(violation.getMessage()).isEqualTo("must not be null");
     }
 
@@ -188,6 +239,7 @@ public class TaskValidatorTests {
         task.setCreationDate(creationDate);
         task.setCreator(creator);
         task.setAsignee(asignee);
+        task.setFlat(flat);
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Task>> constraintViolations = validator.validate(task);

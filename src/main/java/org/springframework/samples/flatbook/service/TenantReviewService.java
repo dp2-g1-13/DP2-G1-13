@@ -1,7 +1,6 @@
 package org.springframework.samples.flatbook.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.TenantReview;
 import org.springframework.samples.flatbook.repository.TenantReviewRepository;
 import org.springframework.stereotype.Service;
@@ -18,12 +17,12 @@ public class TenantReviewService {
     }
 
     @Transactional(readOnly = true)
-    public TenantReview findTenantReviewById(int tenantReviewId) throws DataAccessException {
+    public TenantReview findTenantReviewById(int tenantReviewId) {
         return this.tenantReviewRepository.findById(tenantReviewId);
     }
 
     @Transactional
-    public void saveTenantReview(TenantReview tenantReview) throws DataAccessException {
+    public void saveTenantReview(TenantReview tenantReview) {
         this.tenantReviewRepository.save(tenantReview);
     }
 

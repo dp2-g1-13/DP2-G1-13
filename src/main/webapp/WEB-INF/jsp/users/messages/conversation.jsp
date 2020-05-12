@@ -11,13 +11,38 @@
     <jsp:attribute name="customScript">
         <script>
             document.querySelector("#chat-body").scrollTo(0, document.querySelector("#chat-body").scrollHeight);
+
+            function scrollToBottom() {
+                var messages = document.getElementById('chat-body');
+                messages.scrollTop = messages.scrollHeight;
+            }
+
+            var scrollAtBottom;
+            $(document).ready(function () {
+                var interval = setInterval(function () {
+                    var messages = document.getElementById('chat-body');
+                    scrollAtBottom = messages.scrollTop + messages.clientHeight === messages.scrollHeight;
+                    $("#chat-body").load("${pageContext.request.contextPath}/messages/${message.receiver.username} #chat-body-content");
+                }, 2000);
+            });
+            $(document).ajaxComplete(function () {
+                var messages = document.getElementById('chat-body');
+                var shouldScroll = messages.scrollTop + messages.clientHeight === messages.scrollHeight;
+                if (!shouldScroll && scrollAtBottom) {
+                    scrollToBottom();
+                }
+            });
+
         </script>
     </jsp:attribute>
     <jsp:body>
     <div id="chat-container" class="panel panel-primary">
-        <div id="chat-heading" class="panel-heading"><h2 class="chat-heading">Chat: <c:out value="${message.receiver.username}"/></h2></div>
+        <spring:url value="/users/{user}" var="userPage">
+            <spring:param name="user" value="${message.receiver.username}"/>
+        </spring:url>
+        <div id="chat-heading" class="panel-heading"><h2 class="chat-heading">Chat: <a class="a-chat" href="${fn:escapeXml(userPage)}" aria-pressed="true"><c:out value="${message.receiver.username}"/></a></h2></div>
         <div id="chat-body" class="panel-body">
-            <div class="panel-group">
+            <div id="chat-body-content" class="panel-group">
                 <c:forEach items="${messages}" var="mess">
 
                 <div class="row">

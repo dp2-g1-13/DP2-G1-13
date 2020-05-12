@@ -1,4 +1,5 @@
 <%@ page import="org.springframework.samples.flatbook.model.enums.RequestStatus" %>
+<%@ page import="java.time.LocalDate" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -10,16 +11,25 @@
 
     <h2>These are the results:</h2>
 
+	<c:if test="${requests.size() == 0}">
+		<p>There are no requests to show.</p>
+	</c:if>
     <c:if test="${requests.size() > 0}">
+    <div class="panel-body overflow">
     <c:forEach var="i" begin="0" end="${requests.size()-1}">
         <div class="panel panel-default">
             <div class="panel-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
-                        <sec:authorize access="hasAnyAuthority('admin', 'HOST')">
+                        <sec:authorize access="hasAnyAuthority('ADMIN', 'HOST')">
                         <tr>
                             <th>Username</th>
-                            <td><c:out value="${tenants.get(i).username}"/></td>
+                            <td>
+                                <spring:url value="/users/{user}" var="userPage">
+                                    <spring:param name="user" value="${tenants.get(i).username}"/>
+                                </spring:url>
+                                <a href="${fn:escapeXml(userPage)}"><c:out value="${tenants.get(i).username}"/></a>
+                            </td>
                         </tr>
                         </sec:authorize>
                         <tr>
@@ -47,40 +57,68 @@
                 <div class="row">
                     <sec:authorize access="hasAuthority('TENANT')">
                     <div class="col-md-6">
-                        <spring:url value="/advertisements/{advertisementId}" var="advertisementUrl">
-                            <spring:param name="advertisementId" value="${advIds.get(i)}"/>
+                    <c:choose>
+                    <c:when test="${advIds.get(i)!=null}"> 
+                        <spring:url value="/advertisements/{advId}" var="advUrl">
+                            <spring:param name="advId" value="${advIds.get(i)}"/>
                         </spring:url>
-                        <a role="button" href="${fn:escapeXml(advertisementUrl)}" class="btn btn-default" aria-pressed="true">See details</a>
+                        <a role="button" href="${fn:escapeXml(advUrl)}" class="btn btn-default" aria-pressed="true">See details</a>
+                    </c:when>
+                    <c:otherwise>
+                    	The advertisement that you request for has been deleted.
+                    </c:otherwise>
+                    </c:choose>
                     </div>
                     </sec:authorize>
-                    <sec:authorize access="hasAnyAuthority('HOST', 'admin')">
-                        <c:if test="${requests.get(i).status == RequestStatus.PENDING}">
-                        <div class="col-md-4" align="center">
-                            <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/accept" var="acceptRequestUrl">
-                                <spring:param name="advertisementId" value="${advId}"/>
-                                <spring:param name="requestId" value="${requests.get(i).id}"/>
-                            </spring:url>
-                            <a role="button" href="${fn:escapeXml(acceptRequestUrl)}" class="btn btn-success" aria-pressed="true">Accept request</a>
+                    <sec:authorize access="hasAnyAuthority('HOST', 'ADMIN')">
+                    <div align="center" class="row">
+                        <c:choose>
+                            <c:when test="${requests.get(i).status == RequestStatus.PENDING}">
+                                <div class="col-md-6">
+                                    <spring:url value="/flats/{flatId}/requests/{requestId}/accept" var="acceptRequestUrl">
+                                        <spring:param name="flatId" value="${flatId}"/>
+                                        <spring:param name="requestId" value="${requests.get(i).id}"/>
+                                    </spring:url>
+                                    <a role="button" href="${fn:escapeXml(acceptRequestUrl)}" class="btn btn-success" aria-pressed="true">Accept request</a>
+                                </div>
+                                <div class="col-md-6" align="center">
+                                    <spring:url value="/flats/{flatId}/requests/{requestId}/reject" var="rejectRequestUrl">
+                                        <spring:param name="flatId" value="${flatId}"/>
+                                        <spring:param name="requestId" value="${requests.get(i).id}"/>
+                                    </spring:url>
+                                    <a role="button" href="${fn:escapeXml(rejectRequestUrl)}" class="btn btn-danger" aria-pressed="true">Reject request</a>
+                                </div>
+                            </c:when>
+                            <c:when test="${requests.get(i).status == RequestStatus.ACCEPTED}">
+                                <c:choose>
+                                    <c:when test="${requests.get(i).startDate.isAfter(LocalDate.now())}">
+                                        <div class="col-md-12" align="center">
+                                            <spring:url value="/flats/{flatId}/requests/{requestId}/cancel" var="cancelRequestUrl">
+                                                <spring:param name="flatId" value="${flatId}"/>
+                                                <spring:param name="requestId" value="${requests.get(i).id}"/>
+                                            </spring:url>
+                                            <a role="button" href="${fn:escapeXml(cancelRequestUrl)}" class="btn btn-danger" aria-pressed="true">Cancel request</a>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="col-md-12" align="center">
+                                            <spring:url value="/flats/{flatId}/requests/{requestId}/conclude" var="concludeRequestUrl">
+                                                <spring:param name="flatId" value="${flatId}"/>
+                                                <spring:param name="requestId" value="${requests.get(i).id}"/>
+                                            </spring:url>
+                                            <a role="button" href="${fn:escapeXml(concludeRequestUrl)}" class="btn btn-warning" aria-pressed="true">Conclude request</a>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:when>
+                        </c:choose>
                         </div>
-                        <div class="col-md-4" align="center">
-                            <spring:url value="/advertisements/{advertisementId}/requests/{requestId}/reject" var="rejectRequestUrl">
-                                <spring:param name="advertisementId" value="${advId}"/>
-                                <spring:param name="requestId" value="${requests.get(i).id}"/>
-                            </spring:url>
-                            <a role="button" href="${fn:escapeXml(rejectRequestUrl)}" class="btn btn-danger" aria-pressed="true">Reject request</a>
-                        </div>
-                        <div class="col-md-4" align="center">
-                            <spring:url value="/messages/{username}" var="messageUrl">
-                                <spring:param name="username" value="${tenants.get(i).username}"/>
-                            </spring:url>
-                            <a role="button" href="${fn:escapeXml(messageUrl)}" class="btn btn-info" aria-pressed="true">Send message</a>
-                        </div>
-                        </c:if>
                     </sec:authorize>
                 </div>
             </div>
         </div>
     </c:forEach>
+    </div>
     </c:if>
 
 </flatbook:layout>

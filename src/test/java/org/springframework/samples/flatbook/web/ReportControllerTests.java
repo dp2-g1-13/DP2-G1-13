@@ -31,6 +31,7 @@ public class ReportControllerTests {
 	private static final Integer TEST_REPORT_ID = 1;
     private static final String TEST_CREATOR_USERNAME = "creator";
     private static final String TEST_REPORTED_USERNAME = "asignee";
+    private static final String TEST_BAD_REPORTED_USERNAME = "bad";
 
     @Autowired
     private MockMvc mockMvc;
@@ -61,21 +62,31 @@ public class ReportControllerTests {
         
         given(this.personService.findUserById(TEST_CREATOR_USERNAME)).willReturn(creator);
         given(this.personService.findUserById(TEST_REPORTED_USERNAME)).willReturn(reported);
+        given(this.reportService.findReportById(TEST_REPORT_ID)).willReturn(report);
     }
 
     @WithMockUser(value = TEST_CREATOR_USERNAME)
     @Test
     void testInitCreationForm() throws Exception {
-        mockMvc.perform(get("/users/{userId}/reports/new", TEST_REPORTED_USERNAME))
+        mockMvc.perform(get("/reports/{userId}/new", TEST_REPORTED_USERNAME))
             .andExpect(status().isOk())
             .andExpect(view().name("reports/createOrUpdateReportForm"))
             .andExpect(model().attributeExists("report"));
     }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME)
+    @Test
+    void testInitCreationFormThrowExceptionBadReportedUsername() throws Exception {
+        mockMvc.perform(get("/reports/{userId}/new", TEST_BAD_REPORTED_USERNAME))
+            .andExpect(status().isOk())
+            .andExpect(view().name("exception"));
+    }
+
 
     @WithMockUser(value = TEST_CREATOR_USERNAME)
     @Test
     void testProcessCreationFormSuccess() throws Exception {
-        mockMvc.perform(post("/users/{userId}/reports/new", TEST_REPORTED_USERNAME)
+        mockMvc.perform(post("/reports/{userId}/new", TEST_REPORTED_USERNAME)
             .with(csrf())
         	.param("creationDate", "01/01/2005")
         	.param("reason", "reason")
@@ -83,12 +94,25 @@ public class ReportControllerTests {
         	.param("sender", TEST_CREATOR_USERNAME))
             .andExpect(status().is3xxRedirection());
     }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME)
+    @Test
+    void testProcessCreationFormThrowExceptionBadReportedUsername() throws Exception {
+        mockMvc.perform(post("/reports/{userId}/new", TEST_BAD_REPORTED_USERNAME)
+            .with(csrf())
+        	.param("creationDate", "01/01/2005")
+        	.param("reason", "reason")
+        	.param("receiver", TEST_REPORTED_USERNAME)
+        	.param("sender", TEST_CREATOR_USERNAME))
+        	.andExpect(status().isOk())
+        	.andExpect(view().name("exception"));
+    }
 
     @WithMockUser(value = TEST_CREATOR_USERNAME)
     @Test
     void testProcessCreationFormHasErrors() throws Exception {
 
-        mockMvc.perform(post("/users/{userId}/reports/new", TEST_REPORTED_USERNAME)
+        mockMvc.perform(post("/reports/{userId}/new", TEST_REPORTED_USERNAME)
             .with(csrf())
             .param("creationDate", "01/01/2005")
         	.param("reason", "")
@@ -98,5 +122,47 @@ public class ReportControllerTests {
             .andExpect(model().attributeHasFieldErrors("report", "reason"))
             .andExpect(model().attributeHasFieldErrors("report", "receiver"))
             .andExpect(view().name("reports/createOrUpdateReportForm"));
+    }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME)
+    @Test
+    void testInitList() throws Exception {
+        mockMvc.perform(get("/reports/list"))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("reports"))
+            .andExpect(view().name("reports/reportsList"));
+    }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME)
+    @Test
+    void testInitUserList() throws Exception {
+        mockMvc.perform(get("/reports/{userId}/list", TEST_REPORTED_USERNAME))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists("username"))
+            .andExpect(model().attributeExists("reports"))
+            .andExpect(view().name("reports/reportsList"));
+    }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME)
+    @Test
+    void testInitUserListThrowExceptionBadUserId() throws Exception {
+        mockMvc.perform(get("/reports/{userId}/list", "baduser"))
+            .andExpect(status().isOk())
+            .andExpect(status().is2xxSuccessful());
+    }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME)
+    @Test
+    void testProcessReportRemovalSucess() throws Exception {
+        mockMvc.perform(get("/reports/{reportId}/delete", TEST_REPORT_ID))
+            .andExpect(status().is3xxRedirection());
+    }
+    
+    @WithMockUser(value = TEST_CREATOR_USERNAME)
+    @Test
+    void testProcessReportRemovalThrowExceptionBadReportId() throws Exception {
+        mockMvc.perform(get("/reports/{reportId}/delete", 000))
+        	.andExpect(status().isOk())
+        	.andExpect(status().is2xxSuccessful());
     }
 }

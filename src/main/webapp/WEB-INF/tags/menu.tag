@@ -22,22 +22,39 @@
 					<span>Home</span>
 				</flatbook:menuItem>
                 <sec:authorize access="hasAuthority('HOST')">
-				    <flatbook:menuItem active="${name eq 'flats'}" url="/flats/my-flats" title="find my flats">
+				    <flatbook:menuItem active="${name eq 'flats'}" url="/flats/list" title="find my flats">
 					    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
 					    <span>Find my flats</span>
 				    </flatbook:menuItem>
                 </sec:authorize>
 
+				<sec:authorize access="hasAnyAuthority('TENANT', 'HOST')">
 				<flatbook:menuItem active="${name eq 'messages'}" url="/messages/list" title="messages">
 					<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
 					<span>Messages</span>
 				</flatbook:menuItem>
+				</sec:authorize>
 
-				<flatbook:menuItem active="${name eq 'error'}" url="/oups" title="trigger a RuntimeException to see how it is handled">
-					<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-					<span>Error</span>
-				</flatbook:menuItem>
-
+				<sec:authorize access="hasAnyAuthority('ADMIN')">
+					<flatbook:menuItem active="${name eq 'statistics'}" url="/statistics" title="view the statistics">
+						<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+						<span>Statistics</span>
+					</flatbook:menuItem>
+				</sec:authorize>
+				
+				<sec:authorize access="hasAnyAuthority('ADMIN')">
+					<flatbook:menuItem active="${name eq 'reports'}" url="/reports/list" title="view the reports">
+						<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+						<span>Reports</span>
+					</flatbook:menuItem>
+				</sec:authorize>
+				
+				<sec:authorize access="hasAnyAuthority('ADMIN')">
+					<flatbook:menuItem active="${name eq 'userList'}" url="/users/list" title="view the users">
+						<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+						<span>User List</span>
+					</flatbook:menuItem>
+				</sec:authorize>
 			</ul>
 
 
@@ -75,6 +92,7 @@
 									</div>
 								</div>
 							</li>
+							<sec:authorize access="hasAnyAuthority('HOST','TENANT')">
 							<li class="divider"></li>
 
 							<li>
@@ -82,6 +100,7 @@
 									<div class="row">
 										<div class="col-lg-12">
 											<p>
+												<a href="/users/<sec:authentication property="name"/>" class="btn btn-primary btn-block">My User Page</a> 
 												<a href="/users/<sec:authentication property="name"/>/edit" class="btn btn-primary btn-block">My Profile</a> 
 												<a href="/users/<sec:authentication property="name"/>/editPassword"	class="btn btn-danger btn-block">Change Password</a>
 											</p>
@@ -89,8 +108,9 @@
 									</div>
 								</div>
 							</li>
-
+							</sec:authorize>
 						</ul></li>
+						
 				</sec:authorize>
 			</ul>
 		</div>

@@ -27,6 +27,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.samples.flatbook.model.mappers.ReviewForm;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +37,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Review extends BaseEntity {
+
+	public Review() {
+	}
+
+	public Review(final ReviewForm review) {
+		this.creationDate = review.getCreationDate();
+		this.modifiedDate = review.getModifiedDate();
+		this.description = review.getDescription();
+		this.rate = review.getRate();
+	}
+
 
 	@Column(name = "description")
 	private String		description;
@@ -52,4 +64,8 @@ public class Review extends BaseEntity {
 	@PastOrPresent
 	private LocalDate	creationDate;
 
+	@Column(name = "modified_date")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@PastOrPresent
+	private LocalDate	modifiedDate;
 }

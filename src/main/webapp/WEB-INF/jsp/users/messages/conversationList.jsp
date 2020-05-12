@@ -7,10 +7,20 @@
 <%@ taglib prefix="flatbook" tagdir="/WEB-INF/tags" %>
 
 <flatbook:layout pageName="messages">
-
+    <jsp:attribute name="customScript">
+        <script>
+            $(document).ready(function () {
+                var interval = setInterval(function () {
+                    $("#messagesListDiv").load("${pageContext.request.contextPath}/messages/list #messagesList");
+                }, 2000);
+            });
+         </script>
+    </jsp:attribute>
+    <jsp:body>
     <h2>
         Active conversations
     </h2>
+    <div id="messagesListDiv">
     <table id="messagesList" class="table table-striped">
         <thead>
         <tr>
@@ -39,22 +49,9 @@
         </c:forEach>
         </tbody>
     </table>
-    
-    <h2>
-        New message
-    </h2>
-    <form:form action="/messages/new" modelAttribute="message" class="form-horizontal" id="add-person-form">
-        <div class="form-group has-feedback">
-            <flatbook:inputField label="To " name="receiver.username"/>
-            <flatbook:textAreaField label="Message " name="body"/>
-            <form:hidden path="creationMoment"/>
-            <form:hidden path="sender.username"/>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                 <button class="btn btn-default" type="submit">Send</button>
-            </div>
-        </div>
-    </form:form>
-
+    </div>
+    <c:if test="${messages.size() == 0}">
+			<p>There are no chats to show, send a message to someone!</p>
+	</c:if>
+</jsp:body>
 </flatbook:layout>

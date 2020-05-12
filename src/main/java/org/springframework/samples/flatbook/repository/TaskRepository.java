@@ -1,18 +1,24 @@
+
 package org.springframework.samples.flatbook.repository;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.samples.flatbook.model.Task;
-
 import java.util.Collection;
+import java.util.Set;
+
+
+import org.springframework.samples.flatbook.model.Task;
 
 public interface TaskRepository {
 
-    Collection<Task> findAll() throws DataAccessException;
+	Collection<Task> findAll();
 
-    Task findById(int id) throws DataAccessException;
-    
-    void deleteById(int id) throws DataAccessException;
-    
-    void save(Task task) throws DataAccessException;
+	Task findById(int id);
+
+	void deleteById(int id);
+
+	void save(Task task);
+
+	Set<Task> findByFlatId(int id);
+
+	Set<Task> findByParticipant(String username);
 
 }

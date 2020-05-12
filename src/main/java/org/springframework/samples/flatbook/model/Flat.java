@@ -1,6 +1,7 @@
 
 package org.springframework.samples.flatbook.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -29,51 +30,72 @@ public class Flat extends BaseEntity {
 	@Column(name = "description")
 	@NotBlank
 	@Size(min = 30, max = 10000)
-	private String					description;
+	private String			description;
 
 	@Column(name = "square_meters")
 	@NotNull
 	@Positive
-	private Integer					squareMeters;
+	private Integer			squareMeters;
 
 	@Column(name = "number_rooms")
 	@NotNull
 	@Positive
-	private Integer					numberRooms;
+	private Integer			numberRooms;
 
 	@Column(name = "number_baths")
 	@NotNull
 	@Positive
-	private Integer					numberBaths;
+	private Integer			numberBaths;
 
 	@Column(name = "available_services")
 	@NotBlank
-	private String					availableServices;
+	private String			availableServices;
 
 	@Valid
 	@NotNull
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private Set<DBImage>		images;
+	private Set<DBImage>	images;
 
 	@Valid
 	@NotNull
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(cascade = {
+		CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST
+	}, fetch = FetchType.EAGER)
 	@JoinColumn(name = "address_id")
-	private Address					address;
+	private Address			address;
 
 	@Valid
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "flat_id")
 	private Set<FlatReview>	flatReviews;
 
 	@Valid
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "flat")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "flat")
 	private Set<Tenant>		tenants;
 
-	public void deleteImage(DBImage image) {
-	    if(image != null) {
-	        this.images.remove(image);
-        }
-    }
+	@Valid
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "flat_id")
+	private Set<Request>	requests;
+
+
+	public void deleteImage(final DBImage image) {
+		if (image != null) {
+			this.images.remove(image);
+		}
+	}
+
+	public void kickTenantOut(final Tenant tenant) {
+		if (tenant != null) {
+			this.tenants.remove(tenant);
+		}
+	}
+
+	public void addRequest(final Request request) {
+		if (this.requests == null) {
+			this.requests = new HashSet<>();
+		}
+		this.requests.add(request);
+	}
 
 }

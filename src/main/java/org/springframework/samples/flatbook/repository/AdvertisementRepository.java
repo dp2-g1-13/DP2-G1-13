@@ -1,29 +1,26 @@
-package org.springframework.samples.flatbook.repository;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.samples.flatbook.model.Advertisement;
+package org.springframework.samples.flatbook.repository;
 
 import java.util.Set;
 
+
+import org.springframework.samples.flatbook.model.Advertisement;
+
 public interface AdvertisementRepository {
 
-    Advertisement findById(int id) throws DataAccessException;
+	Set<Advertisement> findAll();
 
-    Boolean isAdvertisementWithFlatId(int flatId) throws DataAccessException;
+	Advertisement findById(int id);
 
-    Advertisement findAdvertisementWithFlatId(int flatId) throws DataAccessException;
+	Boolean isAdvertisementWithFlatId(int flatId);
 
-    Advertisement findAdvertisementWithRequestId(int requestId) throws DataAccessException;
+	Advertisement findAdvertisementWithFlatId(int flatId);
 
-    Set<Advertisement> findByCity(String city) throws DataAccessException;
+	void save(Advertisement advertisement);
 
-    Set<Advertisement> findByCityAndPostalCode(String city, String postalCode) throws DataAccessException;
+	void delete(Advertisement advertisement);
 
-    Set<Advertisement> findByCityAndCountry(String city, String country) throws DataAccessException;
+	Set<Advertisement> findByHost(String host);
 
-    Set<Advertisement> findByCityAndCountryAndPostalCode(String city, String country, String postalCode) throws DataAccessException;
-
-    void save(Advertisement advertisement);
-
-    void delete(Advertisement advertisement);
+	Integer numberOfAdvertisements();
 }

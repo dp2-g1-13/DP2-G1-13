@@ -3,6 +3,7 @@ package org.springframework.samples.flatbook.web;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,6 @@ import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,7 +22,6 @@ import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.service.MessageService;
 import org.springframework.samples.flatbook.service.PersonService;
-import org.springframework.samples.flatbook.service.exceptions.UserNotExistException;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -145,26 +144,23 @@ class MessageControllerTests {
 
 	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
-	void testProcessSendFormSuccess() throws Exception {
+	void testInitConversation() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
 		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(map);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME1)).willReturn(this.person1);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME2)).willReturn(this.person2);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/new")
-			.with(SecurityMockMvcRequestPostProcessors.csrf())
-			.param("body", this.message1.getBody())
-			.param("creationMoment", this.message1.getCreationMoment().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-			.param("receiver.username", this.message1.getReceiver().getUsername())
-			.param("sender.username", this.message1.getSender().getUsername()))
-			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
+		this.mockMvc.perform(MockMvcRequestBuilders.get("/messages/{username}", USERNAME2))
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.view().name("users/messages/conversation"))
+			.andExpect(MockMvcResultMatchers.model().attributeExists("message"))
+			.andExpect(MockMvcResultMatchers.model().attributeExists("messages"));
 	}
-
+	
 	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
-	void testInitConversation() throws Exception {
-		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
-		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(map);
+	void testInitConversationEmpty() throws Exception {
+		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(new HashMap<>());
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME1)).willReturn(this.person1);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME2)).willReturn(this.person2);
 
@@ -195,18 +191,17 @@ class MessageControllerTests {
 
 	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
 	@Test
-	void testProcessSendFormWithCantReceiveYourOwnMessageError() throws Exception {
+	void testProcessSendFormWithCantReceiveYourOwnMessageException() throws Exception {
 		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
 		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(map);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME1)).willReturn(this.person1);
-		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME2)).willReturn(this.person2);
 
-		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/{username}/new", USERNAME2)
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/{username}/new", USERNAME1)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
 			.param("body", this.message1.getBody())
 			.param("creationMoment", this.message1.getCreationMoment().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-			.param("receiver.username", this.message1.getReceiver().getUsername())
-			.param("sender.username", this.message1.getSender().getUsername()))
+			.param("receiver.username", USERNAME1)
+			.param("sender.username", USERNAME1))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 		}
 
@@ -217,13 +212,30 @@ class MessageControllerTests {
 		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(map);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME1)).willReturn(this.person1);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME2)).willReturn(this.person2);
-		BDDMockito.lenient().doThrow(UserNotExistException.class).when(this.messageService).saveMessage(Mockito.any(Message.class));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/{username}/new", USERNAME2)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())
 			.param("body", this.message2.getBody())
 			.param("creationMoment", this.message2.getCreationMoment().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
-			.param("receiver.username", this.message2.getReceiver().getUsername())
+			.param("receiver.username", "notexists")
+			.param("sender.username", this.message2.getSender().getUsername()))
+			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
+		}
+	
+	@WithMockUser(username = MessageControllerTests.USERNAME1, authorities = MessageControllerTests.TENANT_USER)
+	@Test
+	void testProcessSendFormWithUserIsBanned() throws Exception {
+		Map<String, List<Message>> map = Maps.newHashMap(this.person2.getUsername(), Lists.list(message1, message2, message3, message4, message5));
+		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(map);
+		this.person2.setEnabled(false);
+		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME1)).willReturn(this.person1);
+		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME2)).willReturn(this.person2);
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/{username}/new", USERNAME2)
+			.with(SecurityMockMvcRequestPostProcessors.csrf())
+			.param("body", this.message2.getBody())
+			.param("creationMoment", this.message2.getCreationMoment().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
+			.param("receiver.username", MessageControllerTests.USERNAME2)
 			.param("sender.username", this.message2.getSender().getUsername()))
 			.andExpect(MockMvcResultMatchers.status().is2xxSuccessful());
 		}
@@ -235,7 +247,6 @@ class MessageControllerTests {
 		BDDMockito.given(this.messageService.findMessagesByParticipant(MessageControllerTests.USERNAME1)).willReturn(map);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME1)).willReturn(this.person1);
 		BDDMockito.given(this.personService.findUserById(MessageControllerTests.USERNAME2)).willReturn(this.person2);
-		BDDMockito.lenient().doThrow(UserNotExistException.class).when(this.messageService).saveMessage(this.message1);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/messages/{username}/new", USERNAME2)
 			.with(SecurityMockMvcRequestPostProcessors.csrf())

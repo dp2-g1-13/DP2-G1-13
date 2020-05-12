@@ -6,27 +6,43 @@
 
 <flatbook:layout pageName="advertisements">
 
-    <h2>These are the results:</h2>
+    <jsp:attribute name="customScript">
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNGjohXXlwq4qcQE66tjVEnfXa5WqM-4c&libraries=places&language=en"></script>
+        <script>$(document).ready(function() {
+            initMap(<c:out value="${latitude}"/>, <c:out value="${longitude}"/>, 10);
+            <c:set var="first" value="true"/>
 
-    <c:forEach items="${selections}" var="advertisement">
-        <div class="panel panel-default">
-            <div class="panel-heading"><h4><c:out value="${advertisement.title}" /></h4></div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><c:out value="${advertisement.description}"/></p>
+            var advertisements = [
+                    {
+        <c:forEach items="${selections}" var="adv">
+            <c:choose>
+                <c:when test="${first != 'true'}">
+                    ,{
+                </c:when>
+                <c:otherwise>
+                    <c:set var="first" value="false"/>
+                </c:otherwise>
+            </c:choose>
+                        title: "${adv.title} - <fmt:formatNumber type="number" minFractionDigits="2" value="${adv.pricePerMonth}"/> \u20AC",
+                        position: new google.maps.LatLng(${adv.flat.address.latitude}, ${adv.flat.address.longitude})
+                    }
+        </c:forEach>
+            ];
+            createMarkers(advertisements);
 
-                        <p><strong><fmt:formatNumber type="number" minFractionDigits="2" value="${advertisement.pricePerMonth}" /> &euro;</strong></p>
-                    </div>
-                    <div class="col-md-6">
-                        <spring:url value="/advertisements/{advertisementId}" var="advertisementUrl">
-                            <spring:param name="advertisementId" value="${advertisement.id}"/>
-                        </spring:url>
-                        <a role="button" href="${fn:escapeXml(advertisementUrl)}" class="btn btn-default" aria-pressed="true">See details</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </c:forEach>
+        });
+        </script>
+
+
+    </jsp:attribute>
+    <jsp:body>
+
+        <h2>These are the results:</h2>
+
+        <div id="map"></div>
+        <br>
+        <%@include file="/WEB-INF/jsp/advertisements/advertisementsListPanel.jsp"%>
+
+    </jsp:body>
 
 </flatbook:layout>

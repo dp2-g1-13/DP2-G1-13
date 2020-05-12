@@ -7,7 +7,7 @@ public enum SaveType {
 	private final String type;
 
 
-	private SaveType(final String type) {
+	SaveType(final String type) {
 		this.type = type;
 	}
 

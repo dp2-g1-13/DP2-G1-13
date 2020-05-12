@@ -1,21 +1,34 @@
+
 package org.springframework.samples.flatbook.repository;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.samples.flatbook.model.Flat;
-import org.springframework.samples.flatbook.model.Tenant;
-
-import java.util.Collection;
 import java.util.Set;
+
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.samples.flatbook.model.Flat;
 
 public interface FlatRepository {
 
-    Set<Flat> findAll() throws DataAccessException;
+	Set<Flat> findAll();
 
-    Flat findById(int id) throws DataAccessException;
+	Flat findById(int id);
 
-    Set<Flat> findByHostUsername(String username) throws DataAccessException;
+	Set<Flat> findByHostUsername(String username);
 
-    Collection<Tenant> findTenantsById(int id) throws DataAccessException;
+	void save(Flat flat);
 
-    void save(Flat flat) throws DataAccessException;
+    void delete(Flat flat);
+    void deleteById(int id);
+
+	Flat findByReviewId(Integer reviewId);
+
+	Page<Flat> topBestReviewedFlats(Pageable pageable);
+
+	Page<Flat> topWorstReviewedFlats(Pageable pageable);
+
+	Integer numberOfFlats();
+
+	Flat findFlatWithRequestId(int requestId);
+
 }

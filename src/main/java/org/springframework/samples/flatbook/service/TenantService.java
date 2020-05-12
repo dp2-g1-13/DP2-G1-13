@@ -4,7 +4,6 @@ package org.springframework.samples.flatbook.service;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.repository.TenantRepository;
 import org.springframework.stereotype.Service;
@@ -15,28 +14,35 @@ public class TenantService {
 
 	private TenantRepository tenantRepository;
 
+
 	@Autowired
-	public TenantService(TenantRepository tenantRepository) {
+	public TenantService(final TenantRepository tenantRepository) {
 		this.tenantRepository = tenantRepository;
 	}
 
 	@Transactional(readOnly = true)
-	public Tenant findTenantById(String username) throws DataAccessException {
+	public Tenant findTenantById(final String username) {
 		return this.tenantRepository.findByUsername(username);
 	}
 
 	@Transactional(readOnly = true)
-	public Collection<Tenant> findAllTenants() throws DataAccessException {
+	public Collection<Tenant> findAllTenants() {
 		return this.tenantRepository.findAll();
 	}
 
 	@Transactional
-    public void saveTenant(Tenant tenant) throws DataAccessException {
-        this.tenantRepository.save(tenant);
-    }
+	public void saveTenant(final Tenant tenant) {
+		this.tenantRepository.save(tenant);
+	}
 
-    @Transactional(readOnly = true)
-    public Tenant findTenantByRequestId(int requestId) throws DataAccessException {
-        return this.tenantRepository.findByRequestId(requestId);
-    }
+	@Transactional(readOnly = true)
+	public Tenant findTenantByRequestId(final int requestId) {
+		return this.tenantRepository.findByRequestId(requestId);
+	}
+
+	@Transactional(readOnly = true)
+	public Tenant findTenantByReviewId(final int reviewId) {
+		return this.tenantRepository.findByReviewId(reviewId);
+	}
+
 }

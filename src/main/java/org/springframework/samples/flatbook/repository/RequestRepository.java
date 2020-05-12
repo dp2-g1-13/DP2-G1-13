@@ -1,18 +1,31 @@
-package org.springframework.samples.flatbook.repository;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.samples.flatbook.model.Request;
+package org.springframework.samples.flatbook.repository;
 
 import java.util.Set;
 
+
+import org.springframework.samples.flatbook.model.Request;
+
 public interface RequestRepository {
 
-    Request findById(int id) throws DataAccessException;
+	Request findById(int id);
 
-    Set<Request> findManyByTenantUsername(String username) throws DataAccessException;
+	Set<Request> findManyByTenantUsername(String username);
 
-    Boolean isThereRequestOfTenantByAdvertisementId(String tenantUser, int advId) throws DataAccessException;
+	Boolean isThereRequestOfTenantByFlatId(String tenantUser, int advId);
 
-    void save(Request request) throws DataAccessException;
+	void save(Request request);
+
+	void delete(Request request);
+
+	Double ratioOfAcceptedRequests();
+
+	Double ratioOfRejectedRequests();
+
+	Double ratioOfCanceledRequests();
+
+	Double ratioOfFinishedRequests();
+
+	Integer numberOfRequests();
 
 }
