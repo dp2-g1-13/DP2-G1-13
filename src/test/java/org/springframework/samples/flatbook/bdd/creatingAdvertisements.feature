@@ -21,3 +21,10 @@ Feature: Creating advertisements (UH 4)
     Given I am not logged in the system
     When I do login as user "mmcgaheye"
     Then The system says that my user is disabled
+
+  Scenario: Fail advertisement creation because already exists one (Negative)
+    Given I am not logged in the system
+    When I do login as user "rbordessa0"
+    And I go to my flats page
+    And I try to create an advertisement for the first flat
+    Then The "Publish an ad" button doesnt exists
