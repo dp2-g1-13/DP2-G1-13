@@ -6,7 +6,7 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
-class UH2PerformanceTest extends Simulation {
+class UH4PerformanceTest extends Simulation {
 
   val httpProtocol = http
     .baseUrl("http://www.dp2.com")
@@ -62,8 +62,8 @@ class UH2PerformanceTest extends Simulation {
       .pause(16)
   }
 
-  object NewFlatForm {
-    var newFlatForm = exec(http("NewFlatForm")
+  object NewFlatNewAdvertisement {
+    var newFlatNewAdvertisement = exec(http("NewFlatForm")
       .get("/flats/new")
       .headers(headers_0)
       .check(css("input[name=_csrf]", "value").saveAs("stoken")))
@@ -96,6 +96,29 @@ class UH2PerformanceTest extends Simulation {
         .get("${nextPageLocation}")
         .headers(headers_0))
       .pause(20)
+      .exec(http("NewAdvertisementForm")
+        .get("${nextPageLocation}" + "/advertisements/new")
+        .headers(headers_0)
+        .check(css("input[name=_csrf]", "value").saveAs("stoken2")))
+      .pause(35)
+      .exec(http("AdvertisementCreated")
+        .post("${nextPageLocation}" + "/advertisements/new")
+        .headers(headers_2)
+        .formParam("title", "New Advertisement")
+        .formParam("description", "Advertisement description")
+        .formParam("requirements", "There are no requirements for this flat")
+        .formParam("pricePerMonth", "250.90")
+        .formParam("_csrf", "${stoken2}")
+        .check(
+          status.is(302),
+          header("Location").saveAs("nextPageLocation2")
+        ))
+      .pause(22)
+      .exec(http("request_2")
+        .get("${nextPageLocation2}")
+        .headers(headers_0))
+      .pause(22)
+
   }
 
   object TenantLogin {
@@ -117,29 +140,35 @@ class UH2PerformanceTest extends Simulation {
       .pause(18)
   }
 
-  object NewFlatForbidden {
-    var newFlatForbidden = exec(http("NewFlatForbidden")
-      .get("/flats/new")
+  object NewAdvertisementForbidden {
+    var newAdvertisementForbidden = exec(http("NewAdvertisementForbidden")
+      .get("/flats/46/advertisements/new")
       .headers(headers_0)
+      .resources(http("request_11")
+        .get("/login")
+        .headers(headers_9))
       .check(status.is(403)))
-      .pause(10)
+      .pause(17)
   }
 
-  val createFlatByHostScn = scenario("CreateFlatByHost")
+  val createAdvertisementByHostScn = scenario("CreateAdvertisementByHost")
     .exec(
       Home.home,
       HostLogin.hostLogin,
       FindMyFlats.findMyFlats,
-      NewFlatForm.newFlatForm)
+      NewFlatNewAdvertisement.newFlatNewAdvertisement)
 
-  val createFlatByTenantScn = scenario("CreateFlatByTenant")
+  val createAdvertisementByTenantScn = scenario("CreateAdvertisementByTenant")
     .exec(
       Home.home,
       TenantLogin.tenantLogin,
-      NewFlatForbidden.newFlatForbidden)
+      NewAdvertisementForbidden.newAdvertisementForbidden)
 
   setUp(
-    createFlatByHostScn.inject(rampUsers(10) during (10 seconds)),
-    createFlatByTenantScn.inject(rampUsers(10) during (10 seconds))
+    createAdvertisementByHostScn.inject(rampUsers(10) during (10 seconds)),
+    createAdvertisementByTenantScn.inject(rampUsers(10) during (10 seconds))
   ).protocols(httpProtocol)
+
+
+
 }

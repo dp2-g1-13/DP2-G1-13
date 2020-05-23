@@ -6,7 +6,7 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
-class UH2PerformanceTest extends Simulation {
+class UH3PerformanceTest extends Simulation {
 
   val httpProtocol = http
     .baseUrl("http://www.dp2.com")
@@ -36,8 +36,8 @@ class UH2PerformanceTest extends Simulation {
       .headers(headers_0))
       .pause(9)
   }
-  object HostLogin {
-    val hostLogin = exec(http("HostLogin")
+  object HostLoginScn1 {
+    val hostLogin = exec(http("HostLoginScn1")
       .get("/login")
       .headers(headers_0)
       .check(css("input[name=_csrf]", "value").saveAs("stoken")))
@@ -46,6 +46,25 @@ class UH2PerformanceTest extends Simulation {
         .post("/login")
         .headers(headers_2)
         .formParam("username", "rbordessa0")
+        .formParam("password", "Is-Dp2-G1-13")
+        .formParam("_csrf", "${stoken}")
+        .resources(http("request_3")
+          .get("/")
+          .headers(headers_0))
+        .check(status.is(302)))
+      .pause(22)
+  }
+
+  object HostLoginScn2 {
+    val hostLogin = exec(http("HostLoginScn2")
+      .get("/login")
+      .headers(headers_0)
+      .check(css("input[name=_csrf]", "value").saveAs("stoken")))
+      .pause(22)
+      .exec(http("HostLogged")
+        .post("/login")
+        .headers(headers_2)
+        .formParam("username", "rjurries7")
         .formParam("password", "Is-Dp2-G1-13")
         .formParam("_csrf", "${stoken}")
         .resources(http("request_3")
@@ -98,48 +117,53 @@ class UH2PerformanceTest extends Simulation {
       .pause(20)
   }
 
-  object TenantLogin {
-    val tenantLogin = exec(http("TenantLogin")
-      .get("/login")
-      .headers(headers_0)
-      .check(css("input[name=_csrf]", "value").saveAs("stoken")))
-      .pause(22)
-      .exec(http("TenantLogged")
-        .post("/login")
-        .headers(headers_2)
-        .formParam("username", "rdunleavy0")
-        .formParam("password", "Is-Dp2-G1-13")
-        .formParam("_csrf", "${stoken}")
-        .resources(http("request_14")
-          .get("/")
-          .headers(headers_0))
-        .check(status.is(302)))
-      .pause(18)
-  }
-
-  object NewFlatForbidden {
-    var newFlatForbidden = exec(http("NewFlatForbidden")
+  object NewFlatFormBadAddress {
+    var newFlatForm = exec(http("NewFlatForm")
       .get("/flats/new")
       .headers(headers_0)
-      .check(status.is(403)))
-      .pause(10)
+      .check(css("input[name=_csrf]", "value").saveAs("stoken")))
+      .pause(48)
+      .exec(http("FlatBadAddress")
+        .post("/flats/new")
+        .headers(headers_6)
+        .formParam("description", "This is a sample description with more than 30 characters")
+        .formParam("squareMeters", "90")
+        .formParam("numberRooms", "2")
+        .formParam("numberBaths", "2")
+        .formParam("availableServices", "Wifi")
+        .formParam("address.address", "This address does not exist")
+        .formParam("address.city", "This city does not exist")
+        .formParam("address.postalCode", "12345")
+        .formParam("address.country", "This country does not exist")
+        .formUpload("images", "dp2/uh2/images/pivotal-logo.png")
+        .formUpload("images", "dp2/uh2/images/pivotal-logo2.png")
+        .formUpload("images", "dp2/uh2/images/pivotal-logo3.png")
+        .formUpload("images", "dp2/uh2/images/pivotal-logo4.png")
+        .formUpload("images", "dp2/uh2/images/pivotal-logo5.png")
+        .formUpload("images", "dp2/uh2/images/pivotal-logo6.png")
+        .formParam("_csrf", "${stoken}")
+        .check(
+          status.in(200 to 210)
+        ))
+      .pause(20)
   }
 
-  val createFlatByHostScn = scenario("CreateFlatByHost")
+  val createFlatExistingAddress = scenario("CreateFlatExistingAddress")
     .exec(
       Home.home,
-      HostLogin.hostLogin,
+      HostLoginScn1.hostLogin,
       FindMyFlats.findMyFlats,
       NewFlatForm.newFlatForm)
 
-  val createFlatByTenantScn = scenario("CreateFlatByTenant")
+  val createFlatBadAddress = scenario("CreateFlatBadAddress")
     .exec(
       Home.home,
-      TenantLogin.tenantLogin,
-      NewFlatForbidden.newFlatForbidden)
+      HostLoginScn2.hostLogin,
+      FindMyFlats.findMyFlats,
+      NewFlatFormBadAddress.newFlatForm)
 
   setUp(
-    createFlatByHostScn.inject(rampUsers(10) during (10 seconds)),
-    createFlatByTenantScn.inject(rampUsers(10) during (10 seconds))
+    createFlatExistingAddress.inject(rampUsers(10) during (10 seconds)),
+    createFlatBadAddress.inject(rampUsers(10) during (10 seconds))
   ).protocols(httpProtocol)
 }
