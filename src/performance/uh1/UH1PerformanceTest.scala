@@ -10,7 +10,7 @@ class UH1PerformanceTest extends Simulation {
 
 	val httpProtocol = http
 		.baseUrl("http://www.dp2.com")
-		.inferHtmlResources(BlackList(""".*.css""", """.*.js""", """.*.ico""", """.*.png""", """.*.jpg""", """.*.jpeg"""), WhiteList())
+		.inferHtmlResources(BlackList(""".*.css""", """.*.js""", """.*js.*""", """.*.ico""", """.*.png""", """.*.jpg""", """.*.jpeg"""), WhiteList())
 		.acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 		.acceptEncodingHeader("gzip, deflate")
 		.acceptLanguageHeader("es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3")
@@ -31,29 +31,28 @@ class UH1PerformanceTest extends Simulation {
 			.pause(9)
 	}
 
-	object RegisterForm {
-		val registerForm = exec(http("RegisterForm")
+	object Register {
+		val register = exec(http("Register")
 			.get("/users/new")
-			.headers(headers_0))
-			.pause(25)
-	}
-
-	object RegisteredAndLogged {
-		val registeredAndLogged = exec(http("Registered&Logged")
+			.headers(headers_0)
+			.check(css("input[name=_csrf]", "value").saveAs("stoken")))
+		.pause(25)
+		.feed(csv("data_registerUser.csv"))
+		.exec(http("Register")
 			.post("/users/new")
 			.headers(headers_2)
-			.formParam("username", "perftestinghost")
-			.formParam("authority", "HOST")
+			.formParam("username", "${username}")
+			.formParam("authority", "${authority}")
 			.formParam("password", "Is-Dp2-G1-13")
 			.formParam("confirmPassword", "Is-Dp2-G1-13")
-			.formParam("firstName", "Performance")
-			.formParam("lastName", "Testing")
-			.formParam("dni", "33366699W")
-			.formParam("email", "performancetesting@dp2.com")
-			.formParam("phoneNumber", "333555777")
+			.formParam("firstName", "${firstName}")
+			.formParam("lastName", "${lastName}")
+			.formParam("dni", "${dni}")
+			.formParam("email", "${email}")
+			.formParam("phoneNumber", "${phoneNumber}")
 			.formParam("saveType", "NEW")
-			.formParam("_csrf", "a684da09-7d84-4e41-a0b7-b6c42706275a")
-			.resources(http("request_3")
+			.formParam("_csrf", "${stoken}")
+			.resources(http("Register")
 				.get("/favicon.ico")
 				.headers(headers_3)))
 			.pause(15)
@@ -61,6 +60,11 @@ class UH1PerformanceTest extends Simulation {
 
 	object NotRegisteredErrors {
 		val notRegisteredErrors = exec(http("NotRegisteredErrors")
+			.get("/users/new")
+			.headers(headers_0)
+			.check(css("input[name=_csrf]", "value").saveAs("stoken")))
+		.pause(25)
+		.exec(http("NotRegisteredErrors")
 			.post("/users/new")
 			.headers(headers_2)
 			.formParam("username", "perftestingwrong")
@@ -73,20 +77,17 @@ class UH1PerformanceTest extends Simulation {
 			.formParam("email", "perftestingwrong@dp2.com")
 			.formParam("phoneNumber", "")
 			.formParam("saveType", "NEW")
-			.formParam("_csrf", "6c11f47b-34f0-4b42-9e11-3f836fad8aea"))
+			.formParam("_csrf", "${stoken}"))
 			.pause(36)
 	}
 
 	val registeredScn = scenario("Registered").exec(Home.home,
-		RegisterForm.registerForm,
-		RegisteredAndLogged.registeredAndLogged)
+													Register.register)
 
 	val notRegisteredScn = scenario("NotRegistered").exec(Home.home,
-		RegisterForm.registerForm,
-		NotRegisteredErrors.notRegisteredErrors)
-
+													NotRegisteredErrors.notRegisteredErrors)
 	setUp(
-		registeredScn.inject(atOnceUsers(1)),
-		notRegisteredScn.inject(atOnceUsers(1))
+		registeredScn.inject(atOnceUsers(15)),
+		notRegisteredScn.inject(atOnceUsers(15))
 	).protocols(httpProtocol)
 }
