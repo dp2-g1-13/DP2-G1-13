@@ -6,7 +6,7 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
-class UH4PerformanceTest extends Simulation {
+class UH6PerformanceTest extends Simulation {
 
   val httpProtocol = http
     .baseUrl("http://www.dp2.com")
@@ -125,6 +125,14 @@ class UH4PerformanceTest extends Simulation {
       .pause(22)
   }
 
+	  object DeleteAdvertisement {
+		   val deleteAdvertisement = exec(http("DeleteAdvertisement")
+			 .get("${createdAdvertisement}" + "/delete")
+			 .headers(headers_0)
+			 .check(status.is(302)))
+		   .pause(22)
+	  }
+
   object TenantLogin {
     val tenantLogin = exec(http("TenantLogin")
       .get("/login")
@@ -155,23 +163,24 @@ class UH4PerformanceTest extends Simulation {
       .pause(17)
   }
 
-  val createAdvertisementByHostScn = scenario("CreateAdvertisementByHost")
+  val deleteAdvertisement = scenario("DeleteAdvertisement")
     .exec(
       Home.home,
       HostLogin.hostLogin,
       FindMyFlats.findMyFlats,
       NewFlat.newFlat,
-	  NewAdvertisement.newAdvertisement)
+	  NewAdvertisement.newAdvertisement,
+	  DeleteAdvertisement.deleteAdvertisement)
 
-  val createAdvertisementByTenantScn = scenario("CreateAdvertisementByTenant")
+  val deleteAdvertisementForbidden = scenario("DeleteAdvertisementForbidden")
     .exec(
       Home.home,
       TenantLogin.tenantLogin,
       NewAdvertisementForbidden.newAdvertisementForbidden)
 
   setUp(
-    createAdvertisementByHostScn.inject(rampUsers(10) during (10 seconds)),
-    createAdvertisementByTenantScn.inject(rampUsers(10) during (10 seconds))
+    deleteAdvertisement.inject(rampUsers(10) during (10 seconds)),
+    deleteAdvertisementForbidden.inject(rampUsers(10) during (10 seconds))
   ).protocols(httpProtocol)
 
 

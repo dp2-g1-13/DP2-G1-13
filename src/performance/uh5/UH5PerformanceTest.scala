@@ -6,7 +6,7 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
-class UH4PerformanceTest extends Simulation {
+class UH5PerformanceTest extends Simulation {
 
   val httpProtocol = http
     .baseUrl("http://www.dp2.com")
@@ -97,33 +97,15 @@ class UH4PerformanceTest extends Simulation {
         .get("${createdFlat}")
         .headers(headers_0))
       .pause(20)
+	  }   
+
+	  object DeleteFlat {
+		   val deleteFlat = exec(http("DeleteFlat")
+			 .get("${createdFlat}" + "/delete")
+			 .headers(headers_0)
+			 .check(status.is(302)))
+		   .pause(22)
 	  }
-	  
-      object NewAdvertisement {
-	   val newAdvertisement = exec(http("NewAdvertisement")
-         .get("${createdFlat}" + "/advertisements/new")
-         .headers(headers_0)
-         .check(css("input[name=_csrf]", "value").saveAs("stoken2")))
-       .pause(35)
-       .feed(csv("data_createAdvertisement.csv"))
-       .exec(http("AdvertisementCreated")
-        .post("${createdFlat}" + "/advertisements/new")
-        .headers(headers_2)
-        .formParam("title", "${title}")
-        .formParam("description", "${description}")
-        .formParam("requirements", "${requirements}")
-        .formParam("pricePerMonth", "${pricePerMonth}")
-        .formParam("_csrf", "${stoken2}")
-        .check(
-          status.is(302),
-          header("Location").saveAs("createdAdvertisement")
-        ))
-      .pause(22)
-      .exec(http("AdvertisementCreated")
-        .get("${createdAdvertisement}")
-        .headers(headers_0))
-      .pause(22)
-  }
 
   object TenantLogin {
     val tenantLogin = exec(http("TenantLogin")
@@ -144,34 +126,34 @@ class UH4PerformanceTest extends Simulation {
       .pause(18)
   }
 
-  object NewAdvertisementForbidden {
-    var newAdvertisementForbidden = exec(http("NewAdvertisementForbidden")
-      .get("/flats/46/advertisements/new")
+  object NewFlatForbidden {
+    var newFlatForbidden = exec(http("NewFlatForbidden")
+      .get("/flats/new")
       .headers(headers_0)
-      .resources(http("NewAdvertisementForbidden")
+      .resources(http("NewFlatForbidden")
         .get("/login")
         .headers(headers_9))
       .check(status.is(403)))
       .pause(17)
   }
 
-  val createAdvertisementByHostScn = scenario("CreateAdvertisementByHost")
+  val deleteFlat = scenario("DeleteFlat")
     .exec(
       Home.home,
       HostLogin.hostLogin,
       FindMyFlats.findMyFlats,
       NewFlat.newFlat,
-	  NewAdvertisement.newAdvertisement)
+	  DeleteFlat.deleteFlat)
 
-  val createAdvertisementByTenantScn = scenario("CreateAdvertisementByTenant")
+  val deleteFlatForbidden = scenario("DeleteFlatForbidden")
     .exec(
       Home.home,
       TenantLogin.tenantLogin,
-      NewAdvertisementForbidden.newAdvertisementForbidden)
+      NewFlatForbidden.newFlatForbidden)
 
   setUp(
-    createAdvertisementByHostScn.inject(rampUsers(10) during (10 seconds)),
-    createAdvertisementByTenantScn.inject(rampUsers(10) during (10 seconds))
+    deleteFlat.inject(rampUsers(10) during (10 seconds)),
+    deleteFlatForbidden.inject(rampUsers(10) during (10 seconds))
   ).protocols(httpProtocol)
 
 
