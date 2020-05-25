@@ -77,7 +77,7 @@ class UH4PerformanceTest extends Simulation {
         .formParam("numberRooms", "${numberRooms}")
         .formParam("numberBaths", "${numberBaths}")
         .formParam("availableServices", "${availableServices}")
-        .formParam("address.address", "Calle Sierpes")
+        .formParam("address.location", "Calle Sierpes")
         .formParam("address.city", "Sevilla")
         .formParam("address.postalCode", "41004")
         .formParam("address.country", "Spain")

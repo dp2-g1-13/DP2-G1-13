@@ -29,7 +29,7 @@ public class AddressValidatorTests {
     @BeforeEach
     void setup() {
         address = new Address();
-        address.setAddress("Av. de la República Argentina 72");
+        address.setLocation("Av. de la República Argentina 72");
         address.setCity("Sevilla");
         address.setCountry("Spain");
         address.setPostalCode("41011");
@@ -38,14 +38,14 @@ public class AddressValidatorTests {
     @Test
     void shouldNotValidateWhenAddressEmpty() {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        address.setAddress("");
+        address.setLocation("");
 
         Validator validator = createValidator();
         Set<ConstraintViolation<Address>> constraintViolations = validator.validate(address);
 
         assertThat(constraintViolations.size()).isEqualTo(1);
         ConstraintViolation<Address> violation = constraintViolations.iterator().next();
-        assertThat(violation.getPropertyPath().toString()) .isEqualTo("address");
+        assertThat(violation.getPropertyPath().toString()).isEqualTo("location");
         assertThat(violation.getMessage()).isEqualTo("must not be blank");
     }
 
@@ -126,7 +126,7 @@ public class AddressValidatorTests {
     })
     void shouldValidate(String address, String city, String postalCode, String country) {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
-        this.address.setAddress(address);
+        this.address.setLocation(address);
         this.address.setCity(city);
         this.address.setPostalCode(postalCode);
         this.address.setCountry(country);

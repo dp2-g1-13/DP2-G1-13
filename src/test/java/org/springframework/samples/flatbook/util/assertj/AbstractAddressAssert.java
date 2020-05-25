@@ -32,7 +32,7 @@ public abstract class AbstractAddressAssert<S extends AbstractAddressAssert<S, A
     String assertjErrorMessage = "\nExpecting address of:\n  <%s>\nto be:\n  <%s>\nbut was:\n  <%s>";
 
     // null safe check
-    String actualAddress = actual.getAddress();
+    String actualAddress = actual.getLocation();
     if (!Objects.areEqual(actualAddress, address)) {
       failWithMessage(assertjErrorMessage, actual, address, actualAddress);
     }

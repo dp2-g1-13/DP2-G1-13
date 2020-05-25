@@ -23,7 +23,7 @@
             </tr>
             <tr>
                 <th>Address</th>
-                <td><c:out value="${flat.address.address}"/></td>
+                <td><c:out value="${flat.address.location}"/></td>
             </tr>
             <tr>
                 <th>City</th>

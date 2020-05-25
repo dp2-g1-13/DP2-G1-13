@@ -96,7 +96,7 @@ class FlatControllerTests {
         Set<DBImage> images = new HashSet<>();
 
         Address address = new Address();
-        address.setAddress("Avenida de la República Argentina");
+        address.setLocation("Avenida de la República Argentina");
         address.setPostalCode("41011");
         address.setCity("Sevilla");
         address.setCountry("Spain");
@@ -209,7 +209,7 @@ class FlatControllerTests {
             return flat;
         }).given(this.dbImageService).deleteImage(image);
         try {
-			BDDMockito.given(this.geocodeAPIService.getGeocodeData(address.getAddress() + ", " + address.getCity())).willReturn(response);
+			BDDMockito.given(this.geocodeAPIService.getGeocodeData(address.getLocation() + ", " + address.getCity())).willReturn(response);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_ADDRESS_NOT_EXISTS + ", " + TEST_CITY_FLAT_NOT_EXISTS)).willReturn(responseZeroResults);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_ADDRESS_NOT_EXISTS + ", " + address.getCity())).willReturn(responseError);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_CITY_FLAT + ", " + TEST_COUNTRY_FLAT + " " + TEST_POSTAL_CODE_FLAT)).willReturn(response);
@@ -249,7 +249,7 @@ class FlatControllerTests {
             .param("numberRooms", "2")
             .param("numberBaths", "2")
             .param("availableServices", "Wifi and cable TV")
-            .param("address.address", "Avenida de la República Argentina")
+            .param("address.location", "Avenida de la República Argentina")
             .param("address.postalCode", "41011")
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))
@@ -279,7 +279,7 @@ class FlatControllerTests {
             .param("squareMeters", "90")
             .param("numberBaths", "0")
             .param("availableServices", "Wifi and cable TV")
-            .param("address.address", "Avenida de la República Argentina")
+            .param("address.location", "Avenida de la República Argentina")
             .param("address.postalCode", "41011")
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))
@@ -308,7 +308,7 @@ class FlatControllerTests {
             .param("numberRooms", "2")
             .param("numberBaths", "2")
             .param("availableServices", "Wifi and cable TV")
-            .param("address.address", "Avenida de la República Argentina")
+            .param("address.location", "Avenida de la República Argentina")
             .param("address.postalCode", "41011")
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))
@@ -341,13 +341,13 @@ class FlatControllerTests {
             .param("numberRooms", "2")
             .param("numberBaths", "2")
             .param("availableServices", "Wifi and cable TV")
-            .param("address.address", TEST_ADDRESS_NOT_EXISTS)
+            .param("address.location", TEST_ADDRESS_NOT_EXISTS)
             .param("address.postalCode", "41011")
             .param("address.city", TEST_CITY_FLAT_NOT_EXISTS)
             .param("address.country", "Spain"))
         	.andExpect(status().isOk())
         	.andExpect(model().attributeHasErrors("flat"))
-            .andExpect(model().attributeHasFieldErrors("flat", "address.address"))
+            .andExpect(model().attributeHasFieldErrors("flat", "address.location"))
         	.andExpect(view().name("flats/createOrUpdateFlatForm"));
     }
     
@@ -374,7 +374,7 @@ class FlatControllerTests {
             .param("numberRooms", "2")
             .param("numberBaths", "2")
             .param("availableServices", "Wifi and cable TV")
-            .param("address.address", TEST_ADDRESS_NOT_EXISTS)
+            .param("address.location", TEST_ADDRESS_NOT_EXISTS)
             .param("address.postalCode", "41011")
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))
@@ -393,7 +393,7 @@ class FlatControllerTests {
             .andExpect(model().attribute("flat", hasProperty("numberRooms", is(2))))
             .andExpect(model().attribute("flat", hasProperty("numberBaths", is(2))))
             .andExpect(model().attribute("flat", hasProperty("availableServices", is("Wifi and cable TV"))))
-            .andExpect(model().attribute("flat", hasProperty("address", hasProperty("address", is("Avenida de la República Argentina")))))
+            .andExpect(model().attribute("flat", hasProperty("address", hasProperty("location", is("Avenida de la República Argentina")))))
             .andExpect(model().attribute("flat", hasProperty("address", hasProperty("postalCode", is("41011")))))
             .andExpect(model().attribute("flat", hasProperty("address", hasProperty("city", is("Sevilla")))))
             .andExpect(model().attribute("flat", hasProperty("address", hasProperty("country", is("Spain")))))
@@ -423,7 +423,7 @@ class FlatControllerTests {
             .param("numberRooms", "2")
             .param("numberBaths", "2")
             .param("availableServices", "Wifi and cable TV")
-            .param("address.address", "Calle Luis Montoto")
+            .param("address.location", "Calle Luis Montoto")
             .param("address.postalCode", "41003")
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))
@@ -444,7 +444,7 @@ class FlatControllerTests {
             .param("numberRooms", "2")
             .param("numberBaths", "2")
             .param("availableServices", "Wifi and cable TV")
-            .param("address.address", "Calle Luis Montoto")
+            .param("address.location", "Calle Luis Montoto")
             .param("address.postalCode", "41003")
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))
@@ -467,7 +467,7 @@ class FlatControllerTests {
             .param("squareMeters", "90")
             .param("numberRooms", "2")
             .param("numberBaths", "2")
-            .param("address.address", "Calle Luis Montoto")
+            .param("address.location", "Calle Luis Montoto")
             .param("address.postalCode", "41003")
             .param("address.city", "Sevilla"))
             .andExpect(status().isOk())
@@ -491,7 +491,7 @@ class FlatControllerTests {
             .param("numberRooms", "2")
             .param("numberBaths", "2")
             .param("availableServices", "Wifi and cable TV")
-            .param("address.address", "Calle Luis Montoto")
+            .param("address.location", "Calle Luis Montoto")
             .param("address.postalCode", "41003")
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))

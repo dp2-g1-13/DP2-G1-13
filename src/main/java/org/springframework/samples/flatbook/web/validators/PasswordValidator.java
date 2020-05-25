@@ -34,7 +34,7 @@ public class PasswordValidator implements Validator {
 		PersonForm personForm = (PersonForm) obj;
 
 		if (personForm.getPassword() != null) {
-			if (personForm.getPassword() == "") {
+			if (personForm.getPassword().equals("")) {
 				errors.rejectValue("password", PasswordValidator.REQUIRED, PasswordValidator.REQUIRED);
 			} else {
 				String pattern = "^(?=(.*[0-9]){2})(?=(.*[!-\\.<-@_]){2})(?=(.*[A-Z]){2})(?=(.*[a-z]){2})\\S{8,100}$";

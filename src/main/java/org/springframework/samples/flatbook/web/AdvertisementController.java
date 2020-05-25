@@ -26,12 +26,14 @@ import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
 import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.model.pojos.Location;
 import org.springframework.samples.flatbook.service.AdvertisementService;
+import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.DBImageService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.RequestService;
 import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
+import org.springframework.samples.flatbook.service.exceptions.IllegalAccessRuntimeException;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,8 +50,11 @@ import org.springframework.web.servlet.ModelAndView;
 public class AdvertisementController {
 
 	private static final String		VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM	= "advertisements/createOrUpdateAdvertisementForm";
-
+	private static final String 	EXCEPTION_MESSAGE = "Illegal access";
+	private static final String 	WELCOME_PAGE = "welcome";
+	
 	private AdvertisementService	advertisementService;
+	private AuthoritiesService	    authoritiesService;
 	private FlatService				flatService;
 	private DBImageService			dbImageService;
 	private HostService				hostService;
@@ -61,7 +66,7 @@ public class AdvertisementController {
 	@Autowired
 	public AdvertisementController(final AdvertisementService advertisementService, final DBImageService dbImageService,
 		final FlatService flatService, final HostService hostService, final RequestService requestService, final PersonService personService,
-		final GeocodeAPIService geocodeAPIService) {
+		final GeocodeAPIService geocodeAPIService, final AuthoritiesService authoritiesService) {
 		this.advertisementService = advertisementService;
 		this.dbImageService = dbImageService;
 		this.flatService = flatService;
@@ -69,13 +74,14 @@ public class AdvertisementController {
 		this.requestService = requestService;
 		this.personService = personService;
 		this.geocodeAPIService = geocodeAPIService;
+		this.authoritiesService	   =  authoritiesService;
 	}
 
 	@GetMapping(value = "/flats/{flatId}/advertisements/new")
 	public String initCreationForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
 		Flat flat = this.flatService.findFlatById(flatId);
 		if (flat == null || !this.validateHost(flatId) || this.advertisementService.isAdvertisementWithFlatId(flat.getId())) {
-			throw new RuntimeException("Illegal access");
+			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
 		}
 		AdvertisementForm advertisement = new AdvertisementForm();
 		model.put("advertisementForm", advertisement);
@@ -90,7 +96,7 @@ public class AdvertisementController {
 		} else {
 			Flat flat = this.flatService.findFlatById(flatId);
 			if (flat == null || !this.validateHost(flatId) || this.advertisementService.isAdvertisementWithFlatId(flat.getId())) {
-				throw new RuntimeException("Illegal access");
+				throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
 			}
 			Advertisement advertisement = new Advertisement(adv);
 			advertisement.setFlat(flat);
@@ -103,7 +109,7 @@ public class AdvertisementController {
 	public String initUpdateForm(@PathVariable("advertisementId") final int advertisementId, final Map<String, Object> model) {
 		Advertisement adv = this.advertisementService.findAdvertisementById(advertisementId);
 		if (adv == null || !this.validateHost(adv.getFlat().getId())) {
-			throw new RuntimeException("Illegal access");
+			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
 		}
 		AdvertisementForm af = new AdvertisementForm(adv);
 		model.put("advertisementForm", af);
@@ -118,7 +124,7 @@ public class AdvertisementController {
 		} else {
 			Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
 			if (advertisement == null || !this.validateHost(advertisement.getFlat().getId())) {
-				throw new RuntimeException("Illegal access");
+				throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
 			}
 			Advertisement newAdvertisement = new Advertisement(adv);
 			newAdvertisement.setFlat(advertisement.getFlat());
@@ -133,7 +139,7 @@ public class AdvertisementController {
 	public String processDeleteAdvertisement(@PathVariable("advertisementId") final int advertisementId, final Map<String, Object> model) {
 		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
 		if (advertisement == null || !this.validateHost(advertisement.getFlat().getId())) {
-			throw new RuntimeException("Illegal access");
+			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
 		}
 		this.advertisementService.deleteAdvertisement(advertisement);
 		return "redirect:/flats/list";
@@ -146,7 +152,7 @@ public class AdvertisementController {
 		Host host = this.hostService.findHostByFlatId(advertisement.getFlat().getId());
 
 		if (!host.isEnabled()) {
-			throw new RuntimeException("Illegal access");
+			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
 		}
 
 		mav.addObject(advertisement);
@@ -163,7 +169,7 @@ public class AdvertisementController {
 		mav.addObject("reviews", reviews);
 		mav.addObject("flatId", advertisement.getFlat().getId());
 		mav.addObject("canCreateReview",
-			principal != null && ReviewUtils.isAllowedToReviewAFlat(principal.getName(), advertisement.getFlat().getId()));
+			principal != null && ReviewUtils.isAllowedToReviewAFlat(principal.getName(), advertisement.getFlat().getId(), this.flatService, this.authoritiesService));
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals("ROLE_ANONYMOUS"))) {
@@ -182,17 +188,17 @@ public class AdvertisementController {
 		throws UnsupportedEncodingException {
 		if (address.getCity() == null || address.getCity().equals("")) {
 			result.rejectValue("city", "cityNotNull", "The field 'city' can't be null.");
-			return "welcome";
+			return WELCOME_PAGE;
 		}
 
 		GeocodeResponse geocode = this.geocodeAPIService
 			.getGeocodeData(address.getCity() + " " + (address.getPostalCode() != null ? address.getPostalCode() : ""));
 		if (geocode.getStatus().equals("ZERO_RESULTS")) {
 			result.rejectValue("city", "", "The address does not exist. Try again.");
-			return "welcome";
+			return WELCOME_PAGE;
 		} else if (!geocode.getStatus().equals("OK")) {
 			result.reject("An external error has occurred. Please try again later.");
-			return "welcome";
+			return WELCOME_PAGE;
 		}
 
 		Location location = geocode.getResults().get(0).getGeometry().getLocation();
@@ -206,7 +212,7 @@ public class AdvertisementController {
 
 		if (results.isEmpty()) {
 			result.rejectValue("postalCode", "advNotFound", "Not found.");
-			return "welcome";
+			return WELCOME_PAGE;
 		} else {
 			model.put("selections", results);
 			model.put("latitude", location.getLat());

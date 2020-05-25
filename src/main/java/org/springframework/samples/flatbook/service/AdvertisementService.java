@@ -27,7 +27,7 @@ public class AdvertisementService {
 	}
 
 	@Transactional(readOnly = true)
-	public Boolean isAdvertisementWithFlatId(final int id) {
+	public boolean isAdvertisementWithFlatId(final int id) {
 		return this.advertisementRepository.isAdvertisementWithFlatId(id);
 	}
 

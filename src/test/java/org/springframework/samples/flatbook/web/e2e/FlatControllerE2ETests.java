@@ -162,7 +162,7 @@ class FlatControllerE2ETests {
 			.perform(MockMvcRequestBuilders.multipart("/flats/new").file(file1).file(file2).file(file3).file(file4).file(file5).file(file6)
 				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("description", "this is a sample description with more than 30 chars")
 				.param("squareMeters", "90").param("numberRooms", "2").param("numberBaths", "2").param("availableServices", "Wifi and cable TV")
-				.param("address.address", FlatControllerE2ETests.ADDRESS).param("address.postalCode", FlatControllerE2ETests.TEST_POSTAL_CODE_FLAT)
+				.param("address.location", FlatControllerE2ETests.ADDRESS).param("address.postalCode", FlatControllerE2ETests.TEST_POSTAL_CODE_FLAT)
 				.param("address.city", FlatControllerE2ETests.TEST_CITY_FLAT).param("address.country", FlatControllerE2ETests.TEST_COUNTRY_FLAT))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection());
 	}
@@ -183,7 +183,7 @@ class FlatControllerE2ETests {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.multipart("/flats/new").file(file1).file(file2).file(file3).file(file4).file(file5).file(file6)
 				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("description", "sample description w 29 chars").param("squareMeters", "90")
-				.param("numberBaths", "0").param("availableServices", "Wifi and cable TV").param("address.address", FlatControllerE2ETests.ADDRESS)
+				.param("numberBaths", "0").param("availableServices", "Wifi and cable TV").param("address.location", FlatControllerE2ETests.ADDRESS)
 				.param("address.postalCode", FlatControllerE2ETests.TEST_POSTAL_CODE_FLAT)
 				.param("address.city", FlatControllerE2ETests.TEST_CITY_FLAT).param("address.country", FlatControllerE2ETests.TEST_COUNTRY_FLAT))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.model().attributeHasErrors("flat"))
@@ -207,7 +207,7 @@ class FlatControllerE2ETests {
 			.perform(MockMvcRequestBuilders.multipart("/flats/new").file(file1).file(file2).file(file3)
 				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("description", "this is a sample description with more than 30 chars")
 				.param("squareMeters", "90").param("numberRooms", "2").param("numberBaths", "2").param("availableServices", "Wifi and cable TV")
-				.param("address.address", FlatControllerE2ETests.ADDRESS).param("address.postalCode", FlatControllerE2ETests.TEST_POSTAL_CODE_FLAT)
+				.param("address.location", FlatControllerE2ETests.ADDRESS).param("address.postalCode", FlatControllerE2ETests.TEST_POSTAL_CODE_FLAT)
 				.param("address.city", FlatControllerE2ETests.TEST_CITY_FLAT).param("address.country", FlatControllerE2ETests.TEST_COUNTRY_FLAT))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.model().attributeHasErrors("flat"))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("flat", "images"))
@@ -231,12 +231,12 @@ class FlatControllerE2ETests {
 			.perform(MockMvcRequestBuilders.multipart("/flats/new").file(file1).file(file2).file(file3).file(file4).file(file5).file(file6)
 				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("description", "this is a sample description with more than 30 chars")
 				.param("squareMeters", "90").param("numberRooms", "2").param("numberBaths", "2").param("availableServices", "Wifi and cable TV")
-				.param("address.address", FlatControllerE2ETests.TEST_ADDRESS_NOT_EXISTS)
+				.param("address.location", FlatControllerE2ETests.TEST_ADDRESS_NOT_EXISTS)
 				.param("address.postalCode", FlatControllerE2ETests.TEST_POSTAL_CODE_FLAT_NOT_EXISTS)
 				.param("address.city", FlatControllerE2ETests.TEST_CITY_FLAT_NOT_EXISTS)
 				.param("address.country", FlatControllerE2ETests.TEST_COUNTRY_FLAT_NOT_EXISTS))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.model().attributeHasErrors("flat"))
-			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("flat", "address.address"))
+			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("flat", "address.location"))
 			.andExpect(MockMvcResultMatchers.view().name("flats/createOrUpdateFlatForm"));
 	}
 
@@ -265,7 +265,7 @@ class FlatControllerE2ETests {
 			.andExpect(MockMvcResultMatchers.model().attribute("flat", Matchers.hasProperty("numberBaths", Matchers.is(2))))
 			.andExpect(MockMvcResultMatchers.model().attribute("flat", Matchers.hasProperty("availableServices", Matchers.is("Wifi and cable TV"))))
 			.andExpect(MockMvcResultMatchers.model().attribute("flat",
-				Matchers.hasProperty("address", Matchers.hasProperty("address", Matchers.is(FlatControllerE2ETests.ADDRESS)))))
+				Matchers.hasProperty("address", Matchers.hasProperty("location", Matchers.is(FlatControllerE2ETests.ADDRESS)))))
 			.andExpect(MockMvcResultMatchers.model().attribute("flat",
 				Matchers.hasProperty("address", Matchers.hasProperty("postalCode", Matchers.is(FlatControllerE2ETests.TEST_POSTAL_CODE_FLAT)))))
 			.andExpect(MockMvcResultMatchers.model().attribute("flat",
@@ -309,7 +309,7 @@ class FlatControllerE2ETests {
 			.perform(MockMvcRequestBuilders.multipart("/flats/{flatId}/edit", FlatControllerE2ETests.TEST_FLAT_ID).file(file1)
 				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("description", "this is a sample description with more than 30 chars")
 				.param("squareMeters", "90").param("numberRooms", "2").param("numberBaths", "2").param("availableServices", "Wifi and cable TV")
-				.param("address.address", "Calle Luis Montoto").param("address.postalCode", "41003")
+				.param("address.location", "Calle Luis Montoto").param("address.postalCode", "41003")
 				.param("address.city", FlatControllerE2ETests.TEST_CITY_FLAT).param("address.country", FlatControllerE2ETests.TEST_COUNTRY_FLAT))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection()).andExpect(MockMvcResultMatchers.view().name("redirect:/flats/{flatId}"));
 	}
@@ -324,7 +324,7 @@ class FlatControllerE2ETests {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.multipart("/flats/{flatId}/edit", FlatControllerE2ETests.TEST_FLAT_ID).file(file1)
 				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("description", "sample description w 29 chars").param("squareMeters", "90")
-				.param("numberRooms", "2").param("numberBaths", "2").param("address.address", "Calle Luis Montoto")
+				.param("numberRooms", "2").param("numberBaths", "2").param("address.location", "Calle Luis Montoto")
 				.param("address.postalCode", "41003").param("address.city", FlatControllerE2ETests.TEST_CITY_FLAT))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.model().attributeHasErrors("flat"))
 			.andExpect(MockMvcResultMatchers.model().attributeHasFieldErrors("flat", "description"))
@@ -345,7 +345,7 @@ class FlatControllerE2ETests {
 			.perform(MockMvcRequestBuilders.multipart("/flats/{flatId}/edit", FlatControllerE2ETests.TEST_FLAT_ID).file(file1)
 				.with(SecurityMockMvcRequestPostProcessors.csrf()).param("description", "this is a sample description with more than 30 chars")
 				.param("squareMeters", "90").param("numberRooms", "2").param("numberBaths", "2").param("availableServices", "Wifi and cable TV")
-				.param("address.address", "Calle Luis Montoto").param("address.postalCode", "41003")
+				.param("address.location", "Calle Luis Montoto").param("address.postalCode", "41003")
 				.param("address.city", FlatControllerE2ETests.TEST_CITY_FLAT).param("address.country", FlatControllerE2ETests.TEST_COUNTRY_FLAT))
 			.andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.view().name("exception"));
 	}

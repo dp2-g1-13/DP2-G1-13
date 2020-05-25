@@ -30,12 +30,13 @@ public class ReportController {
 	private static final String	REPORTS_LIST						= "reports/reportsList";
 
 	private static final String	VIEWS_REPORTS_CREATE_OR_UPDATE_FORM	= "reports/createOrUpdateReportForm";
+	
+	private static final String	BAD_USER_ID							= "Bad user id.";
 
 	private final PersonService	personService;
 
 	private final ReportService	reportService;
-
-
+	
 	@Autowired
 	public ReportController(final ReportService reportService, final PersonService personService) {
 		this.personService = personService;
@@ -59,7 +60,7 @@ public class ReportController {
 			model.put("report", r);
 			return ReportController.VIEWS_REPORTS_CREATE_OR_UPDATE_FORM;
 		} else {
-			throw new IllegalArgumentException("Bad user id.");
+			throw new IllegalArgumentException(BAD_USER_ID);
 		}
 
 	}
@@ -79,7 +80,7 @@ public class ReportController {
 				return "redirect:/users/{userId}";
 			}
 		} else {
-			throw new IllegalArgumentException("Bad user id.");
+			throw new IllegalArgumentException(BAD_USER_ID);
 		}
 	}
 
@@ -99,7 +100,7 @@ public class ReportController {
 				.sorted(Comparator.comparing(Report::getCreationDate).reversed()).collect(Collectors.toList()));
 			return ReportController.REPORTS_LIST;
 		} else {
-			throw new IllegalArgumentException("Bad user id.");
+			throw new IllegalArgumentException(BAD_USER_ID);
 		}
 
 	}

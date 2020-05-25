@@ -7,12 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
 import org.springframework.samples.flatbook.repository.AdvertisementRepository;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,7 +38,7 @@ public class AdvertisementServiceMockedTests {
         address.setCountry("Spain");
         address.setCity("Sevilla");
         address.setPostalCode("41000");
-        address.setAddress("Plaza Nueva");
+        address.setLocation("Plaza Nueva");
 
         DBImage image = new DBImage();
         image.setFilename("a");

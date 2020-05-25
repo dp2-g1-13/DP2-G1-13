@@ -9,6 +9,9 @@ import java.time.LocalDate;
 
 public class RequestFormValidator implements Validator {
 
+	private static final String FINISH_DATE = "finishDate";
+	private static final String START_DATE = "startDate";
+	
     private AuthoritiesType type;
 
     public RequestFormValidator(AuthoritiesType type) {
@@ -28,18 +31,18 @@ public class RequestFormValidator implements Validator {
                 errors.rejectValue("description", "", "Description must not be null nor blank");
             if(request.getStartDate() != null && request.getFinishDate() != null) {
                 if(request.getStartDate().isAfter(request.getFinishDate()) || request.getStartDate().isEqual(request.getFinishDate())) {
-                    errors.rejectValue("startDate", "", "Start date must be before finish date");
-                    errors.rejectValue("finishDate", "", "Finish date must be after start date");
+                    errors.rejectValue(START_DATE, "", "Start date must be before finish date");
+                    errors.rejectValue(FINISH_DATE, "", "Finish date must be after start date");
                 }
                 if(request.getStartDate().isBefore(LocalDate.now()))
-                    errors.rejectValue("startDate", "", "Start date must be after today's date");
+                    errors.rejectValue(START_DATE, "", "Start date must be after today's date");
                 if(request.getFinishDate().isBefore(LocalDate.now()))
-                    errors.rejectValue("finishDate", "", "Finish date must be after today's date");
+                    errors.rejectValue(FINISH_DATE, "", "Finish date must be after today's date");
             } else {
                 if(request.getStartDate() == null)
-                    errors.rejectValue("startDate", "", "Start date must not be null");
+                    errors.rejectValue(START_DATE, "", "Start date must not be null");
                 else if(request.getFinishDate() == null)
-                    errors.rejectValue("finishDate", "", "Finish date must not be null");
+                    errors.rejectValue(FINISH_DATE, "", "Finish date must not be null");
             }
         }
     }
