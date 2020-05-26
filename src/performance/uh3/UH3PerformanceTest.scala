@@ -164,6 +164,10 @@ class UH3PerformanceTest extends Simulation {
       FindMyFlats.findMyFlats,
       NewFlatFormBadAddress.newFlatForm)
 
+  before {
+    println("Hola")
+  }
+
   setUp(
     createFlatExistingAddress.inject(rampUsers(10) during (10 seconds)),
     createFlatBadAddress.inject(rampUsers(10) during (10 seconds))
