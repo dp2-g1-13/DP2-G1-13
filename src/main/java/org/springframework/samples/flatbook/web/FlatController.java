@@ -25,12 +25,9 @@ import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.DBImageService;
-import org.springframework.samples.flatbook.service.FlatReviewService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
-import org.springframework.samples.flatbook.service.RequestService;
-import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
 import org.springframework.samples.flatbook.service.exceptions.IllegalAccessRuntimeException;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
@@ -51,9 +48,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class FlatController {
 
 	private static final String			VIEWS_FLATS_CREATE_OR_UPDATE_FORM	= "flats/createOrUpdateFlatForm";
-	private static final String 		EXCEPTION_MESSAGE = "Illegal access";
-	private static final String 		IMAGES_FIELD = "images";
-	
+	private static final String			EXCEPTION_MESSAGE					= "Illegal access";
+	private static final String			IMAGES_FIELD						= "images";
+
 	private final FlatService			flatService;
 	private final AuthoritiesService	authoritiesService;
 	private final DBImageService		dbImageService;
@@ -62,10 +59,11 @@ public class FlatController {
 	private final AdvertisementService	advertisementService;
 	private final GeocodeAPIService		geocodeAPIService;
 
+
 	@Autowired
 	public FlatController(final FlatService flatService, final DBImageService dbImageService, final PersonService personService,
-		final HostService hostService, final AdvertisementService advertisementService, final TenantService tenantService,
-		final FlatReviewService flatReviewService, final RequestService requestService, final GeocodeAPIService geocodeAPIService, final AuthoritiesService	authoritiesService) {
+		final HostService hostService, final AdvertisementService advertisementService, final GeocodeAPIService geocodeAPIService,
+		final AuthoritiesService authoritiesService) {
 		this.flatService = flatService;
 		this.dbImageService = dbImageService;
 		this.personService = personService;
@@ -100,7 +98,7 @@ public class FlatController {
 			return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 		} else {
 			if (flat.getImages().size() < 6) {
-				result.rejectValue(IMAGES_FIELD, "", "a minimum of 6 images is required.");
+				result.rejectValue(FlatController.IMAGES_FIELD, "", "a minimum of 6 images is required.");
 				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 			}
 			Address address = flat.getAddress();
@@ -127,11 +125,11 @@ public class FlatController {
 	@GetMapping(value = "/flats/{flatId}/edit")
 	public String initUpdateForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
 		if (!this.validateHost(flatId)) {
-			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		model.put("flat", flat);
-		model.put(IMAGES_FIELD, flat.getImages());
+		model.put(FlatController.IMAGES_FIELD, flat.getImages());
 		return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 	}
 
@@ -142,13 +140,13 @@ public class FlatController {
 			return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 		} else {
 			if (!this.validateHost(flatId)) {
-				throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+				throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
 			}
 			Set<DBImage> newImages = flat.getImages().stream().filter(x -> !x.getFileType().equals("application/octet-stream"))
 				.collect(Collectors.toSet());
 			Flat oldFlat = this.flatService.findFlatById(flatId);
 			if (oldFlat.getImages().size() + newImages.size() < 6) {
-				result.rejectValue(IMAGES_FIELD, "", "a minimum of 6 images is required.");
+				result.rejectValue(FlatController.IMAGES_FIELD, "", "a minimum of 6 images is required.");
 				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 			}
 			Set<DBImage> images = oldFlat.getImages();
@@ -165,11 +163,11 @@ public class FlatController {
 	public String processDeleteImage(@PathVariable("flatId") final int flatId, @PathVariable("imageId") final int imageId,
 		final Map<String, Object> model) {
 		if (!this.validateHost(flatId)) {
-			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		if (flat.getImages().size() == 6) {
-			IllegalAccessRuntimeException e = new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+			IllegalAccessRuntimeException e = new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
 			model.put("exception", e);
 			return "exception";
 		} else {
@@ -183,7 +181,7 @@ public class FlatController {
 	@GetMapping(value = "/flats/{flatId}")
 	public ModelAndView showFlat(@PathVariable("flatId") final int flatId, final Principal principal) {
 		if (!this.validateHost(flatId) && !this.validateTenant(flatId)) {
-			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
 		}
 		ModelAndView mav = new ModelAndView("flats/flatDetails");
 		Flat flat = this.flatService.findFlatById(flatId);
@@ -191,7 +189,7 @@ public class FlatController {
 
 		Host host = this.hostService.findHostByFlatId(flat.getId());
 		mav.addObject("host", host.getUsername());
-		mav.addObject(IMAGES_FIELD, flat.getImages());
+		mav.addObject(FlatController.IMAGES_FIELD, flat.getImages());
 
 		Boolean existAd = this.advertisementService.isAdvertisementWithFlatId(flat.getId());
 		mav.addObject("existAd", existAd);
@@ -201,7 +199,8 @@ public class FlatController {
 		reviews.sort(Comparator.comparing(FlatReview::getCreationDate).reversed());
 		mav.addObject("reviews", reviews);
 		mav.addObject("flatId", flat.getId());
-		mav.addObject("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewAFlat(principal.getName(), flat.getId(), this.flatService, this.authoritiesService));
+		mav.addObject("canCreateReview",
+			principal != null && ReviewUtils.isAllowedToReviewAFlat(principal.getName(), flat.getId(), this.flatService, this.authoritiesService));
 		return mav;
 	}
 
@@ -223,7 +222,7 @@ public class FlatController {
 	@GetMapping(value = "/flats/{flatId}/delete")
 	public String processDeleteFlat(@PathVariable("flatId") final int flatId) {
 		if (!this.validateHost(flatId)) {
-			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		this.flatService.deleteFlat(flat);

@@ -61,7 +61,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.hasAnyAuthority(AuthoritiesType.HOST.toString(), AuthoritiesType.TENANT.toString()).antMatchers("/statistics")
 			.hasAnyAuthority(AuthoritiesType.ADMIN.toString()).antMatchers("/reports/list").hasAnyAuthority(AuthoritiesType.ADMIN.toString())
 			.antMatchers("/reports/{username:[0-9a-zA-Z]{5,}}/list").hasAnyAuthority(AuthoritiesType.ADMIN.toString())
-			.antMatchers("/reports/{reportId:[0-9]+}/delete").hasAnyAuthority(AuthoritiesType.ADMIN.toString()).anyRequest().denyAll().and()
+			.antMatchers("/reports/{reportId:[0-9]+}/delete").hasAnyAuthority(AuthoritiesType.ADMIN.toString())
+			.antMatchers("/performance/**").permitAll()
+			.anyRequest().denyAll().and()
 			.formLogin()
 			/* .loginPage("/login") */
 			.failureUrl("/login-error").and().logout().logoutSuccessUrl("/");

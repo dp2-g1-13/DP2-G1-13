@@ -27,4 +27,8 @@ public class AuthoritiesService {
 	public Collection<Authorities> findAll() {
 		return this.authoritiesRepository.findAll();
 	}
+
+	public void saveAuthorty(final Authorities auth) {
+		this.authoritiesRepository.save(auth);
+	}
 }

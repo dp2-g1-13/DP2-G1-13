@@ -6,7 +6,7 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
-class UH12PerformanceTest extends Simulation {
+class UH13PerformanceTest extends Simulation {
 
 	val httpProtocol = http
 		.baseUrl("http://www.dp2.com")
@@ -36,11 +36,12 @@ class UH12PerformanceTest extends Simulation {
 		.pause(15)
 	}
 	
-	object PrepareFlat {
-		val prepareFlat = exec(http("PrepareFlat")
-			.get("/performance/flats/prepare?hostId=rbordessa0")
+	object PrepareReview {
+		val prepareReview = exec(http("PrepareReview")
+			.get("/performance/reviews/prepare?hostId=rbordessa0")
 			.headers(headers_0)
 			.check(jsonPath("$..flatId").ofType[Int].saveAs("flatId"),
+			jsonPath("$..reviewId").ofType[Int].saveAs("reviewId"),
 			jsonPath("$..tenantId").ofType[String].saveAs("tenantId")))
 		.pause(17)
 	}
@@ -78,51 +79,39 @@ class UH12PerformanceTest extends Simulation {
 		.pause(17)
 	}
 
-	object NewReview {
-		val newReview = exec(http("NewReview")
-			.get("/reviews/new?flatId="+"${flatId}")
-			.headers(headers_0)
-			.check(css("input[name=_csrf]", "value").saveAs("stoken")))
+	
+	object DeleteReview {
+		val deleteReview = exec(http("DeleteReview")
+			.get("/reviews/"+"${reviewId}"+"/delete")
+			.headers(headers_0))
 		.pause(8)
-		.feed(csv("data_createReview.csv"))
-		.exec(http("NewReview")
-			.post("/reviews/new?flatId="+"${flatId}")
-			.headers(headers_3)
-			.formParam("description", "${description}")
-			.formParam("rate", "${rate}")
-			.formParam("creationDate", "23/05/2020")
-			.formParam("reviewed", "${flatId}")
-			.formParam("creator", "${tenantId}")
-			.formParam("type", "FLAT_REVIEW")
-			.formParam("_csrf", "${stoken}"))
-		.pause(10)
 	}
 
-	object NewReviewFail {
-		val newReviewFail = exec(http("NewReviewFail")
+	object DeleteReviewFail {
+		val deleteReviewFail = exec(http("DeleteReviewFail")
 			.get("/reviews/new?flatId=2")
 			.headers(headers_0)
-			.resources(http("NewReviewFail")
+			.resources(http("DeleteReviewFail")
 			.get("/resources/images/error.png")
 			.headers(headers_2))
 			.check(status.is(200)))
 	}
 
-	val positiveScn = scenario("Positive").exec(Home.home,
-									  PrepareFlat.prepareFlat,
+	val deleteReviewScn = scenario("DeleteReviewScn").exec(Home.home,
+									  PrepareReview.prepareReview,
 									  Login.login,
 									  MyUserPage.myUserPage,
 									  MyFlat.myFlat,
-									  NewReview.newReview)
-	val cantCreateReviewScn = scenario("Negative").exec(Home.home,
-									  PrepareFlat.prepareFlat,
+									  DeleteReview.deleteReview)
+	val cantDeleteReviewScn = scenario("Negative").exec(Home.home,
+									  PrepareReview.prepareReview,
 									  Login.login,
 									  MyUserPage.myUserPage,
 									  MyFlat.myFlat,
-									  NewReviewFail.newReviewFail)
+									  DeleteReviewFail.deleteReviewFail)
 
 	setUp(
-		positiveScn.inject(rampUsers(10) during (10 seconds)),
-		cantCreateReviewScn.inject(rampUsers(10) during (10 seconds))
+		deleteReviewScn.inject(rampUsers(10) during (10 seconds)),
+		cantDeleteReviewScn.inject(rampUsers(10) during (10 seconds))
 	).protocols(httpProtocol)
 }
