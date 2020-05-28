@@ -65,16 +65,16 @@ public class Flat extends BaseEntity {
 	private Address			address;
 
 	@Valid
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "flat_id")
 	private Set<FlatReview>	flatReviews;
 
 	@Valid
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "flat")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "flat")
 	private Set<Tenant>		tenants;
 
 	@Valid
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "flat_id")
 	private Set<Request>	requests;
 

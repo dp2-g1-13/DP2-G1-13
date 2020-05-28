@@ -44,6 +44,6 @@ public class FlatReview extends Review {
 
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Tenant creator;
 }

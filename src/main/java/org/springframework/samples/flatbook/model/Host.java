@@ -46,7 +46,7 @@ public class Host extends Person {
 	}
 
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "host_id")
 	private Set<Flat> flats;
 
