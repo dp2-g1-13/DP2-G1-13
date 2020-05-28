@@ -11,6 +11,7 @@ public class FlatValidator implements Validator {
     private static final String FILE_TYPE_EMPTY = "The file type of the image must not be empty";
     private static final String FILE_TYPE_MUST_BE_IMAGE = "The file type must be an image";
     private static final String DATA_EMPTY = "The data of the image must not be empty";
+    private static final String IMAGES_FIELD = "images";
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -24,13 +25,13 @@ public class FlatValidator implements Validator {
         for(DBImage i : flat.getImages()) {
             if (!i.getFileType().equals("application/octet-stream")) {
                 if (i.getFilename() == null || i.getFilename().isEmpty())
-                    errors.rejectValue("images", "", FILENAME_EMPTY);
+                    errors.rejectValue(IMAGES_FIELD, "", FILENAME_EMPTY);
                 else if (i.getFileType() == null || i.getFileType().isEmpty())
-                    errors.rejectValue("images", "", FILE_TYPE_EMPTY);
+                    errors.rejectValue(IMAGES_FIELD, "", FILE_TYPE_EMPTY);
                 else if (!i.getFileType().startsWith("image/"))
-                    errors.rejectValue("images", "", FILE_TYPE_MUST_BE_IMAGE);
+                    errors.rejectValue(IMAGES_FIELD, "", FILE_TYPE_MUST_BE_IMAGE);
                 else if (i.getData() == null || i.getData().length < 1)
-                    errors.rejectValue("images", "", DATA_EMPTY);
+                    errors.rejectValue(IMAGES_FIELD, "", DATA_EMPTY);
             }
         }
     }

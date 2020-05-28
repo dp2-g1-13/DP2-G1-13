@@ -51,7 +51,7 @@ public class FlatServiceTests {
         address.setCountry("Spain");
         address.setCity("Sevilla");
         address.setPostalCode("41000");
-        address.setAddress("Plaza Nueva");
+        address.setLocation("Plaza Nueva");
 
         DBImage image = new DBImage();
         image.setFilename("a.png");

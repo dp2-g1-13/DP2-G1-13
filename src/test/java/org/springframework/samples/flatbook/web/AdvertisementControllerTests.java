@@ -108,7 +108,7 @@ public class AdvertisementControllerTests {
         address.setCountry(AdvertisementControllerTests.TEST_COUNTRY_FLAT);
         address.setCity(AdvertisementControllerTests.TEST_CITY_FLAT);
         address.setPostalCode(AdvertisementControllerTests.TEST_POSTAL_CODE_FLAT);
-        address.setAddress("Plaza Nueva");
+        address.setLocation("Plaza Nueva");
         address.setLatitude(LATITUDE);
         address.setLongitude(LONGITUDE);
         
@@ -243,7 +243,7 @@ public class AdvertisementControllerTests {
         BDDMockito.given(this.authoritiesService.findAuthorityById(AdvertisementControllerTests.TEST_HOST_USERNAME)).willReturn(AuthoritiesType.HOST);
         BDDMockito.given(this.authoritiesService.findAuthorityById(AdvertisementControllerTests.TEST_HOST_USERNAME_NOT_ENABLED)).willReturn(AuthoritiesType.HOST);
         try {
-			BDDMockito.given(this.geocodeAPIService.getGeocodeData(address.getAddress() + ", " + address.getCity())).willReturn(response);
+			BDDMockito.given(this.geocodeAPIService.getGeocodeData(address.getLocation() + ", " + address.getCity())).willReturn(response);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(AdvertisementControllerTests.TEST_CITY_FLAT + ", " + AdvertisementControllerTests.TEST_COUNTRY_FLAT + " " + AdvertisementControllerTests.TEST_POSTAL_CODE_FLAT)).willReturn(response);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(AdvertisementControllerTests.TEST_CITY_FLAT_NOT_EXISTS + ", " + AdvertisementControllerTests.TEST_COUNTRY_FLAT_NOT_EXISTS + " " + AdvertisementControllerTests.TEST_POSTAL_CODE_FLAT_NOT_EXISTS)).willReturn(responseZeroResults);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(AdvertisementControllerTests.TEST_CITY_FLAT + ", " + AdvertisementControllerTests.TEST_COUNTRY_FLAT + " " + AdvertisementControllerTests.TEST_POSTAL_CODE_FLAT_NOT_EXISTS)).willReturn(responseError);

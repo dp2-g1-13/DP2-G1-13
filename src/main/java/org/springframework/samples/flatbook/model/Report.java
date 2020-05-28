@@ -49,10 +49,10 @@ public class Report extends BaseEntity {
 	private LocalDate	creationDate;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Person		sender;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Person		receiver;
 }

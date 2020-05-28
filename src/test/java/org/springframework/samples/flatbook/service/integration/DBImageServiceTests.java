@@ -1,19 +1,13 @@
 package org.springframework.samples.flatbook.service.integration;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.samples.flatbook.model.DBImage;
-import org.springframework.samples.flatbook.repository.DBImageRepository;
 import org.springframework.samples.flatbook.service.DBImageService;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
@@ -22,8 +16,6 @@ import java.util.Set;
 
 import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.*;
 
 @DataJpaTest(includeFilters= @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)

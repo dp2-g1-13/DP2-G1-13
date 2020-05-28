@@ -18,7 +18,7 @@
             <flatbook:inputField name="numberRooms" label="Number of rooms"/>
             <flatbook:inputField name="numberBaths" label="Number of baths"/>
             <flatbook:inputField name="availableServices" label="Available services"/>
-            <flatbook:inputField name="address.address" label="Address"/>
+            <flatbook:inputField name="address.location" label="Address"/>
             <flatbook:inputField name="address.city" label="City"/>
             <flatbook:inputField name="address.postalCode" label="Postal code"/>
             <flatbook:inputField name="address.country" label="Country"/>

@@ -1,7 +1,6 @@
 
 package org.springframework.samples.flatbook.web;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -21,6 +20,7 @@ import org.springframework.samples.flatbook.model.enums.SaveType;
 import org.springframework.samples.flatbook.model.mappers.PersonForm;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
+import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.samples.flatbook.service.UserService;
@@ -28,6 +28,7 @@ import org.springframework.samples.flatbook.service.apis.MailjetAPIService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
+import org.springframework.samples.flatbook.service.exceptions.IllegalAccessRuntimeException;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.PasswordValidator;
 import org.springframework.samples.flatbook.web.validators.PersonAuthorityValidator;
@@ -48,45 +49,31 @@ import com.google.common.collect.Lists;
 public class PersonController {
 
 	private static final String	BANNED								= "banned";
-
 	private static final String	ACTIVE								= "active";
-
 	private static final String	USER_PAGE							= "users/usersPage";
-
 	private static final String	USER_LIST							= "users/usersList";
-
 	private static final String	ONLY_CAN_EDIT_YOUR_OWN_PROFILE		= "Only can edit your own profile";
-
 	private static final String	ONLY_CAN_EDIT_YOUR_OWN_PASSWORD		= "Only can edit your own password";
-
 	private static final String	USERS_UPDATE_PASSWORD				= "users/updatePassword";
-
 	private static final String	USERS_CREATE_OR_UPDATE_USER_FORM	= "users/createOrUpdateUserForm";
-
 	public static final String	USERNAME_DUPLICATED					= "username in use";
-
 	public static final String	DNI_DUPLICATED						= "dni in use";
-
 	public static final String	EMAIL_DUPLICATED					= "email in use";
-
 	public static final String	WRONG_PASSWORD						= "wrong password";
+	public static final String	PERSON_FORM							= "personForm";
 
 	PersonService				personService;
-
 	AuthoritiesService			authoritiesService;
-
 	TenantService				tenantService;
-
+	HostService				    hostService;
 	AdvertisementService		advertisementService;
-
 	UserService					userService;
-
 	MailjetAPIService			mailjetAPIService;
 
 
 	@Autowired
 	public PersonController(final PersonService personService, final AuthoritiesService authoritiesService, final TenantService tenantService, final AdvertisementService advertisementService, final UserService userService,
-		final MailjetAPIService mailjetAPIService) {
+		final MailjetAPIService mailjetAPIService, final HostService hostService) {
 		super();
 		this.personService = personService;
 		this.authoritiesService = authoritiesService;
@@ -94,6 +81,7 @@ public class PersonController {
 		this.advertisementService = advertisementService;
 		this.userService = userService;
 		this.mailjetAPIService = mailjetAPIService;
+		this.hostService = hostService;
 	}
 
 	@ModelAttribute("types")
@@ -115,12 +103,12 @@ public class PersonController {
 	public String newUser(final ModelMap model) {
 		PersonForm person = new PersonForm();
 		person.setSaveType(SaveType.NEW);
-		model.put("personForm", person);
+		model.put(PERSON_FORM, person);
 		return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 	}
 
 	@PostMapping("/users/new")
-	public String registerUser(final ModelMap model, @Valid final PersonForm user, final BindingResult result) throws IOException {
+	public String registerUser(final ModelMap model, @Valid final PersonForm user, final BindingResult result) {
 		if (result.hasErrors()) {
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else {
@@ -148,10 +136,10 @@ public class PersonController {
 			PersonForm user = new PersonForm(this.personService.findUserById(username));
 			user.setAuthority(this.authoritiesService.findAuthorityById(username));
 			user.setSaveType(SaveType.EDIT);
-			model.put("personForm", user);
+			model.put(PERSON_FORM, user);
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else {
-			throw new RuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
+			throw new IllegalAccessRuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
 		}
 
 	}
@@ -161,7 +149,7 @@ public class PersonController {
 		if (result.hasErrors()) {
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else if (!username.equals(principal.getName())) {
-			throw new RuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
+			throw new IllegalAccessRuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
 		} else {
 			user.setSaveType(SaveType.EDIT);
 			user.setUsername(username);
@@ -181,10 +169,10 @@ public class PersonController {
 			PersonForm user = new PersonForm(this.personService.findUserById(username));
 			user.setAuthority(this.authoritiesService.findAuthorityById(username));
 			user.setSaveType(SaveType.EDIT);
-			model.put("personForm", user);
+			model.put(PERSON_FORM, user);
 			return PersonController.USERS_UPDATE_PASSWORD;
 		} else {
-			throw new RuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
+			throw new IllegalAccessRuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
 		}
 	}
 
@@ -193,7 +181,7 @@ public class PersonController {
 		if (result.hasErrors()) {
 			return PersonController.USERS_UPDATE_PASSWORD;
 		} else if (!username.equals(principal.getName())) {
-			throw new RuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
+			throw new IllegalAccessRuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
 		} else {
 			PersonForm previous = new PersonForm(this.personService.findUserById(username));
 			if (!previous.getPassword().equals(user.getPreviousPassword())) {
@@ -220,7 +208,7 @@ public class PersonController {
 
 			if (this.authoritiesService.findAuthorityById(username).equals(AuthoritiesType.TENANT)) {
 				Tenant tenant = this.tenantService.findTenantById(username);
-				model.put("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewATenant(principal.getName(), username));
+				model.put("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewATenant(principal.getName(), username, this.tenantService, this.authoritiesService, this.hostService));
 				List<TenantReview> reviews = tenant.getReviews().stream().filter(x -> x.getCreator().isEnabled()).collect(Collectors.toList());
 				reviews.sort(Comparator.comparing(TenantReview::getCreationDate).reversed());
 				model.put("reviews", reviews);
@@ -231,9 +219,9 @@ public class PersonController {
 			}
 			return PersonController.USER_PAGE;
 		} else if (user != null && !user.isEnabled()) {
-			throw new RuntimeException("This user is banned");
+			throw new IllegalAccessRuntimeException("This user is banned");
 		} else {
-			throw new RuntimeException("This user does not exists");
+			throw new IllegalAccessRuntimeException("This user does not exists");
 		}
 	}
 
@@ -245,10 +233,10 @@ public class PersonController {
 		if (show != null && show.equals(PersonController.ACTIVE)) {
 			users.removeIf(x -> !x.isEnabled());
 		} else if (show != null && show.equals(PersonController.BANNED)) {
-			users.removeIf(x -> x.isEnabled());
+			users.removeIf(User::isEnabled);
 		}
 
-		authorities.removeIf(x -> !users.stream().map(y -> y.getUsername()).collect(Collectors.toList()).contains(x.getUsername()));
+		authorities.removeIf(x -> !users.stream().map(User::getUsername).collect(Collectors.toList()).contains(x.getUsername()));
 		model.put("users", users);
 		model.put("authorities", authorities);
 		return PersonController.USER_LIST;
@@ -269,7 +257,7 @@ public class PersonController {
 			this.userService.save(user);
 			return "redirect:/users/{username}";
 		} else {
-			throw new RuntimeException("This user does not exists");
+			throw new IllegalAccessRuntimeException("This user does not exists");
 		}
 	}
 

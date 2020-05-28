@@ -24,7 +24,7 @@
     <c:forEach var="i" begin="0" end="${flats.size()-1}">
         <div class="row">
             <div class="panel panel-default">
-                <div class="panel-heading"><h4>Flat in <c:out value="${flats.get(i).address.address}"/>, <c:out value="${flats.get(i).address.city}"/></h4></div>
+                <div class="panel-heading"><h4>Flat in <c:out value="${flats.get(i).address.location}"/>, <c:out value="${flats.get(i).address.city}"/></h4></div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-12">

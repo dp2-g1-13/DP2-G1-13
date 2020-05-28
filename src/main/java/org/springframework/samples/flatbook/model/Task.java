@@ -61,14 +61,14 @@ public class Task extends BaseEntity {
 	private LocalDate	creationDate;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Flat		flat;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Tenant		creator;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Tenant		asignee;
 
 }

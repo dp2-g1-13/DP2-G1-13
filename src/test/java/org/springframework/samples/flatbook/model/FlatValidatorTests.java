@@ -43,7 +43,7 @@ public class FlatValidatorTests {
     @BeforeAll
     static void instantiateAddressAndImages() {
         address = new Address();
-        address.setAddress("Av. de la República Argentina 72");
+        address.setLocation("Av. de la República Argentina 72");
         address.setCity("Sevilla");
         address.setCountry("Spain");
         address.setPostalCode("41011");

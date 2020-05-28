@@ -1,6 +1,5 @@
 package org.springframework.samples.flatbook.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
@@ -13,23 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReviewUtils {
 
-    private static AuthoritiesService authoritiesService;
-
-    private static TenantService tenantService;
-
-    private static FlatService flatService;
-
-    private static HostService hostService;
-
-    @Autowired
-    private ReviewUtils(AuthoritiesService authoritiesService, TenantService tenantService, FlatService flatService, HostService hostService) {
-        ReviewUtils.authoritiesService = authoritiesService;
-        ReviewUtils.tenantService = tenantService;
-        ReviewUtils.flatService = flatService;
-        ReviewUtils.hostService = hostService;
-    }
-
-    public static boolean isAllowedToReviewATenant(final String username, final String tenantId) {
+    public static boolean isAllowedToReviewATenant(final String username, final String tenantId, TenantService tenantService, AuthoritiesService authoritiesService, HostService hostService) {
         Boolean allowed = false;
         Tenant tenantToBeReviewed = tenantService.findTenantById(tenantId);
 
@@ -49,12 +32,11 @@ public class ReviewUtils {
         return allowed;
     }
 
-    public static boolean isAllowedToReviewAFlat(final String username, final Integer flatId) {
+    public static boolean isAllowedToReviewAFlat(final String username, final Integer flatId, FlatService flatService, AuthoritiesService authoritiesService) {
         Flat flat = flatService.findFlatById(flatId);
 
         return authoritiesService.findAuthorityById(username).equals(AuthoritiesType.TENANT) && flat != null && flat.getTenants().stream().anyMatch(x -> x.getUsername().equals(username))
             && flat.getFlatReviews().stream().noneMatch(f -> f.getCreator().getUsername().equals(username));
     }
-
 
 }

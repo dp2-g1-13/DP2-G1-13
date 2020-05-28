@@ -59,4 +59,13 @@ public class CreatingAdvertisementsDefinitions extends AbstractStep {
 		assertEquals("User is disabled", driver.findElement(By.xpath("//div[contains(text(),'User is disabled')]")).getText());
 		assertEquals("http://localhost:"+port+"/login-error", driver.getCurrentUrl());
 	}
+	
+	@And("I try to create an advertisement for the first flat")
+	public void TryToCreateAnAd() throws Exception {	
+		TryToCreateAnAd(getDriver());		
+	}
+	
+	public static void TryToCreateAnAd(WebDriver driver) throws Exception {		
+		driver.findElement(By.xpath("//a[contains(text(),'See details')]")).click();
+	}
 }

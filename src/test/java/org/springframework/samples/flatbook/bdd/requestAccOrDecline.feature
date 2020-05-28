@@ -1,4 +1,4 @@
-Feature: Listing requests (UH 18) 
+Feature: Accepting or rejecting requests (UH 18) 
    I can sign up in the system as a host and accept or decline the requests of my flats.
   
   Scenario: Successful request accepting (Positive)
