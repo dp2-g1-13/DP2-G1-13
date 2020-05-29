@@ -180,7 +180,7 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}")
 	public ModelAndView showFlat(@PathVariable("flatId") final int flatId, final Principal principal) {
-		if (!this.validateUser(flatId) && !this.validateUser(flatId)) {
+		if (!this.validateUser(flatId)) {
 			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		ModelAndView mav = new ModelAndView("flats/flatDetails");
