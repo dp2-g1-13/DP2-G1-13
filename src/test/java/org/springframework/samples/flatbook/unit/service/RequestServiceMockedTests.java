@@ -9,7 +9,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
+import static org.springframework.samples.flatbook.utils.assertj.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

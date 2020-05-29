@@ -1,27 +1,11 @@
 
 package org.springframework.samples.flatbook.web;
 
-import java.security.Principal;
-import java.time.LocalDate;
-import java.util.Map;
-
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.samples.flatbook.model.Flat;
-import org.springframework.samples.flatbook.model.FlatReview;
-import org.springframework.samples.flatbook.model.Person;
-import org.springframework.samples.flatbook.model.Tenant;
-import org.springframework.samples.flatbook.model.TenantReview;
-import org.springframework.samples.flatbook.model.enums.ReviewType;
+import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.model.dtos.ReviewForm;
-import org.springframework.samples.flatbook.service.AuthoritiesService;
-import org.springframework.samples.flatbook.service.FlatReviewService;
-import org.springframework.samples.flatbook.service.FlatService;
-import org.springframework.samples.flatbook.service.HostService;
-import org.springframework.samples.flatbook.service.PersonService;
-import org.springframework.samples.flatbook.service.TenantReviewService;
-import org.springframework.samples.flatbook.service.TenantService;
+import org.springframework.samples.flatbook.model.enums.ReviewType;
+import org.springframework.samples.flatbook.service.*;
 import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.stereotype.Controller;
@@ -31,6 +15,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.validation.Valid;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.util.Map;
 
 @Controller
 public class ReviewController {

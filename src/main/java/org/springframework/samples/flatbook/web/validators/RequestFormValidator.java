@@ -30,20 +30,28 @@ public class RequestFormValidator implements Validator {
             if(request.getDescription() == null || request.getDescription().isEmpty())
                 errors.rejectValue("description", "", "Description must not be null nor blank");
             if(request.getStartDate() != null && request.getFinishDate() != null) {
-                if(request.getStartDate().isAfter(request.getFinishDate()) || request.getStartDate().isEqual(request.getFinishDate())) {
-                    errors.rejectValue(START_DATE, "", "Start date must be before finish date");
-                    errors.rejectValue(FINISH_DATE, "", "Finish date must be after start date");
-                }
-                if(request.getStartDate().isBefore(LocalDate.now()))
-                    errors.rejectValue(START_DATE, "", "Start date must be after today's date");
-                if(request.getFinishDate().isBefore(LocalDate.now()))
-                    errors.rejectValue(FINISH_DATE, "", "Finish date must be after today's date");
+                validateExistingDates(errors, request);
             } else {
-                if(request.getStartDate() == null)
-                    errors.rejectValue(START_DATE, "", "Start date must not be null");
-                else if(request.getFinishDate() == null)
-                    errors.rejectValue(FINISH_DATE, "", "Finish date must not be null");
+                validateNotExistingDates(errors, request);
             }
         }
     }
+
+	private void validateNotExistingDates(Errors errors, RequestForm request) {
+		if(request.getStartDate() == null)
+		    errors.rejectValue(START_DATE, "", "Start date must not be null");
+		else if(request.getFinishDate() == null)
+		    errors.rejectValue(FINISH_DATE, "", "Finish date must not be null");
+	}
+
+	private void validateExistingDates(Errors errors, RequestForm request) {
+		if(request.getStartDate().isAfter(request.getFinishDate()) || request.getStartDate().isEqual(request.getFinishDate())) {
+		    errors.rejectValue(START_DATE, "", "Start date must be before finish date");
+		    errors.rejectValue(FINISH_DATE, "", "Finish date must be after start date");
+		}
+		if(request.getStartDate().isBefore(LocalDate.now()))
+		    errors.rejectValue(START_DATE, "", "Start date must be after today's date");
+		if(request.getFinishDate().isBefore(LocalDate.now()))
+		    errors.rejectValue(FINISH_DATE, "", "Finish date must be after today's date");
+	}
 }

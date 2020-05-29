@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.util.assertj;
+package org.springframework.samples.flatbook.utils.assertj;
 
 /**
  * Entry point for BDD assertions of different data types.

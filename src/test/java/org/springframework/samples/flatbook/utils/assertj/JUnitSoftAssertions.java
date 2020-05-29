@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.util.assertj;
+package org.springframework.samples.flatbook.utils.assertj;
 
 /**
  * Like {@link SoftAssertions} but as a junit rule that takes care of calling

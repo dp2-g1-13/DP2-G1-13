@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.util.assertj;
+package org.springframework.samples.flatbook.utils.assertj;
 
 import org.assertj.core.api.AbstractObjectAssert;
 import org.springframework.samples.flatbook.model.Indicators;

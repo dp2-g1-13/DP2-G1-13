@@ -9,7 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.samples.flatbook.model.Host;
-import org.springframework.samples.flatbook.util.TestUtils;
+import org.springframework.samples.flatbook.utils.TestUtils;
 
 class HostValidatorTests {
 

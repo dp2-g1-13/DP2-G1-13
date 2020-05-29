@@ -11,7 +11,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
-import org.springframework.samples.flatbook.util.TestUtils;
+import org.springframework.samples.flatbook.utils.TestUtils;
 
 class PersonFormValidatorTests {
 

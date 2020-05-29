@@ -1,4 +1,4 @@
-package org.springframework.samples.flatbook.util.assertj;
+package org.springframework.samples.flatbook.utils.assertj;
 
 /**
  * Entry point for assertions of different data types. Each method in this class is a static factory for the

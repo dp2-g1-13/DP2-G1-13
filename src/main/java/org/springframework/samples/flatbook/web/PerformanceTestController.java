@@ -3,6 +3,7 @@ package org.springframework.samples.flatbook.web;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,6 +38,7 @@ import io.cucumber.messages.internal.com.google.common.collect.Sets;
 @RequestMapping("performance")
 public class PerformanceTestController {
 
+	private static final String DESCRIPTION = "DescriptionDescriptionDescriptionDescriptionDescription";
 	private final FlatService			flatService;
 	private final RequestService		requestService;
 	private final TenantService			tenantService;
@@ -64,7 +66,7 @@ public class PerformanceTestController {
 
 		Flat flat = new Flat();
 
-		flat.setImages(Stream.generate(() -> new DBImage()).limit(6).collect(Collectors.toSet()));
+		flat.setImages(Stream.generate(DBImage::new).limit(6).collect(Collectors.toSet()));
 		flat.getImages().forEach(x -> {
 			x.setData("imagina".getBytes());
 			x.setFilename("image");
@@ -75,7 +77,7 @@ public class PerformanceTestController {
 
 		flat.setAvailableServices("Wifi and breakfast");
 		flat.setNumberBaths(2);
-		flat.setDescription("DescriptionDescriptionDescriptionDescriptionDescription");
+		flat.setDescription(DESCRIPTION);
 		flat.setNumberRooms(2);
 		flat.setSquareMeters(900);
 
@@ -105,9 +107,10 @@ public class PerformanceTestController {
 	}
 
 	private String createTenant(final Flat flat) {
+		Random random = new Random();
 		Tenant tenant = new Tenant();
-		char letter = (char) (Math.floor(Math.random() * 100 % 25) + 65);
-		String numbers = Stream.generate(() -> (int) (Math.random() * 9) + "").limit(8).reduce("", (x, y) -> x.toString() + y.toString());
+		char letter = (char) (random.nextInt() * 100 % 25 + 65);
+		String numbers = Stream.generate(() -> random.nextInt() * 9 + "").limit(8).reduce("", (x, y) -> x + y);
 		tenant.setDni(numbers + letter);
 		tenant.setEmail("email" + tenant.getDni() + "@user.com");
 		tenant.setEnabled(true);
@@ -129,7 +132,7 @@ public class PerformanceTestController {
 		Advertisement advertisement = new Advertisement();
 
 		advertisement.setCreationDate(LocalDate.now().plusDays(-1));
-		advertisement.setDescription("DescriptionDescriptionDescriptionDescriptionDescription");
+		advertisement.setDescription(DESCRIPTION);
 		advertisement.setPricePerMonth(1000.0);
 		advertisement.setRequirements("RequerementRequirmentRequerementRequeriment");
 		advertisement.setTitle("Advertisement");
@@ -149,7 +152,7 @@ public class PerformanceTestController {
 		Request request = new Request();
 
 		request.setCreationDate(LocalDateTime.now().plusDays(-1));
-		request.setDescription("DescriptionDescriptionDescriptionDescriptionDescription");
+		request.setDescription(DESCRIPTION);
 		request.setFinishDate(LocalDate.now().plusDays(20));
 		request.setStartDate(LocalDate.now().plusDays(-1));
 		request.setStatus(RequestStatus.valueOf(status));
@@ -176,7 +179,7 @@ public class PerformanceTestController {
 		Tenant tenant = this.tenantService.findTenantById(info.getTenantId());
 
 		review.setCreationDate(LocalDate.now().plusDays(-1));
-		review.setDescription("DescriptionDescriptionDescriptionDescriptionDescription");
+		review.setDescription(DESCRIPTION);
 		review.setRate(2);
 		review.setCreator(tenant);
 

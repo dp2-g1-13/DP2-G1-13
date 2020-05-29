@@ -15,9 +15,9 @@ import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.TenantReview;
 import org.springframework.samples.flatbook.model.User;
+import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
-import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.HostService;
@@ -25,10 +25,10 @@ import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.samples.flatbook.service.UserService;
 import org.springframework.samples.flatbook.service.apis.MailjetAPIService;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
-import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.PasswordValidator;
 import org.springframework.samples.flatbook.web.validators.PersonAuthorityValidator;
@@ -65,15 +65,16 @@ public class PersonController {
 	PersonService				personService;
 	AuthoritiesService			authoritiesService;
 	TenantService				tenantService;
-	HostService				    hostService;
+	HostService					hostService;
 	AdvertisementService		advertisementService;
 	UserService					userService;
 	MailjetAPIService			mailjetAPIService;
 
 
 	@Autowired
-	public PersonController(final PersonService personService, final AuthoritiesService authoritiesService, final TenantService tenantService, final AdvertisementService advertisementService, final UserService userService,
-		final MailjetAPIService mailjetAPIService, final HostService hostService) {
+	public PersonController(final PersonService personService, final AuthoritiesService authoritiesService, final TenantService tenantService,
+		final AdvertisementService advertisementService, final UserService userService, final MailjetAPIService mailjetAPIService,
+		final HostService hostService) {
 		super();
 		this.personService = personService;
 		this.authoritiesService = authoritiesService;
@@ -103,7 +104,7 @@ public class PersonController {
 	public String newUser(final ModelMap model) {
 		PersonForm person = new PersonForm();
 		person.setSaveType(SaveType.NEW);
-		model.put(PERSON_FORM, person);
+		model.put(PersonController.PERSON_FORM, person);
 		return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 	}
 
@@ -115,7 +116,8 @@ public class PersonController {
 			try {
 				user.setSaveType(SaveType.NEW);
 				this.personService.saveUser(user);
-				this.mailjetAPIService.sendSimpleMessage(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getUsername(), user.getPassword());
+				this.mailjetAPIService.sendSimpleMessage(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getUsername(),
+					user.getPassword());
 				return "redirect:/login";
 			} catch (DuplicatedUsernameException e) {
 				result.rejectValue("username", PersonController.USERNAME_DUPLICATED, PersonController.USERNAME_DUPLICATED);
@@ -136,7 +138,7 @@ public class PersonController {
 			PersonForm user = new PersonForm(this.personService.findUserById(username));
 			user.setAuthority(this.authoritiesService.findAuthorityById(username));
 			user.setSaveType(SaveType.EDIT);
-			model.put(PERSON_FORM, user);
+			model.put(PersonController.PERSON_FORM, user);
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else {
 			throw new BadRequestException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
@@ -145,7 +147,9 @@ public class PersonController {
 	}
 
 	@PostMapping("/users/{username}/edit")
-	public String updateUserProfile(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username, final Principal principal) {
+	public String updateUserProfile(final ModelMap model, @Valid final PersonForm user, final BindingResult result,
+		@PathVariable("username") final String username, final Principal principal)
+		throws DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
 		if (result.hasErrors()) {
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else if (!username.equals(principal.getName())) {
@@ -155,10 +159,7 @@ public class PersonController {
 			user.setUsername(username);
 			user.setPassword(this.personService.findUserById(username).getPassword());
 			user.setAuthority(this.authoritiesService.findAuthorityById(user.getUsername()));
-			try {
-				this.personService.saveUser(user);
-			} catch (DuplicatedUsernameException | DuplicatedDniException | DuplicatedEmailException e) {
-			}
+			this.personService.saveUser(user);
 			return "redirect:/";
 		}
 	}
@@ -169,7 +170,7 @@ public class PersonController {
 			PersonForm user = new PersonForm(this.personService.findUserById(username));
 			user.setAuthority(this.authoritiesService.findAuthorityById(username));
 			user.setSaveType(SaveType.EDIT);
-			model.put(PERSON_FORM, user);
+			model.put(PersonController.PERSON_FORM, user);
 			return PersonController.USERS_UPDATE_PASSWORD;
 		} else {
 			throw new BadRequestException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
@@ -177,7 +178,9 @@ public class PersonController {
 	}
 
 	@PostMapping("/users/{username}/editPassword")
-	public String updatePassword(final ModelMap model, @Valid final PersonForm user, final BindingResult result, @PathVariable("username") final String username, final Principal principal) {
+	public String updatePassword(final ModelMap model, @Valid final PersonForm user, final BindingResult result,
+		@PathVariable("username") final String username, final Principal principal)
+		throws DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
 		if (result.hasErrors()) {
 			return PersonController.USERS_UPDATE_PASSWORD;
 		} else if (!username.equals(principal.getName())) {
@@ -191,10 +194,7 @@ public class PersonController {
 			previous.setPassword(user.getPassword());
 			previous.setAuthority(this.authoritiesService.findAuthorityById(username));
 			previous.setSaveType(SaveType.EDIT);
-			try {
-				this.personService.saveUser(previous);
-			} catch (DuplicatedUsernameException | DuplicatedDniException | DuplicatedEmailException e) {
-			}
+			this.personService.saveUser(previous);
 			return "redirect:/";
 		}
 	}
@@ -202,13 +202,15 @@ public class PersonController {
 	@GetMapping("/users/{username}")
 	public String initUserPage(final ModelMap model, @PathVariable("username") final String username, final Principal principal) {
 		User user = this.personService.findUserById(username);
-		if (user != null && (user.isEnabled() || !user.isEnabled() && this.authoritiesService.findAuthorityById(principal.getName()).equals(AuthoritiesType.ADMIN))) {
+		if (user != null && (user.isEnabled()
+			|| !user.isEnabled() && this.authoritiesService.findAuthorityById(principal.getName()).equals(AuthoritiesType.ADMIN))) {
 			model.put("username", username);
 			model.put("enabled", user.isEnabled());
 
 			if (this.authoritiesService.findAuthorityById(username).equals(AuthoritiesType.TENANT)) {
 				Tenant tenant = this.tenantService.findTenantById(username);
-				model.put("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewATenant(principal.getName(), username, this.tenantService, this.authoritiesService, this.hostService));
+				model.put("canCreateReview", principal != null && ReviewUtils.isAllowedToReviewATenant(principal.getName(), username,
+					this.tenantService, this.authoritiesService, this.hostService));
 				List<TenantReview> reviews = tenant.getReviews().stream().filter(x -> x.getCreator().isEnabled()).collect(Collectors.toList());
 				reviews.sort(Comparator.comparing(TenantReview::getCreationDate).reversed());
 				model.put("reviews", reviews);
@@ -228,7 +230,8 @@ public class PersonController {
 	@GetMapping("/users/list")
 	public String initUserList(final ModelMap model, final Principal principal, @RequestParam(name = "show", required = false) final String show) {
 		List<User> users = this.personService.findAllUsers().stream().sorted(Comparator.comparing(User::getUsername)).collect(Collectors.toList());
-		List<Authorities> authorities = this.authoritiesService.findAll().stream().sorted(Comparator.comparing(Authorities::getUsername)).collect(Collectors.toList());
+		List<Authorities> authorities = this.authoritiesService.findAll().stream().sorted(Comparator.comparing(Authorities::getUsername))
+			.collect(Collectors.toList());
 
 		if (show != null && show.equals(PersonController.ACTIVE)) {
 			users.removeIf(x -> !x.isEnabled());

@@ -9,10 +9,10 @@ import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Tenant;
+import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
 import org.springframework.samples.flatbook.model.enums.SaveType;
-import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.samples.flatbook.repository.AuthoritiesRepository;
 import org.springframework.samples.flatbook.repository.FlatRepository;
 import org.springframework.samples.flatbook.repository.HostRepository;
@@ -45,7 +45,8 @@ public class PersonService {
 
 
 	@Autowired
-	public PersonService(final PersonRepository personRepository, final AuthoritiesRepository authoritiesRepository, final HostRepository hostRepository, final TenantRepository tenantRepository, final FlatRepository flatRepository,
+	public PersonService(final PersonRepository personRepository, final AuthoritiesRepository authoritiesRepository,
+		final HostRepository hostRepository, final TenantRepository tenantRepository, final FlatRepository flatRepository,
 		final TaskRepository taskRepository, final RequestRepository requestRepository) {
 		this.personRepository = personRepository;
 		this.authoritiesRepository = authoritiesRepository;
@@ -60,7 +61,7 @@ public class PersonService {
 		DuplicatedUsernameException.class, DuplicatedDniException.class, DuplicatedEmailException.class
 	})
 	public void saveUser(final PersonForm user) throws DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
-		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : user.getAuthority().equals(AuthoritiesType.TENANT) ? new Tenant(user) : null;
+		Person person = user.getAuthority().equals(AuthoritiesType.HOST) ? new Host(user) : new Tenant(user);
 		SaveType type = user.getSaveType();
 
 		if (SaveType.NEW.equals(type)) {
@@ -148,9 +149,9 @@ public class PersonService {
 		});
 
 		this.taskRepository.findByParticipant(tenant.getUsername()).forEach(x -> {
-            if (x.getCreator().equals(tenant)) {
-                this.taskRepository.deleteById(x.getId());
-            } else if (x.getAsignee().equals(tenant)) {
+			if (x.getCreator().equals(tenant)) {
+				this.taskRepository.deleteById(x.getId());
+			} else if (x.getAsignee().equals(tenant)) {
 				x.setAsignee(null);
 				this.taskRepository.save(x);
 			}

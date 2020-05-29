@@ -223,15 +223,13 @@ public class AdvertisementController {
 		}
 	}
 
-	public Boolean validateHost(final int flatId) {
-		Boolean userIsHost = true;
+	public boolean validateHost(final int flatId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals(AuthoritiesType.ADMIN.toString()))) {
-			String username = ((User) auth.getPrincipal()).getUsername();
 			Host host = this.hostService.findHostByFlatId(flatId);
-			userIsHost = username.equals(host.getUsername()) && host.isEnabled();
+			return ((User) auth.getPrincipal()).getUsername().equals(host.getUsername()) && host.isEnabled();
 		}
-		return userIsHost;
+		return true;
 	}
 
 	private Double haversineFormula(final Double latitudeAd, final Double longitudeAd, final Double latitudeQuery, final Double longitudeQuery) {
