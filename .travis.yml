@@ -11,5 +11,4 @@ services:
 before_install:
   - mysql -e 'CREATE DATABASE flatbook;'
 script: 
-  - mvn test -Dspring.profiles.active=mysql-travis
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=dp2-g1-13_DP2-G1-13
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=dp2-g1-13_DP2-G1-13 -Dspring.profiles.active=mysql-travis
