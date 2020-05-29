@@ -18,7 +18,7 @@ package org.springframework.samples.flatbook.web.validators;
 
 import java.util.regex.Pattern;
 
-import org.springframework.samples.flatbook.model.mappers.PersonForm;
+import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 

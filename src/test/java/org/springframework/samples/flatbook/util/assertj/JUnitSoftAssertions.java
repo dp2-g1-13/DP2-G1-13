@@ -231,47 +231,47 @@ public class JUnitSoftAssertions extends org.assertj.core.api.JUnitSoftAssertion
   }
 
   /**
-   * Creates a new "soft" instance of <code>{@link org.springframework.samples.flatbook.model.mappers.AdvertisementFormAssert}</code>.
+   * Creates a new "soft" instance of <code>{@link org.springframework.samples.flatbook.model.dtos.AdvertisementFormAssert}</code>.
    *
    * @param actual the actual value.
    * @return the created "soft" assertion object.
    */
   @org.assertj.core.util.CheckReturnValue
-  public AdvertisementFormAssert assertThat(org.springframework.samples.flatbook.model.mappers.AdvertisementForm actual) {
-    return proxy(AdvertisementFormAssert.class, org.springframework.samples.flatbook.model.mappers.AdvertisementForm.class, actual);
+  public AdvertisementFormAssert assertThat(org.springframework.samples.flatbook.model.dtos.AdvertisementForm actual) {
+    return proxy(AdvertisementFormAssert.class, org.springframework.samples.flatbook.model.dtos.AdvertisementForm.class, actual);
   }
 
   /**
-   * Creates a new "soft" instance of <code>{@link org.springframework.samples.flatbook.model.mappers.PersonFormAssert}</code>.
+   * Creates a new "soft" instance of <code>{@link org.springframework.samples.flatbook.model.dtos.PersonFormAssert}</code>.
    *
    * @param actual the actual value.
    * @return the created "soft" assertion object.
    */
   @org.assertj.core.util.CheckReturnValue
-  public PersonFormAssert assertThat(org.springframework.samples.flatbook.model.mappers.PersonForm actual) {
-    return proxy(PersonFormAssert.class, org.springframework.samples.flatbook.model.mappers.PersonForm.class, actual);
+  public PersonFormAssert assertThat(org.springframework.samples.flatbook.model.dtos.PersonForm actual) {
+    return proxy(PersonFormAssert.class, org.springframework.samples.flatbook.model.dtos.PersonForm.class, actual);
   }
 
   /**
-   * Creates a new "soft" instance of <code>{@link org.springframework.samples.flatbook.model.mappers.RequestFormAssert}</code>.
+   * Creates a new "soft" instance of <code>{@link org.springframework.samples.flatbook.model.dtos.RequestFormAssert}</code>.
    *
    * @param actual the actual value.
    * @return the created "soft" assertion object.
    */
   @org.assertj.core.util.CheckReturnValue
-  public RequestFormAssert assertThat(org.springframework.samples.flatbook.model.mappers.RequestForm actual) {
-    return proxy(RequestFormAssert.class, org.springframework.samples.flatbook.model.mappers.RequestForm.class, actual);
+  public RequestFormAssert assertThat(org.springframework.samples.flatbook.model.dtos.RequestForm actual) {
+    return proxy(RequestFormAssert.class, org.springframework.samples.flatbook.model.dtos.RequestForm.class, actual);
   }
 
   /**
-   * Creates a new "soft" instance of <code>{@link org.springframework.samples.flatbook.model.mappers.ReviewFormAssert}</code>.
+   * Creates a new "soft" instance of <code>{@link org.springframework.samples.flatbook.model.dtos.ReviewFormAssert}</code>.
    *
    * @param actual the actual value.
    * @return the created "soft" assertion object.
    */
   @org.assertj.core.util.CheckReturnValue
-  public ReviewFormAssert assertThat(org.springframework.samples.flatbook.model.mappers.ReviewForm actual) {
-    return proxy(ReviewFormAssert.class, org.springframework.samples.flatbook.model.mappers.ReviewForm.class, actual);
+  public ReviewFormAssert assertThat(org.springframework.samples.flatbook.model.dtos.ReviewForm actual) {
+    return proxy(ReviewFormAssert.class, org.springframework.samples.flatbook.model.dtos.ReviewForm.class, actual);
   }
 
 }

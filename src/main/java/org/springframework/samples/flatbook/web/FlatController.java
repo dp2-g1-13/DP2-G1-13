@@ -29,7 +29,7 @@ import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
-import org.springframework.samples.flatbook.service.exceptions.IllegalAccessRuntimeException;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.core.Authentication;
@@ -124,8 +124,8 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}/edit")
 	public String initUpdateForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
-		if (!this.validateHost(flatId)) {
-			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+		if (!this.validateUser(flatId)) {
+			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		model.put("flat", flat);
@@ -139,8 +139,8 @@ public class FlatController {
 		if (result.hasErrors()) {
 			return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 		} else {
-			if (!this.validateHost(flatId)) {
-				throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+			if (!this.validateUser(flatId)) {
+				throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 			}
 			Set<DBImage> newImages = flat.getImages().stream().filter(x -> !x.getFileType().equals("application/octet-stream"))
 				.collect(Collectors.toSet());
@@ -162,12 +162,12 @@ public class FlatController {
 	@GetMapping(value = "/flats/{flatId}/images/{imageId}/delete")
 	public String processDeleteImage(@PathVariable("flatId") final int flatId, @PathVariable("imageId") final int imageId,
 		final Map<String, Object> model) {
-		if (!this.validateHost(flatId)) {
-			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+		if (!this.validateUser(flatId)) {
+			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		if (flat.getImages().size() == 6) {
-			IllegalAccessRuntimeException e = new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+			BadRequestException e = new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 			model.put("exception", e);
 			return "exception";
 		} else {
@@ -180,8 +180,8 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}")
 	public ModelAndView showFlat(@PathVariable("flatId") final int flatId, final Principal principal) {
-		if (!this.validateHost(flatId) && !this.validateTenant(flatId)) {
-			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+		if (!this.validateUser(flatId) && !this.validateUser(flatId)) {
+			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		ModelAndView mav = new ModelAndView("flats/flatDetails");
 		Flat flat = this.flatService.findFlatById(flatId);
@@ -221,8 +221,8 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}/delete")
 	public String processDeleteFlat(@PathVariable("flatId") final int flatId) {
-		if (!this.validateHost(flatId)) {
-			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+		if (!this.validateUser(flatId)) {
+			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		this.flatService.deleteFlat(flat);
@@ -230,26 +230,19 @@ public class FlatController {
 		return "redirect:/flats/list";
 	}
 
-	public boolean validateHost(final int flatId) {
-		Boolean userIsHost = true;
+	public boolean validateUser(final int flatId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals(AuthoritiesType.ADMIN.toString()))) {
-			String username = ((User) auth.getPrincipal()).getUsername();
-			Host host = this.hostService.findHostByFlatId(flatId);
-			userIsHost = username.equals(host.getUsername()) && host.isEnabled();
-		}
-		return userIsHost;
-	}
+		String username = ((User) auth.getPrincipal()).getUsername();
 
-	private boolean validateTenant(final int flatId) {
-		boolean userIsTenantOfFlat = true;
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals(AuthoritiesType.ADMIN.toString()))) {
-			String username = ((User) auth.getPrincipal()).getUsername();
+		if (auth.getAuthorities().stream().anyMatch(x -> x.getAuthority().equals(AuthoritiesType.HOST.toString()))) {
+			Host host = this.hostService.findHostByFlatId(flatId);
+			return username.equals(host.getUsername()) && host.isEnabled();
+		} else if (auth.getAuthorities().stream().anyMatch(x -> x.getAuthority().equals(AuthoritiesType.TENANT.toString()))) {
 			Flat flat = this.flatService.findFlatById(flatId);
-			userIsTenantOfFlat = flat.getTenants().stream().anyMatch(x -> x.getUsername().equals(username));
+			return flat.getTenants().stream().anyMatch(x -> x.getUsername().equals(username));
+		} else {
+			return true;
 		}
-		return userIsTenantOfFlat;
 	}
 
 }

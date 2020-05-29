@@ -23,7 +23,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-import org.springframework.samples.flatbook.model.mappers.PersonForm;
+import org.springframework.samples.flatbook.model.dtos.PersonForm;
 
 import lombok.Getter;
 import lombok.Setter;

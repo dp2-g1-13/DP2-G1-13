@@ -17,7 +17,7 @@
 package org.springframework.samples.flatbook.web.validators;
 
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
-import org.springframework.samples.flatbook.model.mappers.PersonForm;
+import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 

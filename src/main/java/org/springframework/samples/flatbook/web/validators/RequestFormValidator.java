@@ -1,7 +1,7 @@
 package org.springframework.samples.flatbook.web.validators;
 
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
-import org.springframework.samples.flatbook.model.mappers.RequestForm;
+import org.springframework.samples.flatbook.model.dtos.RequestForm;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -11,7 +11,7 @@ public class RequestFormValidator implements Validator {
 
 	private static final String FINISH_DATE = "finishDate";
 	private static final String START_DATE = "startDate";
-	
+
     private AuthoritiesType type;
 
     public RequestFormValidator(AuthoritiesType type) {

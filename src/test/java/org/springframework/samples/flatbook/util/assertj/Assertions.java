@@ -217,46 +217,46 @@ public class Assertions {
   }
 
   /**
-   * Creates a new instance of <code>{@link org.springframework.samples.flatbook.model.mappers.AdvertisementFormAssert}</code>.
+   * Creates a new instance of <code>{@link org.springframework.samples.flatbook.model.dtos.AdvertisementFormAssert}</code>.
    *
    * @param actual the actual value.
    * @return the created assertion object.
    */
   @org.assertj.core.util.CheckReturnValue
-  public static AdvertisementFormAssert assertThat(org.springframework.samples.flatbook.model.mappers.AdvertisementForm actual) {
+  public static AdvertisementFormAssert assertThat(org.springframework.samples.flatbook.model.dtos.AdvertisementForm actual) {
     return new AdvertisementFormAssert(actual);
   }
 
   /**
-   * Creates a new instance of <code>{@link org.springframework.samples.flatbook.model.mappers.PersonFormAssert}</code>.
+   * Creates a new instance of <code>{@link org.springframework.samples.flatbook.model.dtos.PersonFormAssert}</code>.
    *
    * @param actual the actual value.
    * @return the created assertion object.
    */
   @org.assertj.core.util.CheckReturnValue
-  public static PersonFormAssert assertThat(org.springframework.samples.flatbook.model.mappers.PersonForm actual) {
+  public static PersonFormAssert assertThat(org.springframework.samples.flatbook.model.dtos.PersonForm actual) {
     return new PersonFormAssert(actual);
   }
 
   /**
-   * Creates a new instance of <code>{@link org.springframework.samples.flatbook.model.mappers.RequestFormAssert}</code>.
+   * Creates a new instance of <code>{@link org.springframework.samples.flatbook.model.dtos.RequestFormAssert}</code>.
    *
    * @param actual the actual value.
    * @return the created assertion object.
    */
   @org.assertj.core.util.CheckReturnValue
-  public static RequestFormAssert assertThat(org.springframework.samples.flatbook.model.mappers.RequestForm actual) {
+  public static RequestFormAssert assertThat(org.springframework.samples.flatbook.model.dtos.RequestForm actual) {
     return new RequestFormAssert(actual);
   }
 
   /**
-   * Creates a new instance of <code>{@link org.springframework.samples.flatbook.model.mappers.ReviewFormAssert}</code>.
+   * Creates a new instance of <code>{@link org.springframework.samples.flatbook.model.dtos.ReviewFormAssert}</code>.
    *
    * @param actual the actual value.
    * @return the created assertion object.
    */
   @org.assertj.core.util.CheckReturnValue
-  public static ReviewFormAssert assertThat(org.springframework.samples.flatbook.model.mappers.ReviewForm actual) {
+  public static ReviewFormAssert assertThat(org.springframework.samples.flatbook.model.dtos.ReviewForm actual) {
     return new ReviewFormAssert(actual);
   }
 

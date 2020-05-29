@@ -22,7 +22,7 @@ import org.springframework.samples.flatbook.model.Host;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
-import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
+import org.springframework.samples.flatbook.model.dtos.AdvertisementForm;
 import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.model.pojos.Location;
 import org.springframework.samples.flatbook.service.AdvertisementService;
@@ -33,7 +33,7 @@ import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.RequestService;
 import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
-import org.springframework.samples.flatbook.service.exceptions.IllegalAccessRuntimeException;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,11 +49,13 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class AdvertisementController {
 
-	private static final String		VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM	= "advertisements/createOrUpdateAdvertisementForm";
+    private static final String		VIEWS_ADVERTISEMENTS_CREATE_OR_UPDATE_FORM	= "advertisements/createOrUpdateAdvertisementForm";
 	private static final String 	EXCEPTION_MESSAGE = "Illegal access";
 	private static final String 	WELCOME_PAGE = "welcome";
-	
-	private AdvertisementService	advertisementService;
+    public static final String ADVERTISEMENTS_LIST = "advertisements/advertisementsList";
+    public static final String ADVERTISEMENT_DETAILS = "advertisements/advertisementDetails";
+
+    private AdvertisementService	advertisementService;
 	private AuthoritiesService	    authoritiesService;
 	private FlatService				flatService;
 	private DBImageService			dbImageService;
@@ -81,7 +83,7 @@ public class AdvertisementController {
 	public String initCreationForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
 		Flat flat = this.flatService.findFlatById(flatId);
 		if (flat == null || !this.validateHost(flatId) || this.advertisementService.isAdvertisementWithFlatId(flat.getId())) {
-			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+			throw new BadRequestException(EXCEPTION_MESSAGE);
 		}
 		AdvertisementForm advertisement = new AdvertisementForm();
 		model.put("advertisementForm", advertisement);
@@ -96,7 +98,7 @@ public class AdvertisementController {
 		} else {
 			Flat flat = this.flatService.findFlatById(flatId);
 			if (flat == null || !this.validateHost(flatId) || this.advertisementService.isAdvertisementWithFlatId(flat.getId())) {
-				throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+				throw new BadRequestException(EXCEPTION_MESSAGE);
 			}
 			Advertisement advertisement = new Advertisement(adv);
 			advertisement.setFlat(flat);
@@ -109,7 +111,7 @@ public class AdvertisementController {
 	public String initUpdateForm(@PathVariable("advertisementId") final int advertisementId, final Map<String, Object> model) {
 		Advertisement adv = this.advertisementService.findAdvertisementById(advertisementId);
 		if (adv == null || !this.validateHost(adv.getFlat().getId())) {
-			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+			throw new BadRequestException(EXCEPTION_MESSAGE);
 		}
 		AdvertisementForm af = new AdvertisementForm(adv);
 		model.put("advertisementForm", af);
@@ -124,7 +126,7 @@ public class AdvertisementController {
 		} else {
 			Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
 			if (advertisement == null || !this.validateHost(advertisement.getFlat().getId())) {
-				throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+				throw new BadRequestException(EXCEPTION_MESSAGE);
 			}
 			Advertisement newAdvertisement = new Advertisement(adv);
 			newAdvertisement.setFlat(advertisement.getFlat());
@@ -139,7 +141,7 @@ public class AdvertisementController {
 	public String processDeleteAdvertisement(@PathVariable("advertisementId") final int advertisementId, final Map<String, Object> model) {
 		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
 		if (advertisement == null || !this.validateHost(advertisement.getFlat().getId())) {
-			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+			throw new BadRequestException(EXCEPTION_MESSAGE);
 		}
 		this.advertisementService.deleteAdvertisement(advertisement);
 		return "redirect:/flats/list";
@@ -147,12 +149,12 @@ public class AdvertisementController {
 
 	@GetMapping(value = "/advertisements/{advertisementId}")
 	public ModelAndView showAdvertisement(@PathVariable("advertisementId") final int advertisementId, final Principal principal) {
-		ModelAndView mav = new ModelAndView("advertisements/advertisementDetails");
+		ModelAndView mav = new ModelAndView(ADVERTISEMENT_DETAILS);
 		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
 		Host host = this.hostService.findHostByFlatId(advertisement.getFlat().getId());
 
 		if (!host.isEnabled()) {
-			throw new IllegalAccessRuntimeException(EXCEPTION_MESSAGE);
+			throw new BadRequestException(EXCEPTION_MESSAGE);
 		}
 
 		mav.addObject(advertisement);
@@ -217,7 +219,7 @@ public class AdvertisementController {
 			model.put("selections", results);
 			model.put("latitude", location.getLat());
 			model.put("longitude", location.getLng());
-			return "advertisements/advertisementsList";
+			return ADVERTISEMENTS_LIST;
 		}
 	}
 

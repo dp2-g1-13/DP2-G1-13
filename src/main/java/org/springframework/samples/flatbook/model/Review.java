@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.samples.flatbook.model.mappers.ReviewForm;
+import org.springframework.samples.flatbook.model.dtos.ReviewForm;
 
 import lombok.Getter;
 import lombok.Setter;

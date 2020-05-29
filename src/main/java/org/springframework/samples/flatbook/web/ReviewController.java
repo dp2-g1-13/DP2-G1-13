@@ -14,7 +14,7 @@ import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.TenantReview;
 import org.springframework.samples.flatbook.model.enums.ReviewType;
-import org.springframework.samples.flatbook.model.mappers.ReviewForm;
+import org.springframework.samples.flatbook.model.dtos.ReviewForm;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.FlatReviewService;
 import org.springframework.samples.flatbook.service.FlatService;
@@ -22,7 +22,7 @@ import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.TenantReviewService;
 import org.springframework.samples.flatbook.service.TenantService;
-import org.springframework.samples.flatbook.service.exceptions.IllegalAccessRuntimeException;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -159,7 +159,7 @@ public class ReviewController {
 
 			}
 		} else {
-			throw new IllegalAccessRuntimeException("You don't have access to this review!");
+			throw new BadRequestException("You don't have access to this review!");
 		}
 	}
 

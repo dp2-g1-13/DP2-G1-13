@@ -12,7 +12,7 @@ import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
 import org.springframework.samples.flatbook.model.enums.SaveType;
-import org.springframework.samples.flatbook.model.mappers.PersonForm;
+import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.samples.flatbook.repository.AuthoritiesRepository;
 import org.springframework.samples.flatbook.repository.FlatRepository;
 import org.springframework.samples.flatbook.repository.HostRepository;

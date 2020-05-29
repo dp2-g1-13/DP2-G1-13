@@ -17,7 +17,7 @@ import org.springframework.samples.flatbook.model.TenantReview;
 import org.springframework.samples.flatbook.model.User;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.enums.SaveType;
-import org.springframework.samples.flatbook.model.mappers.PersonForm;
+import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.HostService;
@@ -28,7 +28,7 @@ import org.springframework.samples.flatbook.service.apis.MailjetAPIService;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedDniException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedEmailException;
 import org.springframework.samples.flatbook.service.exceptions.DuplicatedUsernameException;
-import org.springframework.samples.flatbook.service.exceptions.IllegalAccessRuntimeException;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.PasswordValidator;
 import org.springframework.samples.flatbook.web.validators.PersonAuthorityValidator;
@@ -139,7 +139,7 @@ public class PersonController {
 			model.put(PERSON_FORM, user);
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else {
-			throw new IllegalAccessRuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
+			throw new BadRequestException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
 		}
 
 	}
@@ -149,7 +149,7 @@ public class PersonController {
 		if (result.hasErrors()) {
 			return PersonController.USERS_CREATE_OR_UPDATE_USER_FORM;
 		} else if (!username.equals(principal.getName())) {
-			throw new IllegalAccessRuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
+			throw new BadRequestException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PROFILE);
 		} else {
 			user.setSaveType(SaveType.EDIT);
 			user.setUsername(username);
@@ -172,7 +172,7 @@ public class PersonController {
 			model.put(PERSON_FORM, user);
 			return PersonController.USERS_UPDATE_PASSWORD;
 		} else {
-			throw new IllegalAccessRuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
+			throw new BadRequestException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
 		}
 	}
 
@@ -181,7 +181,7 @@ public class PersonController {
 		if (result.hasErrors()) {
 			return PersonController.USERS_UPDATE_PASSWORD;
 		} else if (!username.equals(principal.getName())) {
-			throw new IllegalAccessRuntimeException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
+			throw new BadRequestException(PersonController.ONLY_CAN_EDIT_YOUR_OWN_PASSWORD);
 		} else {
 			PersonForm previous = new PersonForm(this.personService.findUserById(username));
 			if (!previous.getPassword().equals(user.getPreviousPassword())) {
@@ -219,9 +219,9 @@ public class PersonController {
 			}
 			return PersonController.USER_PAGE;
 		} else if (user != null && !user.isEnabled()) {
-			throw new IllegalAccessRuntimeException("This user is banned");
+			throw new BadRequestException("This user is banned");
 		} else {
-			throw new IllegalAccessRuntimeException("This user does not exists");
+			throw new BadRequestException("This user does not exists");
 		}
 	}
 
@@ -257,7 +257,7 @@ public class PersonController {
 			this.userService.save(user);
 			return "redirect:/users/{username}";
 		} else {
-			throw new IllegalAccessRuntimeException("This user does not exists");
+			throw new BadRequestException("This user does not exists");
 		}
 	}
 
