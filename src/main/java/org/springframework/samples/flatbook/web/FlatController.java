@@ -20,7 +20,6 @@ import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.model.Host;
-import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
@@ -30,6 +29,7 @@ import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
 import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
+import org.springframework.samples.flatbook.utils.FlatUtils;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.core.Authentication;
@@ -124,7 +124,7 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}/edit")
 	public String initUpdateForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
-		if (!this.validateUser(flatId)) {
+		if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
 			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
@@ -139,7 +139,7 @@ public class FlatController {
 		if (result.hasErrors()) {
 			return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 		} else {
-			if (!this.validateUser(flatId)) {
+			if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
 				throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 			}
 			Set<DBImage> newImages = flat.getImages().stream().filter(x -> !x.getFileType().equals("application/octet-stream"))
@@ -162,7 +162,7 @@ public class FlatController {
 	@GetMapping(value = "/flats/{flatId}/images/{imageId}/delete")
 	public String processDeleteImage(@PathVariable("flatId") final int flatId, @PathVariable("imageId") final int imageId,
 		final Map<String, Object> model) {
-		if (!this.validateUser(flatId)) {
+		if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
 			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
@@ -180,7 +180,7 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}")
 	public ModelAndView showFlat(@PathVariable("flatId") final int flatId, final Principal principal) {
-		if (!this.validateUser(flatId)) {
+		if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
 			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		ModelAndView mav = new ModelAndView("flats/flatDetails");
@@ -221,28 +221,13 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}/delete")
 	public String processDeleteFlat(@PathVariable("flatId") final int flatId) {
-		if (!this.validateUser(flatId)) {
+		if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
 			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		this.flatService.deleteFlat(flat);
 
 		return "redirect:/flats/list";
-	}
-
-	public boolean validateUser(final int flatId) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String username = ((User) auth.getPrincipal()).getUsername();
-
-		if (auth.getAuthorities().stream().anyMatch(x -> x.getAuthority().equals(AuthoritiesType.HOST.toString()))) {
-			Host host = this.hostService.findHostByFlatId(flatId);
-			return username.equals(host.getUsername()) && host.isEnabled();
-		} else if (auth.getAuthorities().stream().anyMatch(x -> x.getAuthority().equals(AuthoritiesType.TENANT.toString()))) {
-			Flat flat = this.flatService.findFlatById(flatId);
-			return flat.getTenants().stream().anyMatch(x -> x.getUsername().equals(username));
-		} else {
-			return true;
-		}
 	}
 
 }

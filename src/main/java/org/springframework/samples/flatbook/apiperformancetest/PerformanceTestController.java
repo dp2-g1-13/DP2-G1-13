@@ -1,5 +1,5 @@
 
-package org.springframework.samples.flatbook.web;
+package org.springframework.samples.flatbook.apiperformancetest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

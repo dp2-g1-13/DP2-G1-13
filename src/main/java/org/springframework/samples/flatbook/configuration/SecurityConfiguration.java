@@ -15,15 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- * @author japarejo
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -61,10 +52,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.hasAnyAuthority(AuthoritiesType.HOST.toString(), AuthoritiesType.TENANT.toString()).antMatchers("/statistics")
 			.hasAnyAuthority(AuthoritiesType.ADMIN.toString()).antMatchers("/reports/list").hasAnyAuthority(AuthoritiesType.ADMIN.toString())
 			.antMatchers("/reports/{username:[0-9a-zA-Z]{5,}}/list").hasAnyAuthority(AuthoritiesType.ADMIN.toString())
-			.antMatchers("/reports/{reportId:[0-9]+}/delete").hasAnyAuthority(AuthoritiesType.ADMIN.toString())
-			.antMatchers("/performance/**").permitAll()
-			.anyRequest().denyAll().and()
-			.formLogin()
+			.antMatchers("/reports/{reportId:[0-9]+}/delete").hasAnyAuthority(AuthoritiesType.ADMIN.toString()).antMatchers("/performance/**")
+			.permitAll().anyRequest().denyAll().and().formLogin()
 			/* .loginPage("/login") */
 			.failureUrl("/login-error").and().logout().logoutSuccessUrl("/");
 		// Configuración para que funcione la consola de administración

@@ -65,32 +65,39 @@ public class PersonService {
 		SaveType type = user.getSaveType();
 
 		if (SaveType.NEW.equals(type)) {
-			if (this.personRepository.findByUsername(user.getUsername()) != null) {
-				throw new DuplicatedUsernameException();
-			} else if (this.personRepository.findByDni(user.getDni()) != null) {
-				throw new DuplicatedDniException();
-			} else if (this.personRepository.findByEmail(user.getEmail()) != null) {
-				throw new DuplicatedEmailException();
-			} else if (this.personRepository.findByUsername(user.getUsername()) == null) {
-				this.personRepository.save(person);
-				this.authoritiesRepository.save(new Authorities(user.getUsername(), user.getAuthority()));
-			}
+			this.processNewUser(user, person);
 		} else if (SaveType.EDIT.equals(type)) {
-
-			if (user.getAuthority().equals(AuthoritiesType.HOST)) {
-				Host previusHost = this.hostRepository.findByUsername(user.getUsername());
-				((Host) person).setFlats(previusHost.getFlats());
-				this.hostRepository.save((Host) person);
-
-			} else {
-				Tenant previusTenant = this.tenantRepository.findByUsername(user.getUsername());
-				((Tenant) person).setFlat(previusTenant.getFlat());
-				((Tenant) person).setRequests(previusTenant.getRequests());
-				((Tenant) person).setReviews(previusTenant.getReviews());
-				this.tenantRepository.save((Tenant) person);
-			}
+			this.processEditUser(user, person);
 		}
 
+	}
+
+	private void processEditUser(final PersonForm user, final Person person) {
+		if (user.getAuthority().equals(AuthoritiesType.HOST)) {
+			Host previusHost = this.hostRepository.findByUsername(user.getUsername());
+			((Host) person).setFlats(previusHost.getFlats());
+			this.hostRepository.save((Host) person);
+		} else {
+			Tenant previusTenant = this.tenantRepository.findByUsername(user.getUsername());
+			((Tenant) person).setFlat(previusTenant.getFlat());
+			((Tenant) person).setRequests(previusTenant.getRequests());
+			((Tenant) person).setReviews(previusTenant.getReviews());
+			this.tenantRepository.save((Tenant) person);
+		}
+	}
+
+	private void processNewUser(final PersonForm user, final Person person)
+		throws DuplicatedUsernameException, DuplicatedDniException, DuplicatedEmailException {
+		if (this.personRepository.findByUsername(user.getUsername()) != null) {
+			throw new DuplicatedUsernameException();
+		} else if (this.personRepository.findByDni(user.getDni()) != null) {
+			throw new DuplicatedDniException();
+		} else if (this.personRepository.findByEmail(user.getEmail()) != null) {
+			throw new DuplicatedEmailException();
+		} else if (this.personRepository.findByUsername(user.getUsername()) == null) {
+			this.personRepository.save(person);
+			this.authoritiesRepository.save(new Authorities(user.getUsername(), user.getAuthority()));
+		}
 	}
 
 	@Transactional
