@@ -143,7 +143,7 @@ class RequestControllerE2ETests {
 	void testProcessAcceptRequest() throws Exception {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.get("/flats/{flatId}/requests/{requestId}/accept", RequestControllerE2ETests.TEST_FLAT_ID,
-				RequestControllerE2ETests.TEST_NEW_REQUEST_ID))
+				RequestControllerE2ETests.TEST_REQUEST_ID))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 			.andExpect(MockMvcResultMatchers.view().name("redirect:/flats/{flatId}/requests/list"));
 	}
@@ -178,7 +178,7 @@ class RequestControllerE2ETests {
 	void testProcessRejectRequest() throws Exception {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.get("/flats/{flatId}/requests/{requestId}/reject", RequestControllerE2ETests.TEST_FLAT_ID,
-				RequestControllerE2ETests.TEST_REQUEST_ID))
+				RequestControllerE2ETests.TEST_NEW_REQUEST_ID))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 			.andExpect(MockMvcResultMatchers.view().name("redirect:/flats/{flatId}/requests/list"));
 	}
@@ -266,7 +266,7 @@ class RequestControllerE2ETests {
 	void testProcessCancelRequest() throws Exception {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.get("/flats/{flatId}/requests/{requestId}/cancel", RequestControllerE2ETests.TEST_FLAT_ID,
-				RequestControllerE2ETests.TEST_NEW_REQUEST_ID))
+				RequestControllerE2ETests.TEST_REQUEST_ID))
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 			.andExpect(MockMvcResultMatchers.view().name("redirect:/flats/{flatId}/requests/list"));
 	}
