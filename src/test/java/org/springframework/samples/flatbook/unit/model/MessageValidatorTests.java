@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.model.Person;
-import org.springframework.samples.flatbook.util.TestUtils;
+import org.springframework.samples.flatbook.utils.TestUtils;
 
 class MessageValidatorTests {
 

@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.samples.flatbook.model.Authorities;
 import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
-import org.springframework.samples.flatbook.util.TestUtils;
+import org.springframework.samples.flatbook.utils.TestUtils;
 
 class AuthoritiesValidatorTests {
 

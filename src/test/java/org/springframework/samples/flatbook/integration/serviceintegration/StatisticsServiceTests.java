@@ -1,5 +1,7 @@
 package org.springframework.samples.flatbook.integration.serviceintegration;
 
+import static org.springframework.samples.flatbook.utils.assertj.Assertions.assertThat;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +12,6 @@ import org.springframework.samples.flatbook.model.*;
 import org.springframework.samples.flatbook.service.StatisticsService;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
-
-import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)

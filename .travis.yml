@@ -1,8 +1,14 @@
 dist: trusty
 language: java
 jdk: oraclejdk8
+addons:
+  sonarcloud:
+    organization: "dp2-g1-13"
+    token:
+      secure: "imEK3dYHlKFSaMgYrnYFEzpg7TaHK0/TKnXGSAcgAj3fMK5Taf50cAUxBMS7MRFiymFU93tbE8D9XNhGKDsavPEU4bVYvPHpOt5IHXJRqr4UqsoClVSm4xBQl7JnMf3uQUAoG9bh+HSC8kCeCjxNkbCo6c+W2Pq0vb1PykN0KbU0w8521QpXDeFR7swTX5RB1enm4IWSWvuOUdMQiHP3V3ve79BgaHo03r54mQlKePMBbZ0xy1XP6AdtJixpCHUiO+YSHHPor/2+LsxzZ0Uh5R3SLUyMv+4Teb72xLe4Ew+n5xUyJgd5/TZJRIlo3QQbfuIblN5WVUQ+5RV0vPn9aSIII9Uz+Clxg84saD4Zcf2GNv41ztSC8i2aVBZEXuqOmVUB8FTTJ8EOqW3wvWPnBZHNHi1aHxK0lOLZ0Eq/RpFS67rpvg9XThiuV8UzjVT4OTHRBzyRChIUtOZ45k5iL4E5hduJst3q+iFxZSxuzXNwnVj/v1iMrqjDDwFBYaIZZMzDxtTasTOg7MN4hImG4Y15CrOKxuk7iOHo6dx0Ip5uvA6WCx2x+/ahhTEETLM/7PZP6Vi5oacCFFRQ6Gb5VtbPaGMrWc6s8uhMpCmtUxJWmHBDfmBW4O84XRd61fYCIqgnXMrHOM89h4A68rC5i4kNDW8GglZWvr8hIkLbORE="
 services:
   - mysql
 before_install:
   - mysql -e 'CREATE DATABASE flatbook;'
-script: mvn test -Dspring.profiles.active=mysql-travis
+script: 
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=dp2-g1-13_DP2-G1-13 -Dspring.profiles.active=mysql-travis

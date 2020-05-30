@@ -1,5 +1,7 @@
 package org.springframework.samples.flatbook.integration.serviceintegration;
 
+import static org.springframework.samples.flatbook.utils.assertj.Assertions.assertThat;
+
 import java.util.Collection;
 
 import org.assertj.core.api.Assertions;
@@ -14,8 +16,6 @@ import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.DirtiesContext;
-
-import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)

@@ -1,6 +1,6 @@
 package org.springframework.samples.flatbook.unit.service;
 
-import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
+import static org.springframework.samples.flatbook.utils.assertj.Assertions.assertThat;
 
 import java.util.Collections;
 

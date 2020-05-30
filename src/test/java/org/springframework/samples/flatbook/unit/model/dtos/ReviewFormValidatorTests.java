@@ -10,7 +10,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.dtos.ReviewForm;
 import org.springframework.samples.flatbook.model.enums.ReviewType;
-import org.springframework.samples.flatbook.util.TestUtils;
+import org.springframework.samples.flatbook.utils.TestUtils;
 
 class ReviewFormValidatorTests {
 

@@ -14,8 +14,8 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Set;
 
-import static org.springframework.samples.flatbook.util.assertj.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.samples.flatbook.utils.assertj.Assertions.assertThat;
 
 @DataJpaTest(includeFilters= @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
