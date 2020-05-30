@@ -39,15 +39,13 @@ import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.ReviewController;
 import org.springframework.samples.flatbook.web.formatters.PersonFormatter;
-import org.springframework.samples.flatbook.web.formatters.ReviewFormatter;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = ReviewController.class,
 includeFilters = {@ComponentScan.Filter(value = ReviewUtils.class, type = FilterType.ASSIGNABLE_TYPE),
-		@ComponentScan.Filter(value = PersonFormatter.class, type = FilterType.ASSIGNABLE_TYPE),
-		@ComponentScan.Filter(value = ReviewFormatter.class, type = FilterType.ASSIGNABLE_TYPE)},
+		@ComponentScan.Filter(value = PersonFormatter.class, type = FilterType.ASSIGNABLE_TYPE)},
 excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurer.class),
 excludeAutoConfiguration= SecurityConfiguration.class)
 class ReviewControllerTests {
