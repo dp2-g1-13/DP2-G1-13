@@ -254,7 +254,7 @@ class AdvertisementControllerTests {
         BDDMockito.given(this.advertisementService.findAllAdvertisements()).willReturn(allAdverts);
     }
 
-    @WithMockUser(value = "spring", roles = {"HOST"})
+    @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testInitCreationForm() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/flats/{flatId}/advertisements/new", AdvertisementControllerTests.TEST_FLAT_ID))
@@ -263,7 +263,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.model().attributeExists("advertisementForm"));
     }
 
-    @WithMockUser(value = "spring-wrong", roles = {"HOST"})
+    @WithMockUser(username = "spring-wrong", authorities = {"HOST"})
     @Test
     void testInitCreationFormThrowsExceptionWithWrongHost() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/flats/{flatId}/advertisements/new", AdvertisementControllerTests.TEST_FLAT_ID))
@@ -271,7 +271,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("exception"));
     }
 
-    @WithMockUser(value = "spring", roles = {"HOST"})
+    @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessCreationFormSuccess() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/flats/{flatId}/advertisements/new", AdvertisementControllerTests.TEST_FLAT_ID)
@@ -284,7 +284,7 @@ class AdvertisementControllerTests {
         BDDMockito.then(this.advertisementService).should().saveAdvertisement(ArgumentMatchers.isA(Advertisement.class));
     }
 
-    @WithMockUser(value = "spring", roles = {"HOST"})
+    @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessCreationFormWithErrors() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/flats/{flatId}/advertisements/new", AdvertisementControllerTests.TEST_FLAT_ID)
@@ -299,7 +299,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("advertisements/createOrUpdateAdvertisementForm"));
     }
 
-    @WithMockUser(value = "spring-wrong", roles = {"HOST"})
+    @WithMockUser(username = "spring-wrong", authorities = {"HOST"})
     @Test
     void testProcessCreationFormThrowExceptionWithWrongHost() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/flats/{flatId}/advertisements/new", AdvertisementControllerTests.TEST_FLAT_ID)
@@ -312,7 +312,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("exception"));
     }
 
-    @WithMockUser(value = "spring", roles = {"HOST"})
+    @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testInitUpdateForm() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements/{advertisementId}/edit", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID))
@@ -325,7 +325,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("advertisements/createOrUpdateAdvertisementForm"));
     }
 
-    @WithMockUser(value = "spring-wrong", roles = {"HOST"})
+    @WithMockUser(username = "spring-wrong", authorities = {"HOST"})
     @Test
     void testInitUpdateFormThrowExceptionWithWrongHost() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements/{advertisementId}/edit", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID))
@@ -333,7 +333,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("exception"));
     }
 
-    @WithMockUser(value = "spring", roles = {"HOST"})
+    @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessUpdateFormSuccess() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/advertisements/{advertisementId}/edit", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID)
@@ -346,7 +346,7 @@ class AdvertisementControllerTests {
         BDDMockito.then(this.advertisementService).should().saveAdvertisement(ArgumentMatchers.isA(Advertisement.class));
     }
 
-    @WithMockUser(value = "spring", roles = {"HOST"})
+    @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessUpdateFormWithErrors() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/advertisements/{advertisementId}/edit", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID)
@@ -361,7 +361,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("advertisements/createOrUpdateAdvertisementForm"));
     }
 
-    @WithMockUser(value = "spring-wrong", roles = {"HOST"})
+    @WithMockUser(username = "spring-wrong", authorities = {"HOST"})
     @Test
     void testProcessUpdateFormThrowExceptionWithWrongHost() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.post("/advertisements/{advertisementId}/edit", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID)
@@ -374,7 +374,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("exception"));
     }
 
-    @WithMockUser(value = "spring", roles = {"HOST"})
+    @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessDeleteAdvertisementSuccess() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements/{advertisementId}/delete", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID))
@@ -383,7 +383,7 @@ class AdvertisementControllerTests {
         BDDMockito.then(this.advertisementService).should().deleteAdvertisement(ArgumentMatchers.isA(Advertisement.class));
     }
 
-    @WithMockUser(value = "spring-wrong", roles = {"HOST"})
+    @WithMockUser(username = "spring-wrong", authorities = {"HOST"})
     @Test
     void testProcessDeleteAdvertisementThrowExceptionWithWrongHost() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements/{advertisementId}/delete", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID))
@@ -391,7 +391,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("exception"));
     }
 
-    @WithMockUser(value = "spring", roles = {"HOST"})
+    @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testShowAdvertisement() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements/{advertisementId}", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID))
@@ -402,7 +402,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("advertisements/advertisementDetails"));
     }
 
-    @WithMockUser(value = "spring", roles = {"HOST"})
+    @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testShowAdvertisementThrowExceptionNotEnabledHost() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements/{advertisementId}", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID2))
@@ -410,7 +410,7 @@ class AdvertisementControllerTests {
         	.andExpect(MockMvcResultMatchers.view().name("exception"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
+    @WithMockUser(username = "spring-tenant", authorities = {"TENANT"})
     @Test
     void testShowAdvertisementAsTenant() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements/{advertisementId}", AdvertisementControllerTests.TEST_ADVERTISEMENT_ID))
@@ -423,7 +423,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("advertisements/advertisementDetails"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
+    @WithMockUser(username = "spring-tenant", authorities = {"TENANT"})
     @Test
     void testProcessFindFormSuccess() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements")
@@ -434,7 +434,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("advertisements/advertisementsList"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
+    @WithMockUser(username = "spring-tenant", authorities = {"TENANT"})
     @Test
     void testProcessFindFormWithErrors() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements"))
@@ -443,7 +443,7 @@ class AdvertisementControllerTests {
             .andExpect(MockMvcResultMatchers.view().name("welcome"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
+    @WithMockUser(username = "spring-tenant", authorities = {"TENANT"})
     @Test
     void testProcessFindFormNoResults() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements")
@@ -454,7 +454,7 @@ class AdvertisementControllerTests {
         	.andExpect(MockMvcResultMatchers.view().name("welcome"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
+    @WithMockUser(username = "spring-tenant", authorities = {"TENANT"})
     @Test
     void testProcessFindFormApiError() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements")
@@ -464,7 +464,7 @@ class AdvertisementControllerTests {
         	.andExpect(MockMvcResultMatchers.view().name("welcome"));
     }
 
-    @WithMockUser(value = "spring-tenant", roles = {"TENANT"})
+    @WithMockUser(username = "spring-tenant", authorities = {"TENANT"})
     @Test
     void testProcessFindFormEmptyResponse() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/advertisements")

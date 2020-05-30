@@ -203,8 +203,8 @@ public class RequestController {
 	}
 
 	private boolean validateTenant(final Authentication auth, final Tenant tenant, final Flat flat, final int flatId) {
-		return tenant.getFlat() != null || this.requestService.isThereRequestOfTenantByFlatId(((User) auth.getPrincipal()).getUsername(), flatId)
-			|| flat == null;
+		return tenant.getFlat() == null && !this.requestService.isThereRequestOfTenantByFlatId(((User) auth.getPrincipal()).getUsername(), flatId)
+			&& flat != null;
 	}
 
 	private boolean validateHostAcceptingOrRejectingRequest(final int flatId) {
