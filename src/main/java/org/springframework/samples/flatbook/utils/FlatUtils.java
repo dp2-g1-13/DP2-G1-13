@@ -10,10 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
-@Component
 public interface FlatUtils {
 
-	public static boolean validateUser(final int flatId, final HostService hostService, final FlatService flatService) {
+	static boolean validateUser(final int flatId, final HostService hostService, final FlatService flatService) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = ((User) auth.getPrincipal()).getUsername();
 

@@ -109,8 +109,8 @@ public class PerformanceTestController {
 	private String createTenant(final Flat flat) {
 		Random random = new Random();
 		Tenant tenant = new Tenant();
-		char letter = (char) (random.nextInt() * 100 % 25 + 65);
-		String numbers = Stream.generate(() -> random.nextInt() * 9 + "").limit(8).reduce("", (x, y) -> x + y);
+		char letter = (char) (random.nextInt(25) + 65);
+		String numbers = Stream.generate(() -> random.nextInt(10) + "").limit(8).reduce("", (x, y) -> x + y);
 		tenant.setDni(numbers + letter);
 		tenant.setEmail("email" + tenant.getDni() + "@user.com");
 		tenant.setEnabled(true);
@@ -136,7 +136,7 @@ public class PerformanceTestController {
 		advertisement.setPricePerMonth(1000.0);
 		advertisement.setRequirements("RequerementRequirmentRequerementRequeriment");
 		advertisement.setTitle("Advertisement");
-		advertisement.setFlat(this.flatService.findFlatById(info.getFlatId()));
+		advertisement.setFlat(this.flatService.findFlatByIdWithFullData(info.getFlatId()));
 
 		this.advertisementService.saveAdvertisement(advertisement);
 

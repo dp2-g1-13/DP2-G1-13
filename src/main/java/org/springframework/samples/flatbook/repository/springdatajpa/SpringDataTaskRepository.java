@@ -16,6 +16,6 @@ public interface SpringDataTaskRepository extends TaskRepository, Repository<Tas
 	Set<Task> findByParticipant(String username);
 
 	@Override
-	@Query("SELECT t FROM Task t WHERE t.flat.id = ?1")
+	@Query("SELECT t FROM Task t LEFT JOIN FETCH t.asignee a LEFT JOIN FETCH t.creator c WHERE t.flat.id = ?1")
 	Set<Task> findByFlatId(int id);
 }

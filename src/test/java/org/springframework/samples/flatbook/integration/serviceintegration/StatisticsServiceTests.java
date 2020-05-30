@@ -16,7 +16,7 @@ import org.springframework.test.annotation.DirtiesContext;
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 //@TestPropertySource(locations = "classpath:application-mysql.properties")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class StatisticsServiceTests {
 
     @Autowired

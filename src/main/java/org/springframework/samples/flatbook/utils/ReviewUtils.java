@@ -10,7 +10,6 @@ import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.TenantService;
 import org.springframework.stereotype.Component;
 
-@Component
 public interface ReviewUtils {
 
 	static boolean isAllowedToReviewATenant(final String username, final String tenantId, final TenantService tenantService,

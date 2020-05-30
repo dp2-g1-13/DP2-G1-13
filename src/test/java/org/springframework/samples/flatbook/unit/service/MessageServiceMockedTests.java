@@ -114,15 +114,6 @@ class MessageServiceMockedTests {
 		Mockito.verify(this.messageRepositoryMocked).save(this.message);
 	}
 
-//	@Test
-//	void shouldThrowUserNotExistsExceptionWhenTryToSendToAnNotExistingUser() {
-//		Mockito.lenient().doNothing().when(this.messageRepositoryMocked).save(ArgumentMatchers.isA(Message.class));
-//		Mockito.when(this.personRepository.findByUsername(MessageServiceTests.USERNAME1)).thenReturn(null);
-//
-//		assertThrows(UsernameNotFoundException.class, () -> this.messageServiceMocked.saveMessage(message));
-//
-//	}
-
 	@Test
 	void shouldThrowExceptionWhenTryToSaveNull() {
 	    Mockito.doThrow(new InvalidDataAccessApiUsageException("Target object must not be null; nested exception is java.lang.IllegalArgumentException: Target object must not be null")).when(this.messageRepositoryMocked).save(null);

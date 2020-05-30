@@ -10,7 +10,11 @@ public interface AdvertisementRepository {
 
 	Set<Advertisement> findAll();
 
+    Set<Advertisement> findAllOfEnabledHosts();
+
 	Advertisement findById(int id);
+
+    Advertisement findByIdWithFullFlatData(int id);
 
 	Boolean isAdvertisementWithFlatId(int flatId);
 

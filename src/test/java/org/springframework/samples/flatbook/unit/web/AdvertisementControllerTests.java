@@ -234,6 +234,7 @@ class AdvertisementControllerTests {
         BDDMockito.given(this.hostService.findHostByFlatId(AdvertisementControllerTests.TEST_FLAT_ID)).willReturn(host);
         BDDMockito.given(this.hostService.findHostByFlatId(AdvertisementControllerTests.TEST_FLAT_ID2)).willReturn(hostNotEnabled);
         BDDMockito.given(this.advertisementService.findAdvertisementById(AdvertisementControllerTests.TEST_ADVERTISEMENT_ID)).willReturn(advertisement);
+        BDDMockito.given(this.advertisementService.findAdvertisementByIdWithFullFlatData(AdvertisementControllerTests.TEST_ADVERTISEMENT_ID)).willReturn(advertisement);
         BDDMockito.given(this.advertisementService.findAdvertisementById(AdvertisementControllerTests.TEST_ADVERTISEMENT_ID2)).willReturn(advertisement2);
         BDDMockito.given(this.dbImageService.getImagesByFlatId(AdvertisementControllerTests.TEST_FLAT_ID)).willReturn(images);
         BDDMockito.given(this.personService.findUserById(AdvertisementControllerTests.TEST_HOST_USERNAME)).willReturn(host);
@@ -251,7 +252,7 @@ class AdvertisementControllerTests {
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(AdvertisementControllerTests.TEST_CITY_FLAT_NOT_EXISTS + ", " + AdvertisementControllerTests.TEST_COUNTRY_FLAT_NOT_EXISTS + " " + AdvertisementControllerTests.TEST_POSTAL_CODE_FLAT)).willReturn(responseFar);
         } catch (UnsupportedEncodingException e) {
 		}
-        BDDMockito.given(this.advertisementService.findAllAdvertisements()).willReturn(allAdverts);
+        BDDMockito.given(this.advertisementService.findAllAdvertisementsOfEnabledHosts()).willReturn(allAdverts);
     }
 
     @WithMockUser(username = "spring", authorities = {"HOST"})

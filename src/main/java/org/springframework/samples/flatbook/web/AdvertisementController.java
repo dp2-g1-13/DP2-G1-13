@@ -152,7 +152,7 @@ public class AdvertisementController {
 	@GetMapping(value = "/advertisements/{advertisementId}")
 	public ModelAndView showAdvertisement(@PathVariable("advertisementId") final int advertisementId, final Principal principal) {
 		ModelAndView mav = new ModelAndView(AdvertisementController.ADVERTISEMENT_DETAILS);
-		Advertisement advertisement = this.advertisementService.findAdvertisementById(advertisementId);
+		Advertisement advertisement = this.advertisementService.findAdvertisementByIdWithFullFlatData(advertisementId);
 		Host host = this.hostService.findHostByFlatId(advertisement.getFlat().getId());
 
 		if (!host.isEnabled()) {
@@ -207,11 +207,11 @@ public class AdvertisementController {
 
 		Location location = geocode.getResults().get(0).getGeometry().getLocation();
 
-		List<Advertisement> results = this.advertisementService.findAllAdvertisements().stream().filter(
-			x -> this.hostService.findHostByFlatId(x.getFlat().getId()).isEnabled() && this.haversineFormula(x.getFlat().getAddress().getLatitude(),
-				x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
-			.sorted(Comparator.comparing(x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(),
-				location.getLat(), location.getLng())))
+		List<Advertisement> results = this.advertisementService.findAllAdvertisementsOfEnabledHosts().stream()
+            .filter(
+			    x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng()) < 30000)
+			.sorted(Comparator.comparing(
+			    x -> this.haversineFormula(x.getFlat().getAddress().getLatitude(), x.getFlat().getAddress().getLongitude(), location.getLat(), location.getLng())))
 			.collect(Collectors.toList());
 
 		if (results.isEmpty()) {

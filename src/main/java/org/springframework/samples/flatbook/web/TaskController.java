@@ -47,7 +47,7 @@ public class TaskController {
 
 	@GetMapping(value = "/tasks/new")
 	public String initCreationForm(final Map<String, Object> model, final Principal principal) {
-		Tenant tenant = this.tenantService.findTenantById(principal.getName());
+		Tenant tenant = this.tenantService.findTenantByIdWithFlatAndTenantList(principal.getName());
 		if (tenant.getFlat() != null) {
 			Task task = new Task();
 			task.setCreator(tenant);
@@ -65,7 +65,7 @@ public class TaskController {
 	@PostMapping(value = "/tasks/new")
 	public String processCreationForm(final Map<String, Object> model, @Valid final Task task, final BindingResult result,
 		final Principal principal) {
-		Tenant tenant = this.tenantService.findTenantById(principal.getName());
+		Tenant tenant = this.tenantService.findTenantByIdWithFlatAndTenantList(principal.getName());
 		if (tenant.getFlat() != null && (task.getAsignee() == null
 			|| tenant.getFlat().getTenants().stream().anyMatch(x -> x.getUsername().equals(task.getAsignee().getUsername())))) {
 			if (result.hasErrors()) {
@@ -87,7 +87,7 @@ public class TaskController {
 	@GetMapping("/tasks/list")
 	public ModelAndView showTaskList(final Principal principal) {
 		ModelAndView mav = new ModelAndView(TaskController.VIEWS_TASKS_LIST);
-		Tenant tenant = this.tenantService.findTenantById(principal.getName());
+		Tenant tenant = this.tenantService.findTenantByIdWithFlat(principal.getName());
 		if (tenant.getFlat() != null) {
 			List<Task> tasks = new ArrayList<>(this.taskService.findTasksByFlatId(tenant.getFlat().getId()));
 			tasks.sort(Comparator.comparing(Task::getStatus).thenComparing(Comparator.comparing(Task::getCreationDate).reversed()));

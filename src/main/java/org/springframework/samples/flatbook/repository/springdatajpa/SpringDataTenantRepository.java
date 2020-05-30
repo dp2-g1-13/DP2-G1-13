@@ -11,7 +11,15 @@ import org.springframework.samples.flatbook.repository.TenantRepository;
 
 public interface SpringDataTenantRepository extends TenantRepository, Repository<Tenant, String> {
 
-	@Override
+    @Override
+    @Query("SELECT tenant FROM Tenant tenant LEFT JOIN FETCH tenant.flat f WHERE tenant.username = :username")
+    Tenant findByUsernameWithFlat(@Param("username")String username);
+
+    @Override
+    @Query("SELECT tenant FROM Tenant tenant LEFT JOIN FETCH tenant.flat f LEFT JOIN FETCH f.tenants WHERE tenant.username = :username")
+    Tenant findByUsernameWithFlatAndTenantList(@Param("username")String username);
+
+    @Override
 	@Query("SELECT tenant FROM Tenant tenant JOIN tenant.requests req WHERE req.id = :request_id")
 	Tenant findByRequestId(@Param("request_id") int requestId);
 

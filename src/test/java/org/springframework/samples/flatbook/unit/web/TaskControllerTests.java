@@ -102,6 +102,8 @@ class TaskControllerTests {
         notAllowed.setUsername(TEST_NOTALLOWED_USERNAME);
 
         given(this.tenantService.findTenantById(TEST_CREATOR_USERNAME)).willReturn(creator);
+        given(this.tenantService.findTenantByIdWithFlat(TEST_CREATOR_USERNAME)).willReturn(creator);
+        given(this.tenantService.findTenantByIdWithFlatAndTenantList(TEST_CREATOR_USERNAME)).willReturn(creator);
         given(this.tenantService.findTenantById(TEST_ASIGNEE_USERNAME)).willReturn(asignee);
         given(this.tenantService.findTenantById(TEST_NOTALLOWED_USERNAME)).willReturn(notAllowed);
         given(this.taskService.findTaskById(TEST_TASK_ID)).willReturn(task);

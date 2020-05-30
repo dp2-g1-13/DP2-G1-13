@@ -127,7 +127,7 @@ public class FlatController {
 		if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
 			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
-		Flat flat = this.flatService.findFlatById(flatId);
+		Flat flat = this.flatService.findFlatByIdWithFullData(flatId);
 		model.put("flat", flat);
 		model.put(FlatController.IMAGES_FIELD, flat.getImages());
 		return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
@@ -184,7 +184,7 @@ public class FlatController {
 			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		ModelAndView mav = new ModelAndView("flats/flatDetails");
-		Flat flat = this.flatService.findFlatById(flatId);
+		Flat flat = this.flatService.findFlatByIdWithFullData(flatId);
 		mav.addObject(flat);
 
 		Host host = this.hostService.findHostByFlatId(flat.getId());
@@ -210,10 +210,8 @@ public class FlatController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = ((User) auth.getPrincipal()).getUsername();
 		List<Flat> flats = new ArrayList<>(this.flatService.findFlatByHostUsername(username));
-		List<Integer> advIds = flats.stream().map(x -> {
-			Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(x.getId());
-			return adv == null ? null : adv.getId();
-		}).collect(Collectors.toList());
+        Map<Flat, Integer> flatAd = this.advertisementService.findAdvertisementsByHost(username).stream().collect(Collectors.toMap(Advertisement::getFlat, Advertisement::getId));
+		List<Integer> advIds = flats.stream().map(x -> flatAd.getOrDefault(x, null)).collect(Collectors.toList());
 		mav.addObject("flats", flats);
 		mav.addObject("advIds", advIds);
 		return mav;

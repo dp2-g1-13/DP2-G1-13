@@ -85,13 +85,13 @@ class FlatControllerTests {
 
     @MockBean
     private FlatService flatService;
-    
+
     @MockBean
     private FlatReviewService flatReviewService;
-    
+
     @MockBean
     private RequestService requestService;
-    
+
     @MockBean
     private TenantService tenantService;
 
@@ -103,13 +103,13 @@ class FlatControllerTests {
 
     @MockBean
     private HostService hostService;
-    
+
     @MockBean
     private AuthoritiesService authoritiesService;
 
     @MockBean
     private AdvertisementService advertisementService;
-    
+
     @MockBean
     private GeocodeAPIService geocodeAPIService;
 
@@ -137,13 +137,13 @@ class FlatControllerTests {
         resultList.add(result);
         response.setResults(resultList);
         response.setStatus("OK");
-        
+
         GeocodeResponse responseZeroResults = new GeocodeResponse();
         responseZeroResults.setStatus("ZERO_RESULTS");
 
         GeocodeResponse responseError = new GeocodeResponse();
         responseError.setStatus("ERROR");
-        
+
         DBImage image = new DBImage();
         image.setId(TEST_IMAGE_ID);
         images.add(image);
@@ -167,13 +167,13 @@ class FlatControllerTests {
         flat.setImages(images);
         flat.setFlatReviews(fr);
         flat.setTenants(tnnts);
-        
+
         Set<DBImage> fourImages = new HashSet<>();
         fourImages.add(image);
         fourImages.add(new DBImage());
         fourImages.add(new DBImage());
         fourImages.add(new DBImage());
-        
+
         Flat flat4Images = new Flat();
         flat4Images.setId(TEST_FLAT_ID2);
         flat4Images.setDescription("this is a sample description with more than 30 chars");
@@ -184,7 +184,7 @@ class FlatControllerTests {
         flat4Images.setAddress(address);
         flat4Images.setImages(fourImages);
         flat4Images.setFlatReviews(fr);
-        
+
         Set<DBImage> sixImages = new HashSet<>();
         sixImages.add(image);
         sixImages.add(new DBImage());
@@ -192,7 +192,7 @@ class FlatControllerTests {
         sixImages.add(new DBImage());
         sixImages.add(new DBImage());
         sixImages.add(new DBImage());
-        
+
         Flat flat6Images = new Flat();
         flat6Images.setId(TEST_FLAT_ID3);
         flat6Images.setDescription("this is a sample description with more than 30 chars");
@@ -215,6 +215,7 @@ class FlatControllerTests {
         given(this.flatService.findFlatById(TEST_FLAT_ID)).willReturn(flat);
         given(this.flatService.findFlatById(TEST_FLAT_ID2)).willReturn(flat4Images);
         given(this.flatService.findFlatById(TEST_FLAT_ID3)).willReturn(flat6Images);
+        given(this.flatService.findFlatByIdWithFullData(TEST_FLAT_ID)).willReturn(flat);
         given(this.flatService.findFlatByHostUsername(TEST_PERSON_USERNAME)).willReturn(flatsOfHost);
         given(this.dbImageService.getImageById(TEST_IMAGE_ID)).willReturn(image);
         given(this.dbImageService.getImagesByFlatId(TEST_FLAT_ID)).willReturn(images);
@@ -312,7 +313,7 @@ class FlatControllerTests {
             .andExpect(model().attributeHasFieldErrors("flat", "numberBaths"))
             .andExpect(view().name("flats/createOrUpdateFlatForm"));
     }
-    
+
     @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessCreationFormHasNotEnoughImages() throws Exception {
@@ -339,7 +340,7 @@ class FlatControllerTests {
             .andExpect(model().attributeHasFieldErrors("flat", "images"))
             .andExpect(view().name("flats/createOrUpdateFlatForm"));
     }
-    
+
     @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessCreationFormZeroResults() throws Exception {
@@ -372,7 +373,7 @@ class FlatControllerTests {
             .andExpect(model().attributeHasFieldErrors("flat", "address.location"))
         	.andExpect(view().name("flats/createOrUpdateFlatForm"));
     }
-    
+
     @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessCreationFormErrorAddress() throws Exception {
@@ -453,7 +454,7 @@ class FlatControllerTests {
             .andExpect(view().name("redirect:/flats/{flatId}"));
         then(this.flatService).should().saveFlat(Mockito.isA(Flat.class));
     }
-    
+
     @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessUpdateFormHasNotMininmumImages() throws Exception {
@@ -537,7 +538,7 @@ class FlatControllerTests {
             .andExpect(status().isOk())
             .andExpect(view().name("exception"));
     }
-    
+
     @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessDeleteImageThrowException6Images() throws Exception {
@@ -557,7 +558,7 @@ class FlatControllerTests {
             .andExpect(view().name("flats/flatDetails"));
 
     }
-    
+
     @WithMockUser(username = "spring-wrong-tenant", authorities = {"TENANT"})
     @Test
     void testShowFlatExceptionNotAllowed() throws Exception {
@@ -576,14 +577,14 @@ class FlatControllerTests {
             .andExpect(view().name("flats/flatsOfHost"));
 
     }
-    
+
     @WithMockUser(username = "spring", authorities = {"HOST"})
     @Test
     void testProcessFlatRemovalSucess() throws Exception {
         mockMvc.perform(get("/flats/{flatId}/delete", TEST_FLAT_ID))
             .andExpect(status().is3xxRedirection());
     }
-    
+
     @WithMockUser(username = "spring-wrong", authorities = {"HOST"})
     @Test
     void testProcessFlatRemovalThrowExceptionWithWrongHost() throws Exception {

@@ -50,6 +50,11 @@ public class FlatService {
 		return this.flatRepository.findById(flatId);
 	}
 
+    @Transactional(readOnly = true)
+    public Flat findFlatByIdWithFullData(final int flatId) {
+	    return this.flatRepository.findByIdWithFullData(flatId);
+    }
+
 	@Transactional(readOnly = true)
 	public Set<Flat> findAllFlats() {
 		return this.flatRepository.findAll();

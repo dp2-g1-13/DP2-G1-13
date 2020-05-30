@@ -2,6 +2,7 @@
 package org.springframework.samples.flatbook.repository.springdatajpa;
 
 import java.util.Set;
+import java.util.SortedSet;
 
 
 import org.springframework.data.domain.Page;
@@ -14,9 +15,13 @@ import org.springframework.samples.flatbook.repository.FlatRepository;
 
 public interface SpringDataFlatRepository extends FlatRepository, Repository<Flat, Integer> {
 
+    @Override
+    @Query("SELECT DISTINCT f FROM Flat f LEFT JOIN FETCH f.address a LEFT JOIN FETCH f.images i LEFT JOIN FETCH f.flatReviews fr LEFT JOIN FETCH f.tenants t WHERE f.id = :id")
+    Flat findByIdWithFullData(@Param("id") int id);
+
 	@Override
-	@Query("SELECT host.flats FROM Host host WHERE host.username = :hostUsername")
-	Set<Flat> findByHostUsername(@Param("hostUsername") String username);
+	@Query("SELECT DISTINCT f FROM Host host JOIN host.flats f LEFT JOIN FETCH f.address WHERE host.username = :hostUsername ORDER BY f.id asc")
+    Set<Flat> findByHostUsername(@Param("hostUsername") String username);
 
 	@Override
 	@Query("SELECT f FROM Flat f join f.flatReviews fr WHERE fr.id = ?1")
