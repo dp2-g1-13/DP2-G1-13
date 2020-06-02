@@ -8,7 +8,6 @@ import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.TenantService;
-import org.springframework.stereotype.Component;
 
 public interface ReviewUtils {
 

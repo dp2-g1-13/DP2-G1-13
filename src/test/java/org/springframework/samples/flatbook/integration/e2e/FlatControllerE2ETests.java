@@ -43,6 +43,7 @@ class FlatControllerE2ETests {
 	private static final String		TENANT_USER							= "TENANT";
 	private static final String		HOST_USER							= "HOST";
 	private static final String		ADDRESS								= "Plaza Nueva";
+    private static final String		ADDRESS_2							= "Calle Luis Montoto";
 	private static final double		LATITUDE							= 37.3822261;
 	private static final double		LONGITUDE							= -6.0123468;
 	private static final String		TEST_HOST_USERNAME					= "rbordessa0";
@@ -112,6 +113,8 @@ class FlatControllerE2ETests {
 				.given(this.geocodeAPIService
 					.getGeocodeData(FlatControllerE2ETests.TEST_ADDRESS_NOT_EXISTS + ", " + FlatControllerE2ETests.TEST_CITY_FLAT_NOT_EXISTS))
 				.willReturn(responseZeroResults);
+            BDDMockito.given(this.geocodeAPIService.getGeocodeData(FlatControllerE2ETests.ADDRESS_2 + ", " + FlatControllerE2ETests.TEST_CITY_FLAT))
+                .willReturn(response);
 
 		} catch (UnsupportedEncodingException e) {
 		}
