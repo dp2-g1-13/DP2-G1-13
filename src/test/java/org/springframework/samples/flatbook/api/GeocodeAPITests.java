@@ -9,7 +9,7 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 @Log
-public class GeocodeAPITests {
+class GeocodeAPITests {
 
     private static final String	GEOCODE_ENDPOINT	= "https://maps.googleapis.com/maps/api/geocode/json";
 

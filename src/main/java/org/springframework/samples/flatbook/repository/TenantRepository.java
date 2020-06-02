@@ -13,6 +13,10 @@ public interface TenantRepository {
 
 	Tenant findByUsername(String username);
 
+    Tenant findByUsernameWithFlat(String username);
+
+    Tenant findByUsernameWithFlatAndTenantList(String username);
+
 	Tenant findByRequestId(int requestId);
 
 	void save(Tenant tenant);

@@ -17,7 +17,7 @@ public class Address extends BaseEntity {
 
 	@Column(name = "address")
 	@NotBlank
-	private String	address;
+	private String	location;
 
 	@Column(name = "city")
 	@NotBlank

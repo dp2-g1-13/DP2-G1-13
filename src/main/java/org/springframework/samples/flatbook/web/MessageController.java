@@ -14,6 +14,7 @@ import org.springframework.samples.flatbook.model.Message;
 import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.service.MessageService;
 import org.springframework.samples.flatbook.service.PersonService;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -96,11 +97,11 @@ public class MessageController {
 
 	private void validateReceiveAndSender(final Person receiver, final String sender) {
 		if (receiver == null) {
-			throw new RuntimeException("User does not exist.");
+			throw new BadRequestException("User does not exist.");
 		} else if (!receiver.isEnabled()) {
-			throw new RuntimeException("User is banned.");
+			throw new BadRequestException("User is banned.");
 		} else if (receiver.getUsername().equals(sender)) {
-			throw new RuntimeException("Cannot send messages to yourself.");
+			throw new BadRequestException("Cannot send messages to yourself.");
 		}
 	}
 }

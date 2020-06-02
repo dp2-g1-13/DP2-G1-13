@@ -16,14 +16,15 @@ import org.springframework.samples.flatbook.model.Advertisement;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.Request;
 import org.springframework.samples.flatbook.model.Tenant;
+import org.springframework.samples.flatbook.model.dtos.RequestForm;
 import org.springframework.samples.flatbook.model.enums.RequestStatus;
-import org.springframework.samples.flatbook.model.mappers.RequestForm;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
 import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.RequestService;
 import org.springframework.samples.flatbook.service.TenantService;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.samples.flatbook.web.validators.RequestFormValidator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,6 +43,10 @@ public class RequestController {
 
 	private static final String		VIEWS_REQUESTS_CREATE_FORM	= "requests/createRequestForm";
 
+	private static final String		EXCEPTION_MESSAGE			= "Illegal access";
+
+	private static final String		REQUESTS_LIST_URL			= "redirect:/flats/{flatId}/requests/list";
+
 	private RequestService			requestService;
 
 	private AdvertisementService	advertisementService;
@@ -56,7 +61,8 @@ public class RequestController {
 
 
 	@Autowired
-	public RequestController(final RequestService requestService, final AdvertisementService advertisementService, final AuthoritiesService authoritiesService, final HostService hostService, final TenantService tenantService,
+	public RequestController(final RequestService requestService, final AdvertisementService advertisementService,
+		final AuthoritiesService authoritiesService, final HostService hostService, final TenantService tenantService,
 		final FlatService flatService) {
 		this.requestService = requestService;
 		this.advertisementService = advertisementService;
@@ -77,7 +83,9 @@ public class RequestController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Tenant tenant = this.tenantService.findTenantById(((User) auth.getPrincipal()).getUsername());
 		Flat flat = this.flatService.findFlatById(flatId);
-		this.validateTenant(auth, tenant, flat, flatId);
+		if (!this.validateTenant(auth, tenant, flat, flatId)) {
+			throw new BadRequestException(RequestController.EXCEPTION_MESSAGE);
+		}
 		RequestForm req = new RequestForm();
 		model.put("requestForm", req);
 		return RequestController.VIEWS_REQUESTS_CREATE_FORM;
@@ -91,7 +99,9 @@ public class RequestController {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			Tenant tenant = this.tenantService.findTenantById(((User) auth.getPrincipal()).getUsername());
 			Flat flat = this.flatService.findFlatById(flatId);
-			this.validateTenant(auth, tenant, flat, flatId);
+			if (!this.validateTenant(auth, tenant, flat, flatId)) {
+				throw new BadRequestException(RequestController.EXCEPTION_MESSAGE);
+			}
 			Request req = new Request();
 			req.setDescription(request.getDescription());
 			req.setCreationDate(LocalDateTime.now());
@@ -107,7 +117,7 @@ public class RequestController {
 
 	@GetMapping("/flats/{flatId}/requests/{requestId}/accept")
 	public String processAcceptRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
-        Request request = this.requestService.findRequestById(requestId);
+		Request request = this.requestService.findRequestById(requestId);
 		if (this.validateHostAcceptingOrRejectingRequest(flatId) && request.getStatus().equals(RequestStatus.PENDING)) {
 			request.setStatus(RequestStatus.ACCEPTED);
 			Flat flat = this.flatService.findFlatById(flatId);
@@ -116,46 +126,48 @@ public class RequestController {
 			this.requestService.saveRequest(request);
 			this.tenantService.saveTenant(tenant);
 		} else {
-			throw new RuntimeException("Illegal access");
+			throw new BadRequestException(RequestController.EXCEPTION_MESSAGE);
 		}
-		return "redirect:/flats/{flatId}/requests/list";
+		return RequestController.REQUESTS_LIST_URL;
 	}
 
 	@GetMapping("/flats/{flatId}/requests/{requestId}/reject")
 	public String processRejectRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
-        Request request = this.requestService.findRequestById(requestId);
+		Request request = this.requestService.findRequestById(requestId);
 		if (this.validateHostAcceptingOrRejectingRequest(flatId) && request.getStatus().equals(RequestStatus.PENDING)) {
 			request.setStatus(RequestStatus.REJECTED);
 			this.requestService.saveRequest(request);
 		} else {
-			throw new RuntimeException("Illegal access");
+			throw new BadRequestException(RequestController.EXCEPTION_MESSAGE);
 		}
-		return "redirect:/flats/{flatId}/requests/list";
+		return RequestController.REQUESTS_LIST_URL;
 	}
 
 	@GetMapping("/flats/{flatId}/requests/{requestId}/cancel")
 	public String processCancelRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
 		Request request = this.requestService.findRequestById(requestId);
-		if (!this.validateHostAcceptingOrRejectingRequest(flatId) || !request.getStatus().equals(RequestStatus.ACCEPTED) || !request.getStartDate().isAfter(LocalDate.now())) {
-			throw new RuntimeException("Illegal access");
+		if (!this.validateHostAcceptingOrRejectingRequest(flatId) || !request.getStatus().equals(RequestStatus.ACCEPTED)
+			|| !request.getStartDate().isAfter(LocalDate.now())) {
+			throw new BadRequestException(RequestController.EXCEPTION_MESSAGE);
 		}
 		request.setFinishDate(LocalDate.now().plusDays(1));
 		request.setStatus(RequestStatus.CANCELED);
 		this.processCancelOrConclude(request, requestId);
 
-		return "redirect:/flats/{flatId}/requests/list";
+		return RequestController.REQUESTS_LIST_URL;
 	}
 
 	@GetMapping("/flats/{flatId}/requests/{requestId}/conclude")
 	public String processConcludeRequest(@PathVariable("flatId") final int flatId, @PathVariable("requestId") final int requestId) {
 		Request request = this.requestService.findRequestById(requestId);
-		if (!this.validateHostAcceptingOrRejectingRequest(flatId) || !request.getStatus().equals(RequestStatus.ACCEPTED) || request.getStartDate().isAfter(LocalDate.now())) {
-			throw new RuntimeException("Illegal access");
+		if (!this.validateHostAcceptingOrRejectingRequest(flatId) || !request.getStatus().equals(RequestStatus.ACCEPTED)
+			|| request.getStartDate().isAfter(LocalDate.now())) {
+			throw new BadRequestException(RequestController.EXCEPTION_MESSAGE);
 		}
 		request.setFinishDate(LocalDate.now().plusDays(1));
 		request.setStatus(RequestStatus.FINISHED);
 		this.processCancelOrConclude(request, requestId);
-		return "redirect:/flats/{flatId}/requests/list";
+		return RequestController.REQUESTS_LIST_URL;
 	}
 
 	@GetMapping("/requests/list")
@@ -176,7 +188,7 @@ public class RequestController {
 	@GetMapping("/flats/{flatId}/requests/list")
 	public ModelAndView showRequestsOfFlat(@PathVariable("flatId") final int flatId) {
 		if (!this.validateHostAcceptingOrRejectingRequest(flatId)) {
-			throw new RuntimeException("Illegal access");
+			throw new BadRequestException(RequestController.EXCEPTION_MESSAGE);
 		}
 		ModelAndView mav = new ModelAndView("requests/requestsList");
 		Flat flat = this.flatService.findFlatById(flatId);
@@ -190,10 +202,9 @@ public class RequestController {
 		return mav;
 	}
 
-	private void validateTenant(final Authentication auth, final Tenant tenant, final Flat flat, final int flatId) {
-		if (tenant.getFlat() != null || this.requestService.isThereRequestOfTenantByFlatId(((User) auth.getPrincipal()).getUsername(), flatId) || flat == null) {
-			throw new RuntimeException("Illegal access");
-		}
+	private boolean validateTenant(final Authentication auth, final Tenant tenant, final Flat flat, final int flatId) {
+		return tenant.getFlat() == null && !this.requestService.isThereRequestOfTenantByFlatId(((User) auth.getPrincipal()).getUsername(), flatId)
+			&& flat != null;
 	}
 
 	private boolean validateHostAcceptingOrRejectingRequest(final int flatId) {

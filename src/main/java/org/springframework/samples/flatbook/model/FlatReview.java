@@ -22,7 +22,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.springframework.samples.flatbook.model.mappers.ReviewForm;
+import org.springframework.samples.flatbook.model.dtos.ReviewForm;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -44,6 +44,6 @@ public class FlatReview extends Review {
 
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Tenant creator;
 }

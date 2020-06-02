@@ -18,7 +18,7 @@ package org.springframework.samples.flatbook.web.validators;
 
 import java.util.regex.Pattern;
 
-import org.springframework.samples.flatbook.model.mappers.PersonForm;
+import org.springframework.samples.flatbook.model.dtos.PersonForm;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -34,7 +34,7 @@ public class PasswordValidator implements Validator {
 		PersonForm personForm = (PersonForm) obj;
 
 		if (personForm.getPassword() != null) {
-			if (personForm.getPassword() == "") {
+			if (personForm.getPassword().equals("")) {
 				errors.rejectValue("password", PasswordValidator.REQUIRED, PasswordValidator.REQUIRED);
 			} else {
 				String pattern = "^(?=(.*[0-9]){2})(?=(.*[!-\\.<-@_]){2})(?=(.*[A-Z]){2})(?=(.*[a-z]){2})\\S{8,100}$";

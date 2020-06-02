@@ -25,6 +25,16 @@ public class TenantService {
 		return this.tenantRepository.findByUsername(username);
 	}
 
+    @Transactional(readOnly = true)
+    public Tenant findTenantByIdWithFlat(final String username) {
+        return this.tenantRepository.findByUsernameWithFlat(username);
+    }
+
+    @Transactional(readOnly = true)
+    public Tenant findTenantByIdWithFlatAndTenantList(final String username) {
+        return this.tenantRepository.findByUsernameWithFlatAndTenantList(username);
+    }
+
 	@Transactional(readOnly = true)
 	public Collection<Tenant> findAllTenants() {
 		return this.tenantRepository.findAll();

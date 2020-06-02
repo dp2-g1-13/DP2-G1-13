@@ -54,11 +54,11 @@ public class Message extends BaseEntity implements Comparable<Message> {
 	private String			body;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Person			sender;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Person			receiver;
 
 

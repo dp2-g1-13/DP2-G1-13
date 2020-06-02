@@ -18,7 +18,6 @@ package org.springframework.samples.flatbook.model;
 
 import java.time.LocalDate;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,7 +30,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Positive;
 
-import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
+import org.springframework.samples.flatbook.model.dtos.AdvertisementForm;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -66,10 +65,9 @@ public class Advertisement extends BaseEntity {
 
 	@Valid
 	@NotNull
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "flat_id")
 	private Flat		flat;
-
 
 	public Advertisement() {
 	}

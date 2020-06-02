@@ -1,12 +1,23 @@
 
 package org.springframework.samples.flatbook.web;
 
+import java.security.Principal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.samples.flatbook.model.Task;
 import org.springframework.samples.flatbook.model.Tenant;
 import org.springframework.samples.flatbook.model.enums.TaskStatus;
 import org.springframework.samples.flatbook.service.TaskService;
 import org.springframework.samples.flatbook.service.TenantService;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -15,19 +26,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.validation.Valid;
-import java.security.Principal;
-import java.time.LocalDate;
-import java.util.*;
-
 @Controller
 public class TaskController {
 
+	private static final String	YOU_CANT_CREATE_TASK				= "You can't create a task if you dont live in a flat.";
 	private static final String	VIEWS_TASKS_CREATE_OR_UPDATE_FORM	= "tasks/createOrUpdateTaskForm";
 	private static final String	VIEWS_TASKS_LIST					= "tasks/tasksList";
+	public static final String	YOU_CAN_NOT_EDIT_THE_TASK			= "Bad task id or you can not edit the task.";
+	public static final String	YOU_DONT_LIVE_IN_A_FLAT				= "You don't live in a flat.";
 
 	private final TaskService	taskService;
 	private final TenantService	tenantService;
+
 
 	@Autowired
 	public TaskController(final TaskService taskService, final TenantService tenantService) {
@@ -37,7 +47,7 @@ public class TaskController {
 
 	@GetMapping(value = "/tasks/new")
 	public String initCreationForm(final Map<String, Object> model, final Principal principal) {
-		Tenant tenant = this.tenantService.findTenantById(principal.getName());
+		Tenant tenant = this.tenantService.findTenantByIdWithFlatAndTenantList(principal.getName());
 		if (tenant.getFlat() != null) {
 			Task task = new Task();
 			task.setCreator(tenant);
@@ -48,14 +58,14 @@ public class TaskController {
 			model.put("roommates", new ArrayList<>(tenant.getFlat().getTenants()));
 			return TaskController.VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
 		} else {
-			throw new RuntimeException("You can't create a task if you dont live in a flat.");
+			throw new BadRequestException(TaskController.YOU_CANT_CREATE_TASK);
 		}
 	}
 
 	@PostMapping(value = "/tasks/new")
 	public String processCreationForm(final Map<String, Object> model, @Valid final Task task, final BindingResult result,
 		final Principal principal) {
-		Tenant tenant = this.tenantService.findTenantById(principal.getName());
+		Tenant tenant = this.tenantService.findTenantByIdWithFlatAndTenantList(principal.getName());
 		if (tenant.getFlat() != null && (task.getAsignee() == null
 			|| tenant.getFlat().getTenants().stream().anyMatch(x -> x.getUsername().equals(task.getAsignee().getUsername())))) {
 			if (result.hasErrors()) {
@@ -70,21 +80,21 @@ public class TaskController {
 				return "redirect:/tasks/list";
 			}
 		} else {
-			throw new RuntimeException("You can't create a task if you dont live in a flat.");
+			throw new BadRequestException(TaskController.YOU_CANT_CREATE_TASK);
 		}
 	}
 
 	@GetMapping("/tasks/list")
 	public ModelAndView showTaskList(final Principal principal) {
 		ModelAndView mav = new ModelAndView(TaskController.VIEWS_TASKS_LIST);
-		Tenant tenant = this.tenantService.findTenantById(principal.getName());
+		Tenant tenant = this.tenantService.findTenantByIdWithFlat(principal.getName());
 		if (tenant.getFlat() != null) {
 			List<Task> tasks = new ArrayList<>(this.taskService.findTasksByFlatId(tenant.getFlat().getId()));
 			tasks.sort(Comparator.comparing(Task::getStatus).thenComparing(Comparator.comparing(Task::getCreationDate).reversed()));
 			mav.addObject("tasks", tasks);
 			return mav;
 		} else {
-			throw new RuntimeException("You don't live in a flat.");
+			throw new BadRequestException(TaskController.YOU_DONT_LIVE_IN_A_FLAT);
 		}
 	}
 
@@ -96,7 +106,7 @@ public class TaskController {
 			this.taskService.deleteTaskById(taskId);
 			return "redirect:/tasks/list";
 		} else {
-            throw new IllegalArgumentException("Bad task id or you are cant delete this task.");
+			throw new BadRequestException(TaskController.YOU_CAN_NOT_EDIT_THE_TASK);
 		}
 	}
 
@@ -110,7 +120,7 @@ public class TaskController {
 			model.put("roommates", new ArrayList<>(tenant.getFlat().getTenants()));
 			return TaskController.VIEWS_TASKS_CREATE_OR_UPDATE_FORM;
 		} else {
-			throw new IllegalArgumentException("Bad task id or you can not edit the task.");
+			throw new BadRequestException(TaskController.YOU_CAN_NOT_EDIT_THE_TASK);
 		}
 	}
 
@@ -133,7 +143,7 @@ public class TaskController {
 				return "redirect:/tasks/list";
 			}
 		} else {
-            throw new RuntimeException("Bad task id or you can not edit the task.");
+			throw new BadRequestException(TaskController.YOU_CAN_NOT_EDIT_THE_TASK);
 		}
 	}
 }
