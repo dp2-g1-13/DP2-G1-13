@@ -75,6 +75,7 @@ class FlatControllerTests {
     private static final String TEST_CITY_FLAT = "Seville";
     private static final String TEST_CITY_FLAT_NOT_EXISTS = "not";
     private static final String TEST_ADDRESS_NOT_EXISTS = "notexists";
+    private static final String TEST_ADDRESS_UPDATE = "Calle Luis Montoto";
     private static final String TEST_COUNTRY_FLAT = "Spain";
     private static final String TEST_POSTAL_CODE_FLAT = "41010";
     private static final double LATITUDE = 37.3822261;
@@ -233,6 +234,7 @@ class FlatControllerTests {
         }).given(this.dbImageService).deleteImage(image);
         try {
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(address.getLocation() + ", " + address.getCity())).willReturn(response);
+            BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_ADDRESS_UPDATE + ", " + address.getCity())).willReturn(response);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_ADDRESS_NOT_EXISTS + ", " + TEST_CITY_FLAT_NOT_EXISTS)).willReturn(responseZeroResults);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_ADDRESS_NOT_EXISTS + ", " + address.getCity())).willReturn(responseError);
 			BDDMockito.given(this.geocodeAPIService.getGeocodeData(TEST_CITY_FLAT + ", " + TEST_COUNTRY_FLAT + " " + TEST_POSTAL_CODE_FLAT)).willReturn(response);
@@ -446,7 +448,7 @@ class FlatControllerTests {
             .param("numberRooms", "2")
             .param("numberBaths", "2")
             .param("availableServices", "Wifi and cable TV")
-            .param("address.location", "Calle Luis Montoto")
+            .param("address.location", TEST_ADDRESS_UPDATE)
             .param("address.postalCode", "41003")
             .param("address.city", "Sevilla")
             .param("address.country", "Spain"))
