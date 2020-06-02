@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Positive;
 
-import org.springframework.samples.flatbook.model.mappers.AdvertisementForm;
+import org.springframework.samples.flatbook.model.dtos.AdvertisementForm;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -20,7 +20,6 @@ import org.springframework.samples.flatbook.model.DBImage;
 import org.springframework.samples.flatbook.model.Flat;
 import org.springframework.samples.flatbook.model.FlatReview;
 import org.springframework.samples.flatbook.model.Host;
-import org.springframework.samples.flatbook.model.enums.AuthoritiesType;
 import org.springframework.samples.flatbook.model.pojos.GeocodeResponse;
 import org.springframework.samples.flatbook.service.AdvertisementService;
 import org.springframework.samples.flatbook.service.AuthoritiesService;
@@ -29,7 +28,8 @@ import org.springframework.samples.flatbook.service.FlatService;
 import org.springframework.samples.flatbook.service.HostService;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.apis.GeocodeAPIService;
-import org.springframework.samples.flatbook.service.exceptions.IllegalAccessRuntimeException;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
+import org.springframework.samples.flatbook.utils.FlatUtils;
 import org.springframework.samples.flatbook.utils.ReviewUtils;
 import org.springframework.samples.flatbook.web.validators.FlatValidator;
 import org.springframework.security.core.Authentication;
@@ -102,16 +102,10 @@ public class FlatController {
 				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 			}
 			Address address = flat.getAddress();
-			GeocodeResponse geocode = this.geocodeAPIService.getGeocodeData(address.getLocation() + ", " + address.getCity());
-			if (geocode.getStatus().equals("ZERO_RESULTS")) {
-				result.rejectValue("address.location", "", "The address does not exist. Try again.");
-				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
-			} else if (!geocode.getStatus().equals("OK")) {
-				result.reject("An external error has occurred. Please try again later.");
-				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
-			}
-			address.setLatitude(geocode.getResults().get(0).getGeometry().getLocation().getLat());
-			address.setLongitude(geocode.getResults().get(0).getGeometry().getLocation().getLng());
+            String errorView = getLatitudeAndLongitudeOfAddress(address, result);
+			if(errorView != null) {
+			    return errorView;
+            }
 			flat.setAddress(address);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			Host host = (Host) this.personService.findUserById(((User) auth.getPrincipal()).getUsername());
@@ -124,10 +118,10 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}/edit")
 	public String initUpdateForm(@PathVariable("flatId") final int flatId, final Map<String, Object> model) {
-		if (!this.validateHost(flatId)) {
-			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+		if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
+			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
-		Flat flat = this.flatService.findFlatById(flatId);
+		Flat flat = this.flatService.findFlatByIdWithFullData(flatId);
 		model.put("flat", flat);
 		model.put(FlatController.IMAGES_FIELD, flat.getImages());
 		return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
@@ -135,12 +129,12 @@ public class FlatController {
 
 	@PostMapping(value = "/flats/{flatId}/edit")
 	public String processUpdateForm(@Valid final Flat flat, final BindingResult result, @PathVariable("flatId") final int flatId,
-		final Map<String, Object> model) {
+		final Map<String, Object> model) throws UnsupportedEncodingException {
 		if (result.hasErrors()) {
 			return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 		} else {
-			if (!this.validateHost(flatId)) {
-				throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+			if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
+				throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 			}
 			Set<DBImage> newImages = flat.getImages().stream().filter(x -> !x.getFileType().equals("application/octet-stream"))
 				.collect(Collectors.toSet());
@@ -149,6 +143,12 @@ public class FlatController {
 				result.rejectValue(FlatController.IMAGES_FIELD, "", "a minimum of 6 images is required.");
 				return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
 			}
+            Address address = flat.getAddress();
+            String errorView = getLatitudeAndLongitudeOfAddress(address, result);
+            if(errorView != null) {
+                return errorView;
+            }
+            flat.setAddress(address);
 			Set<DBImage> images = oldFlat.getImages();
 			images.addAll(newImages);
 			flat.setImages(images);
@@ -162,12 +162,12 @@ public class FlatController {
 	@GetMapping(value = "/flats/{flatId}/images/{imageId}/delete")
 	public String processDeleteImage(@PathVariable("flatId") final int flatId, @PathVariable("imageId") final int imageId,
 		final Map<String, Object> model) {
-		if (!this.validateHost(flatId)) {
-			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+		if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
+			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		if (flat.getImages().size() == 6) {
-			IllegalAccessRuntimeException e = new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+			BadRequestException e = new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 			model.put("exception", e);
 			return "exception";
 		} else {
@@ -180,11 +180,11 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}")
 	public ModelAndView showFlat(@PathVariable("flatId") final int flatId, final Principal principal) {
-		if (!this.validateHost(flatId) && !this.validateTenant(flatId)) {
-			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+		if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
+			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		ModelAndView mav = new ModelAndView("flats/flatDetails");
-		Flat flat = this.flatService.findFlatById(flatId);
+		Flat flat = this.flatService.findFlatByIdWithFullData(flatId);
 		mav.addObject(flat);
 
 		Host host = this.hostService.findHostByFlatId(flat.getId());
@@ -210,10 +210,8 @@ public class FlatController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = ((User) auth.getPrincipal()).getUsername();
 		List<Flat> flats = new ArrayList<>(this.flatService.findFlatByHostUsername(username));
-		List<Integer> advIds = flats.stream().map(x -> {
-			Advertisement adv = this.advertisementService.findAdvertisementWithFlatId(x.getId());
-			return adv == null ? null : adv.getId();
-		}).collect(Collectors.toList());
+        Map<Flat, Integer> flatAd = this.advertisementService.findAdvertisementsByHost(username).stream().collect(Collectors.toMap(Advertisement::getFlat, Advertisement::getId));
+		List<Integer> advIds = flats.stream().map(x -> flatAd.getOrDefault(x, null)).collect(Collectors.toList());
 		mav.addObject("flats", flats);
 		mav.addObject("advIds", advIds);
 		return mav;
@@ -221,8 +219,8 @@ public class FlatController {
 
 	@GetMapping(value = "/flats/{flatId}/delete")
 	public String processDeleteFlat(@PathVariable("flatId") final int flatId) {
-		if (!this.validateHost(flatId)) {
-			throw new IllegalAccessRuntimeException(FlatController.EXCEPTION_MESSAGE);
+		if (!FlatUtils.validateUser(flatId, this.hostService, this.flatService)) {
+			throw new BadRequestException(FlatController.EXCEPTION_MESSAGE);
 		}
 		Flat flat = this.flatService.findFlatById(flatId);
 		this.flatService.deleteFlat(flat);
@@ -230,26 +228,19 @@ public class FlatController {
 		return "redirect:/flats/list";
 	}
 
-	public boolean validateHost(final int flatId) {
-		Boolean userIsHost = true;
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals(AuthoritiesType.ADMIN.toString()))) {
-			String username = ((User) auth.getPrincipal()).getUsername();
-			Host host = this.hostService.findHostByFlatId(flatId);
-			userIsHost = username.equals(host.getUsername()) && host.isEnabled();
-		}
-		return userIsHost;
-	}
+	private String getLatitudeAndLongitudeOfAddress(Address address, BindingResult bindingResult) throws UnsupportedEncodingException {
+        GeocodeResponse geocode = this.geocodeAPIService.getGeocodeData(address.getLocation() + ", " + address.getCity());
+        if (geocode.getStatus().equals("ZERO_RESULTS")) {
+            bindingResult.rejectValue("address.location", "", "The address does not exist. Try again.");
+            return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+        } else if (!geocode.getStatus().equals("OK")) {
+            bindingResult.reject("An external error has occurred. Please try again later.");
+            return FlatController.VIEWS_FLATS_CREATE_OR_UPDATE_FORM;
+        }
+        address.setLatitude(geocode.getResults().get(0).getGeometry().getLocation().getLat());
+        address.setLongitude(geocode.getResults().get(0).getGeometry().getLocation().getLng());
 
-	private boolean validateTenant(final int flatId) {
-		boolean userIsTenantOfFlat = true;
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities().stream().noneMatch(x -> x.getAuthority().equals(AuthoritiesType.ADMIN.toString()))) {
-			String username = ((User) auth.getPrincipal()).getUsername();
-			Flat flat = this.flatService.findFlatById(flatId);
-			userIsTenantOfFlat = flat.getTenants().stream().anyMatch(x -> x.getUsername().equals(username));
-		}
-		return userIsTenantOfFlat;
-	}
+        return null;
+    }
 
 }

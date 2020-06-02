@@ -14,6 +14,8 @@ public interface FlatRepository {
 
 	Flat findById(int id);
 
+	Flat findByIdWithFullData(int id);
+
 	Set<Flat> findByHostUsername(String username);
 
 	void save(Flat flat);

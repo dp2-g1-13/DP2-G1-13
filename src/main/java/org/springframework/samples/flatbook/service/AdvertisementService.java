@@ -26,6 +26,11 @@ public class AdvertisementService {
 		return this.advertisementRepository.findById(id);
 	}
 
+    @Transactional(readOnly = true)
+    public Advertisement findAdvertisementByIdWithFullFlatData(final int id) {
+        return this.advertisementRepository.findByIdWithFullFlatData(id);
+    }
+
 	@Transactional(readOnly = true)
 	public boolean isAdvertisementWithFlatId(final int id) {
 		return this.advertisementRepository.isAdvertisementWithFlatId(id);
@@ -40,6 +45,11 @@ public class AdvertisementService {
 	public Set<Advertisement> findAllAdvertisements() {
 		return this.advertisementRepository.findAll();
 	}
+
+    @Transactional(readOnly = true)
+    public Set<Advertisement> findAllAdvertisementsOfEnabledHosts() {
+        return this.advertisementRepository.findAllOfEnabledHosts();
+    }
 
 	@Transactional
 	public void saveAdvertisement(final Advertisement advertisement) {

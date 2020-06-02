@@ -41,10 +41,7 @@ public class MessageService {
 				otherUsername = message.getReceiver().getUsername();
 			}
 
-			if (!map.containsKey(otherUsername)) {
-				map.put(otherUsername, new ArrayList<>());
-			}
-
+			map.putIfAbsent(otherUsername, new ArrayList<>());
 			map.get(otherUsername).add(message);
 
 		}

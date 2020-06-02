@@ -15,6 +15,7 @@ import org.springframework.samples.flatbook.model.Person;
 import org.springframework.samples.flatbook.model.Report;
 import org.springframework.samples.flatbook.service.PersonService;
 import org.springframework.samples.flatbook.service.ReportService;
+import org.springframework.samples.flatbook.service.exceptions.BadRequestException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -30,13 +31,14 @@ public class ReportController {
 	private static final String	REPORTS_LIST						= "reports/reportsList";
 
 	private static final String	VIEWS_REPORTS_CREATE_OR_UPDATE_FORM	= "reports/createOrUpdateReportForm";
-	
+
 	private static final String	BAD_USER_ID							= "Bad user id.";
 
 	private final PersonService	personService;
 
 	private final ReportService	reportService;
-	
+
+
 	@Autowired
 	public ReportController(final ReportService reportService, final PersonService personService) {
 		this.personService = personService;
@@ -60,7 +62,7 @@ public class ReportController {
 			model.put("report", r);
 			return ReportController.VIEWS_REPORTS_CREATE_OR_UPDATE_FORM;
 		} else {
-			throw new IllegalArgumentException(BAD_USER_ID);
+			throw new BadRequestException(ReportController.BAD_USER_ID);
 		}
 
 	}
@@ -80,7 +82,7 @@ public class ReportController {
 				return "redirect:/users/{userId}";
 			}
 		} else {
-			throw new IllegalArgumentException(BAD_USER_ID);
+			throw new BadRequestException(ReportController.BAD_USER_ID);
 		}
 	}
 
@@ -100,7 +102,7 @@ public class ReportController {
 				.sorted(Comparator.comparing(Report::getCreationDate).reversed()).collect(Collectors.toList()));
 			return ReportController.REPORTS_LIST;
 		} else {
-			throw new IllegalArgumentException(BAD_USER_ID);
+			throw new BadRequestException(ReportController.BAD_USER_ID);
 		}
 
 	}
@@ -113,7 +115,7 @@ public class ReportController {
 			this.reportService.deleteReportById(report.getId());
 			return "redirect:" + request.getHeader("Referer");
 		} else {
-			throw new IllegalArgumentException("Bad report id.");
+			throw new BadRequestException("Bad report id.");
 		}
 	}
 }
