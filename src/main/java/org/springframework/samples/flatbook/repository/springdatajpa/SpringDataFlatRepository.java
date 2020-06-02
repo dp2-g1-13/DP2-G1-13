@@ -2,7 +2,6 @@
 package org.springframework.samples.flatbook.repository.springdatajpa;
 
 import java.util.Set;
-import java.util.SortedSet;
 
 
 import org.springframework.data.domain.Page;
